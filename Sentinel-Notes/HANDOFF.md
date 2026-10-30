@@ -1,35 +1,36 @@
 # Handoff
 
-Written 2026-10-30. All three steps of the visual redesign are built. Step 3 is waiting on Tim's review.
+Written 2026-10-30. The visual redesign is built and reviewed, and the first Settings panel is built and waiting on Tim's review.
 
 ## 1. Current task and status
 
-- **Visual redesign** ([visual-redesign-design-brief.md](visual-redesign-design-brief.md), "Build"). Steps 1 and 2, plus the folder tabs, are pushed and approved. Step 3 is committed and tested in a browser:
-  - fletching links,
-  - the section list fading while typing (cut back from the full interface on 2026-10-30 because the full fade was disruptive; the full scope stays behind `data-fade-scope="full"`),
-  - the Google Docs paste fix, which Tim confirmed.
-- **Frame matched to the mockup** in `02ecbdd`: full width, an edge-to-edge section list, borderless paper fields, wider margins. Waiting on Tim's look.
-- **Settings page** ([settings-page-design-brief.md](settings-page-design-brief.md)): briefed, not built. It covers paste breaks, plus fade on/off, scope, and timing.
+- **Visual redesign** ([visual-redesign-design-brief.md](visual-redesign-design-brief.md)): built and pushed. Motion is a standing design rule in CLAUDE.md.
+- **Settings panel** ([settings-page-design-brief.md](settings-page-design-brief.md)): built in `93aa943`, not pushed, and tested in a browser.
+  - It opens from "Settings" in the header and slides in from the right.
+  - It covers the writing font, paste handling, the interface font, and the fade options (on or off, scope, and pause).
+  - Settings are saved in `story-bible/fletchery-settings.json`, never in browser storage, and an outside edit to the file shows in the open app.
+- **Premise:** the Sheet is now one box. The question set is still Tim's to edit.
 
-## 2. Files touched in step 3
+## 2. Files touched for Settings
 
-- `public/js/app.js`: `onPaste` (multi-line pastes get blank lines between paragraphs, kept in undo history through `insertText`) and `fadeChrome` (the `is-writing` class on `<html>` during typing, cleared after 2 seconds, on pointer movement, or on blur).
-- `public/css/base.css`: the fletching mark on `p a` and `.link-button` (an orange chevron SVG mask) replacing underlines, and the fade rules at the end of the file.
+- `public/js/settings.js` (new): the `Settings` class (load, merge, save with a version check, reload on outside edits) and the panel.
+- `public/js/app.js`: uses `prefs` (the writer's settings) for fonts, paste, fade, and layout choices. `readPref` and `writePref` are gone.
+- `public/index.html`: the header's Settings button and the panel's dialog.
+- `public/css/base.css`, `tokens.css`: the panel, the header button, `--color-backdrop-soft`, and `data-writing-font`.
+- `docs/SPEC.md` (decision 11), `DESIGN.md`, `CLAUDE.md`: record the settings file.
 
 ## 3. Next step
 
-Wait for Tim's review of step 3. After that, the strongest open items:
-- **The Settings page**: first settle where each setting lives (the brief's Open section), then build it.
-- **The Premise brief's open decisions:** the Sheet's questions (the Sheet is now one box, built in `45fa9c2`) and the names for the two question layouts.
+Get Tim's review of the Settings panel. Then ask which author fields he wants, and whether text zoom belongs in Settings now or waits for the formatting editor.
 
 ## 4. Open questions for Tim
 
-- Where settings are saved: personal preferences in the browser and story-level ones in `fletchery.json` was proposed, with no answer yet.
-- The tablet tier from the brief isn't designed yet. The app still has 720px and 960px points only.
+- Author info fields.
+- The AI choice in Settings: the Claude Code bridge, an Anthropic API key, or OpenRouter, and what the button says for each.
+- The formatting editor: a light toolbar or full formatting.
 
 ## 5. Tried and failed
 
-- Editing a brief without touching its TODO line trips the gate's `todo-sync` check, including on `--amend`.
-- Adding a dependency trips `spec-gate` until `docs/SPEC.md` is updated in the same commit.
-- The `raw-token-value` check runs on commit, so `sentinel:full` can pass while a commit with a raw 2px or 8px still fails.
-- If a commit fails and a second `git add` plus `git commit` follows in the same command, the second commit sweeps in everything still staged. Check the first commit before running the second.
+- The file watcher skips the server's own writes and writes with unchanged contents. Test outside edits with a real change made on disk, not through `/api/file`.
+- Editing a brief without touching its TODO line trips `todo-sync`. Commit subjects are limited to 100 characters, and bullets to 80.
+- If a commit fails and a second `git add` plus `git commit` follows in the same command, the second commit sweeps in everything still staged.
