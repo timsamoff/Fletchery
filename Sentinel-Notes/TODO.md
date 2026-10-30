@@ -6,7 +6,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 
 - [ ] Premise end to end: depth screens, paste fix, one-box Sheet built; Sheet questions and copy to do; see [premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md).
 - [ ] Visual redesign before more feature work: steps 1-3 built, frame matched, motion added throughout; see [visual-redesign-design-brief.md](visual-redesign-design-brief.md).
-- [ ] Settings page: fonts, paste, fade built; AI shown as preview (keys need a home outside the story); see [settings-page-design-brief.md](settings-page-design-brief.md).
+- [ ] Settings page: fonts, paste, fade built; AI preview; key file location set; author fields to decide; see [settings-page-design-brief.md](settings-page-design-brief.md).
 - [ ] Fletchery web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
 - [ ] Characters with images, the media library, relationships, and generated indexes.
 - [ ] Notes and media (Inbox, quick capture, maps), then the remaining sections from data for all three story types.
@@ -37,6 +37,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] G1: Decide whether the spec gate's structural triggers should also require `DESIGN.md` in the same commit.
 - [ ] T1: Add automated tests for conflict detection, the path guard, and frontmatter completeness in `server/`.
 - [ ] Consider a narrow permission rule allowing `node scratch/*.js` to cut down on prompts.
+- [ ] X1: Cross-platform pass on macOS and Linux: config folder paths, file modes, `npm link`, recursive `fs.watch`, line endings.
 
 ## Done
 

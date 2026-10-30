@@ -925,9 +925,10 @@ textarea:focus-visible {
   flex-direction: column;
   flex: 1;
 }
+/* The box starts at the page's full height and can be dragged taller; it never shrinks below what fits. */
 .writing-field.fill textarea {
-  flex: 1;
-  resize: none;
+  flex: 1 0 auto;
+  resize: vertical;
   min-height: calc(var(--line) * 9);
 }
 .section-actions {

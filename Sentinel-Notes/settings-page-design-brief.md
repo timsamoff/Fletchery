@@ -28,11 +28,12 @@ Proposed 2026-10-30. A Settings page, reached from the header, for choices that 
 - An AI section shown as a dimmed preview: None, Claude Code on this computer, Anthropic API, or OpenRouter, plus an API key field. Nothing in it works or saves yet.
 - Focus outlines are 1px everywhere (WCAG AA asks only that focus be visible). A thicker-outline switch can be added if wanted.
 
+- **API keys** (Tim, 2026-10-30): stored on the writer's computer in `fletchery-api.json`, in the standard per-user config folder, never in a story folder. Windows: `%APPDATA%\Fletchery\`. macOS: `~/Library/Application Support/Fletchery/`. Linux: `$XDG_CONFIG_HOME/fletchery/`, falling back to `~/.config/fletchery/`. On macOS and Linux the folder is created with mode 700 and the file with 600; on Windows the user's AppData is already private to them. Only the local server reads or writes it; the page sees a masked key (the last four characters). Built with the AI section.
+- **Text zoom** waits for the formatting editor.
+
 ## Open
 
-- **API keys must not live in the story folder.** `fletchery-settings.json` sits in the story's `story-bible/`, and stories are git repos, so a key saved there would be committed. Keys need a home outside the story folder before the AI section goes live.
-- **Author info:** which fields.
-- **Text zoom** for the writer's text.
+- **Author info.** Research (2026-10-30): working story bibles rarely carry author fields beyond a name. TV series bibles add a "created by" credit and contact details on the title page, but that belongs to a pitch document. Writing tools such as Scrivener keep one author name per project, often a pen name, for title pages and exports. Proposal: one "Author name" (as credited, so a pen name works), plus optional co-authors.
 
 - **AI choices in Settings:** the Claude Code bridge, an Anthropic API key, or OpenRouter (see SPEC.md and the web edition brief), and what the button calls each.
 - **The page's layout and how it opens:** a page of its own, or a panel over the editor.
