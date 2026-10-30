@@ -1,13 +1,13 @@
 # Handoff
 
-Updated 2026-10-30. Committed through `0b90d22`. The latest commits may not be pushed: check `git status -sb`.
+Updated 2026-10-30. Committed through `5d49b63`. The latest commits may not be pushed: check `git status -sb`.
 
 ## 1. Current task and status
 
 TODO item "Premise end to end", in three steps:
 
 1. **DESIGN.md:** done (`0b90d22`), waiting on Tim's review.
-2. **Shared core and storage interface:** next, not started. Move frontmatter parsing and serialization and the entry templates into `public/js/core/`, and add the storage interface with `LocalServerStore` as its only backend (see `DESIGN.md`, "Target structure").
+2. **Shared core and storage interface:** done (`5d49b63`), tested in Playwright. Waiting on Tim's own browser test.
 3. **Premise on top of the core:** depth control, status, guided questions in Interview and Full form modes, and section navigation from `sections/prose.json` (only Premise linked). Fold in TODO Q1 and R4.
 
 ## 2. Files touched this session
@@ -21,7 +21,7 @@ TODO item "Premise end to end", in three steps:
 
 ## 3. Next step
 
-After Tim reviews DESIGN.md, start step 2: create `public/js/core/entry.js` (parse and serialize, ported from `server/bible.js`) and `public/js/core/store.js` (the interface plus `LocalServerStore` over the existing API). Then switch `app.js` to them and confirm the skeleton still behaves the same in the browser, including conflicts.
+After Tim's browser test, start step 3: add `sections/prose.json` (Premise fully defined, the other sections listed), a section list in the page from it, and Premise's depth control, status, and Interview and Full form modes, all built on `public/js/core/`.
 
 ## 4. Open questions for Tim
 
@@ -34,4 +34,5 @@ After Tim reviews DESIGN.md, start step 2: create `public/js/core/entry.js` (par
 ## 5. Tried and failed
 
 - `fetch()` followed by `process.exit()` crashed Node on Windows. The session hook uses `node:https` instead.
-- Stopping a background `fletcherling` task can leave Node running on port 3000. Kill it by PID.
+- Stopping a background `fletcherling` task can leave Node running. Kill it by PID, and ignore netstat's stale `LISTENING ... 0` lines (PID 0) when looking for the real one.
+- The `yaml` browser build has no default export. Import `parse` and `stringify` by name.
