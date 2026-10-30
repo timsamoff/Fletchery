@@ -1,38 +1,36 @@
 # Handoff
 
-Updated 2026-10-30. Committed through `5d49b63`. The latest commits may not be pushed: check `git status -sb`.
+Updated 2026-10-30. Committed through `db92857` (plus this handoff). Check `git status -sb` for unpushed commits.
 
 ## 1. Current task and status
 
-TODO item "Premise end to end", in three steps:
+TODO item "Premise end to end": **built, waiting on Tim's review.** Steps 1 (DESIGN.md), 2 (shared core), and 3 (Premise on the core) are done and tested in Playwright.
 
-1. **DESIGN.md:** done (`0b90d22`), reviewed by Tim.
-2. **Shared core and storage interface:** done (`5d49b63`), tested in Playwright. Waiting on Tim's own browser test.
-3. **Premise on top of the core:** depth control, status, guided questions in Interview and Full form modes, and section navigation from `sections/prose.json` (only Premise linked). Fold in TODO R4 (Q1 is fixed).
+## 2. Files touched (this phase)
 
-## 2. Files touched this session
-
-- `docs/SPEC.md`: a Web edition section (optional AI through Anthropic or OpenRouter, local or Drive storage, shared core).
-- `Sentinel-Notes/web-edition-design-brief.md`, `layout-views-design-brief.md`: new briefs.
-- `DESIGN.md`: the new architecture overview.
-- `CLAUDE.md`, `PROJECT_PROFILE.md`: docs routing now includes DESIGN.md.
-- `Sentinel-Notes/TODO.md`: web edition, layout views, and G1 items.
-- `.gitignore`: `Sentinel-Prompts/` ignored.
+- `sections/prose.json`, `screenplay.json`, `game.json`: section IDs and titles, with Premise fully defined using the drafted questions as placeholders.
+- `public/js/core/layers.js`: the Seed, Sketch, and Sheet layers in an entry body.
+- `public/js/core/entry.js`: `updateEntry` with the status rules (settling, and the drop back to draft on edit).
+- `public/js/app.js`: section list, depth control, Interview and Full form, settling, Skip, and save status by the editor.
+- `public/css/base.css`: workspace and nav layout, question card, context layers, 44px buttons on the grid, disabled and pressed states.
+- `server/server.js`: serves `/sections/*.json`.
+- `README.md`, `sentinel-gate/readme-map.json`, `docs/SPEC.md` (section lists, entry depths), `DESIGN.md`, `CLAUDE.md`, TODO, Premise brief, checklist.
+- `sentinel-gate/check.js`: quiet git lookups.
 
 ## 3. Next step
 
-After Tim's browser test, start step 3: add `sections/prose.json` (Premise fully defined, the other sections listed), a section list in the page from it, and Premise's depth control, status, and Interview and Full form modes, all built on `public/js/core/`.
+Wait for Tim's review of Premise. Apply his question edits to `sections/*.json` when they arrive. After approval, the next build phase is Characters with images, the media library, relationships, and indexes, or the web edition's remaining core work. Ask which.
 
 ## 4. Open questions for Tim
 
-- **Premise questions:** Tim is sending edits. Use the drafts in `premise-end-to-end-design-brief.md` until then.
+- **Premise:** review, and edits to the question set.
 - **Layout views brief:** which views, one file per scene or not, and whether to prototype first.
 - **Web edition brief:** hosting, a Claude Code option in local-folder mode, build order, and Drive for desktop.
 - **G1:** should the spec gate also require DESIGN.md?
-- **Session hook test:** confirmed working. The handoff appeared at the start of this session.
 
 ## 5. Tried and failed
 
-- `fetch()` followed by `process.exit()` crashed Node on Windows. The session hook uses `node:https` instead.
-- Stopping a background `fletcherling` task can leave Node running. Kill it by PID, and ignore netstat's stale `LISTENING ... 0` lines (PID 0) when looking for the real one.
+- `fetch()` followed by `process.exit()` crashed Node on Windows. The session hook uses `node:https`.
+- netstat on this machine lists stale `LISTENING` lines and is unreliable for finding test servers. Check with `curl` on the port, find the PID with `netstat -ano | grep ":PORT "`, then confirm with `curl` after `taskkill`.
 - The `yaml` browser build has no default export. Import `parse` and `stringify` by name.
+- Inline `<button>` elements sit on the text baseline and add a pixel. Use `display: block` for button-styled links.
