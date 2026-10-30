@@ -1176,6 +1176,10 @@ textarea:focus-visible {
   font-family: var(--font-serif);
   font-weight: 600;
 }
+/* Literata's letters sit low in their line box, so the gear drops to meet the word's visual middle. */
+.settings-bar h2 svg {
+  transform: translateY(calc(var(--space-1) / 2));
+}
 .settings-body {
   flex: 1;
   overflow: auto;
