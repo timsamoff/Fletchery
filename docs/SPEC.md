@@ -78,7 +78,7 @@ What each section covers is in the approved plan and `first-prompt/FLETCHERLING-
 
 ### Entry depths (built 2026-10-30)
 
-An entry's body holds up to three layers under `## Seed`, `## Sketch`, and `## Sheet` headings, and Sheet fields are `###` subsections named by their labels. Only layers with text are written. A body with no layer headings is read as the Seed, and text the app doesn't recognize is kept. Frontmatter `depth` is the deepest layer with text. Status is empty or draft from the text, and settled only by the writer. Editing a settled entry's text returns it to draft.
+An entry's body holds up to three layers under `## Seed`, `## Sketch`, and `## Sheet` headings, and Sheet fields are `###` subsections named by their labels. Only layers with text are written. A body with no layer headings is read as the Seed, and text the app doesn't recognize is kept. Frontmatter `depth` is the deepest layer with text. Status is empty or draft from the text, and canon only by the writer. Editing a canon entry's text returns it to draft. (Renamed from "settled" on 2026-10-30: "canon" is the term writers use for established bible facts, and "final" would imply a fact never changes. Files with `status: settled` read as canon.)
 
 ## Web edition (decided 2026-10-30)
 
@@ -87,7 +87,7 @@ Fletcherling also runs as a static web app, with no install and no server. Worki
 - **AI is a choice.** A writer can work without AI, or connect a provider: Anthropic (API key) or OpenRouter (sign-in or key), which reaches OpenAI, Google, and other models. Choosing no AI shows plainly which features go away. The guided interview, depths, status, indexes, `BIBLE.md`, link suggestions, and the structural audit all work without AI.
 - **Provider interface.** Each provider sits behind one adapter interface, so more can be added later (direct Gemini, local Ollama). Every AI response is validated against the expected proposal or draft format before anything is written, and a response that fails shows a clear message instead of producing a broken file.
 - **Storage is a choice.** On this computer (a folder the writer picks), or Google Drive. The bible format is identical in both, and in the local edition.
-- **Same rules for AI writing.** API-generated content follows the same rules as Claude Code: proposals for existing text, `author: ai-draft` for new entries, and nothing settled without the writer.
+- **Same rules for AI writing.** API-generated content follows the same rules as Claude Code: proposals for existing text, `author: ai-draft` for new entries, and nothing becomes canon without the writer.
 - **Shared core.** Entry templates, index and `BIBLE.md` generation, link handling, and the audit live in browser-side modules behind one storage interface. The local server becomes one storage backend among several.
 - **Shared core, first step (built 2026-10-30).** The local server is now a plain file store with a version check on every change. Frontmatter parsing, serialization, and new-entry rules live in `public/js/core/entry.js`, which runs in the browser and in Node through an import map that points the bare name `yaml` at the package's browser build. The page validates and writes `fletcherling.json` itself.
 - **Network.** The web edition contacts Google only when Drive storage is chosen, and an AI provider only when one is connected. Fonts stay self-hosted, and nothing else leaves the browser.
@@ -99,7 +99,7 @@ Fletcherling also runs as a static web app, with no install and no server. Worki
 Each of these is a default. Any of them can be changed during plan review.
 
 1. **AI writing versus "never overwrites."** The `fletcherling-process` skill writes results back to the bible, but the AI never overwrites writer text. Default: the AI may create a new entry, or fill an empty one, directly as `author: ai-draft`. Any change to existing text goes through a proposal.
-2. **Settling.** Depth and status are independent. Settling an entry sets `status: settled`. If the entry was `ai-draft`, settling also sets `author: ai-reviewed`. A writer edit alone doesn't change `author`.
+2. **Canon.** Depth and status are independent. Marking an entry as canon sets `status: canon` (originally `settled`). If the entry was `ai-draft`, it also sets `author: ai-reviewed`. A writer edit alone doesn't change `author`.
 3. **Character depths.** Seed is the one-sentence storyline and Sketch is the one-paragraph storyline. Sheet is the full field list. The same pattern applies to other per-item entries: Seed and Sketch are their one-line and one-paragraph summaries.
 4. **Depth scope.** Depth levels apply to section entries only. Notes have no depth, as the prompt says.
 5. **World images.** World's single documents (culture, history, rules) share `world/images/`. Each location keeps its images in its own folder.

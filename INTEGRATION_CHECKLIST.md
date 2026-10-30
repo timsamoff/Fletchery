@@ -50,7 +50,7 @@ Folded in from `PROJECT_PROFILE.md`'s follow-up list:
 - [ ] **3.2 Navigation.** The section appears in the section list, if navigation is built (an open question in the Premise brief). Missing: **silent**. The section exists but can't be reached. [plan]
 - [ ] **3.3 Live updates.** The page's server-sent-events listener accepts changes for the section's files. Today `listen()` in `app.js` drops any change whose path isn't `ENTRY_PATH`, so a new section's outside edits would never appear. **Silent**. [code]
 - [ ] **3.4 Conflict detection.** Every save path sends `baseHash`, and every conflict view keeps "Your version" current. Real example: "Your version" froze when the panel opened and was fixed during the skeleton build. **Silent**. [history]
-- [ ] **3.5 Status shown without color alone.** Empty, draft, and settled each get a text label and a shape. Missing: **silent** for colorblind users. [plan]
+- [ ] **3.5 Status shown without color alone.** Empty, draft, and canon each get a text label and a shape. Missing: **silent** for colorblind users. [plan]
 
 ### 4. Generated files (App and Skills)
 

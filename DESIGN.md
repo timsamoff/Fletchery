@@ -22,7 +22,7 @@ As of the Premise step:
 | `server/bible.js` | File storage inside `story-bible/`: the path guard, atomic writes, list, delete, move, and content hashing. It knows nothing about entries. |
 | `server/watch.js` | Recursive `fs.watch` on the bible. It reports a change only when a file's content hash differs from the last one seen or written. |
 | `public/index.html` | Page shell: skip link, header, `main`, and footer with the save-status live region. |
-| `public/js/app.js` | First-run setup, the section list, and the section editor: depth control, Interview and Full form modes, status and settling, Skip for now, autosave, live updates, and the conflict panel. |
+| `public/js/app.js` | First-run setup, the section list, and the section editor: depth control, Interview and Full form modes, status and marking canon, Skip for now, autosave, live updates, and the conflict panel. |
 | `public/js/core/layers.js` | The Seed, Sketch, and Sheet layers inside an entry body. Unknown text is kept. |
 | `sections/<type>.json` | Section definitions for each story type: IDs, titles, and for built sections the why-it-matters line, guiding questions, and fields at each depth. Served at `/sections/`. |
 | `public/js/core/entry.js` | Entry files: frontmatter parsing and serialization, new-entry frontmatter, and the body update rules. It imports the bare name `yaml`, which the page's import map points at `/vendor/yaml/` and Node resolves from `node_modules`, so the same module runs in both. |
@@ -93,7 +93,7 @@ The core talks to storage only through one interface:
 | Claude Code | Local | "Ask Claude" writes a request file to `story-bible/.fletcherling/requests/`. The `fletcherling-process` skill handles it in a Claude Code session and writes the results back. |
 | Provider adapter | Web | Anthropic or OpenRouter, called from the browser with the writer's own key or sign-in. Every response is validated before anything is written. |
 
-Both routes follow the same writing rules. Changes to existing text become proposal files in `story-bible/.fletcherling/proposals/`, which the writer accepts or rejects. New entries are marked `author: ai-draft` until the writer settles them.
+Both routes follow the same writing rules. Changes to existing text become proposal files in `story-bible/.fletcherling/proposals/`, which the writer accepts or rejects. New entries are marked `author: ai-draft` until the writer marks them as canon.
 
 ### Views
 

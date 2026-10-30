@@ -1,5 +1,5 @@
 // First-run setup, section navigation, and the section editor, with live sync and conflict handling.
-import { parseEntry, updateEntry } from './core/entry.js';
+import { normalizeStatus, parseEntry, updateEntry } from './core/entry.js';
 import { DEPTHS, deepestFilled, parseLayers, serializeLayers } from './core/layers.js';
 import { LocalServerStore, StoreConflict } from './core/store.js';
 
@@ -10,7 +10,7 @@ const WIDE = window.matchMedia('(min-width: 960px)');
 const STATUS = {
   empty: { shape: '○', word: 'Empty' },
   draft: { shape: '◐', word: 'Draft' },
-  settled: { shape: '●', word: 'Settled' },
+  canon: { shape: '●', word: 'Canon' },
 };
 
 const view = document.getElementById('view');
@@ -204,7 +204,7 @@ const composedBody = () => serializeLayers(state.layers, sheetFields());
 const isDirty = () => composedBody() !== state.savedBody;
 const entryPath = () => state.section.file;
 const template = () => ({ title: state.section.title, type: state.section.id });
-const statusOf = () => STATUS[state.frontmatter.status] ?? STATUS.empty;
+const statusOf = () => STATUS[normalizeStatus(state.frontmatter.status)] ?? STATUS.empty;
 const skipped = () => Boolean(state.settings.sections?.[state.section.id]?.skipped);
 
 async function showEditor(settings, settingsVersion) {
@@ -246,7 +246,7 @@ async function showEditor(settings, settingsVersion) {
         <div id="work"></div>
         <p class="local-status" id="local-status" aria-hidden="true"></p>
         <div class="button-row section-actions">
-          <button type="button" class="button" id="settle"></button>
+          <button type="button" class="button" id="canon"></button>
           <button type="button" class="button button-quiet" id="skip">Skip for now</button>
           <button type="button" class="button button-quiet" id="ask-claude" disabled aria-describedby="ask-claude-note">Ask Claude</button>
         </div>
@@ -272,7 +272,7 @@ async function showEditor(settings, settingsVersion) {
   ).join('');
   document.querySelectorAll('[name=depth]').forEach((r) => r.addEventListener('change', () => setDepth(r.value, false)));
   document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
-  document.getElementById('settle').addEventListener('click', toggleSettled);
+  document.getElementById('canon').addEventListener('click', toggleCanon);
   document.getElementById('skip').addEventListener('click', skipSection);
 
   try {
@@ -324,10 +324,10 @@ function renderNav() {
 function renderStatus() {
   const st = statusOf();
   document.getElementById('status-badge').innerHTML = `<span aria-hidden="true">${st.shape}</span> ${st.word}`;
-  const settle = document.getElementById('settle');
-  const settled = state.frontmatter.status === 'settled';
-  settle.textContent = settled ? 'Back to draft' : 'Mark settled';
-  settle.disabled = !settled && !composedBody().trim();
+  const button = document.getElementById('canon');
+  const isCanon = normalizeStatus(state.frontmatter.status) === 'canon';
+  button.textContent = isCanon ? 'Back to draft' : 'Mark as canon';
+  button.disabled = !isCanon && !composedBody().trim();
   const fm = state.frontmatter;
   const updated = fm.updated ? new Date(fm.updated).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'never';
   const row = (label, value) => `<div><dt>${label}</dt><dd>${esc(value ?? 'not set')}</dd></div>`;
@@ -504,16 +504,16 @@ async function save() {
   if (isDirty()) state.timer = setTimeout(save, SAVE_DELAY_MS);
 }
 
-async function toggleSettled() {
+async function toggleCanon() {
   if (state.conflict || state.saving) return;
   clearTimeout(state.timer);
-  const settling = state.frontmatter.status !== 'settled';
+  const makingCanon = normalizeStatus(state.frontmatter.status) !== 'canon';
   state.saving = true;
-  const result = await writeEntry({ settle: settling });
+  const result = await writeEntry({ canon: makingCanon });
   state.saving = false;
   if (!result) return;
-  setStatus(settling ? `${state.section.title} settled.` : `${state.section.title} is back to draft.`);
-  document.getElementById('settle').focus();
+  setStatus(makingCanon ? `${state.section.title} is now canon.` : `${state.section.title} is back to draft.`);
+  document.getElementById('canon').focus();
 }
 
 // Skips live in fletcherling.json. A conflicting write rereads the file and tries once more.
