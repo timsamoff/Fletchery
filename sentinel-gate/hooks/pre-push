@@ -1,0 +1,3 @@
+#!/bin/sh
+# Sentinel: full-repo scan before each push. Source of truth: sentinel-gate/check.js.
+exec node "$(git rev-parse --show-toplevel)/sentinel-gate/check.js" --full --pre-push "$1" "$2"

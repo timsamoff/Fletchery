@@ -1,0 +1,72 @@
+[
+  {
+    "rule": "color-literal",
+    "file": "public/css/base.css",
+    "content": "repeating-linear-gradient(to bottom, transparent 0 3px, rgb(42 45 50 / 0.05) 3px 4px);"
+  },
+  {
+    "rule": "raw-token-value",
+    "file": "public/css/base.css",
+    "content": "text-decoration-thickness: 2px;"
+  },
+  {
+    "rule": "raw-token-value",
+    "file": "public/css/base.css",
+    "content": "outline-offset: 2px;"
+  },
+  {
+    "rule": "raw-token-value",
+    "file": "public/css/base.css",
+    "content": "width: 48px;"
+  },
+  {
+    "rule": "raw-token-value",
+    "file": "public/css/base.css",
+    "content": "height: 48px;"
+  },
+  {
+    "rule": "raw-token-value",
+    "file": "public/css/base.css",
+    "content": "padding: 4px var(--space-3);"
+  },
+  {
+    "rule": "raw-token-value",
+    "file": "public/css/base.css",
+    "content": "min-height: calc(var(--line) * 6 + 28px);"
+  },
+  {
+    "rule": "raw-token-value",
+    "file": "public/css/base.css",
+    "content": "grid-template-columns: 28px 1fr;"
+  },
+  {
+    "rule": "raw-token-value",
+    "file": "public/css/base.css",
+    "content": "margin: 4px 0 0;"
+  },
+  {
+    "rule": "raw-token-value",
+    "file": "public/css/base.css",
+    "content": "border-left: 4px solid var(--color-accent);"
+  },
+  {
+    "rule": "raw-token-value",
+    "file": "public/css/base.css",
+    "content": "border-top: 8px solid var(--color-accent);"
+  },
+  {
+    "rule": "raw-token-value",
+    "file": "public/css/base.css",
+    "content": "min-height: calc(var(--line) * 4 + 28px);"
+  },
+  {
+    "rule": "raw-token-value",
+    "file": "public/css/base.css",
+    "content": "var(--color-grid) 27px 28px"
+  },
+  {
+    "rule": "raw-token-value",
+    "file": "public/css/base.css",
+    "content": "repeating-linear-gradient(to bottom, transparent 0 3px, rgb(42 45 50 / 0.05) 3px 4px);"
+  }
+]

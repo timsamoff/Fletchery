@@ -23,11 +23,11 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] R2: Decide whether forms must take whole 28px lines, and fix the setup form if so.
 - [ ] R3: Align the conflict panel's width with the text area below it.
 - [ ] R4: Make save status visible near the editor on tall pages.
-- [ ] S1: Replace raw 28px, 4px, 8px, and 2px values in `base.css` with their tokens, and tokenize the 82px header and footer height (S2).
+- [ ] S1: Clear the 13 baselined raw-token-value items in `base.css`, and tokenize the 82px header and footer height (S2).
 - [ ] S3: Use role tokens instead of palette tokens for `.choice input` and `.button:hover`.
 - [ ] S4: Add a `--font-mono` token for the monospace stack.
 - [ ] S5: Use or remove the unused tokens `--unit`, `--baseline`, `--space-6`, and `--color-border-quiet`.
-- [ ] C1: Replace the hardcoded overlay color with a token, and derive `--color-grid` from `--color-orange` (C2).
+- [ ] C1: Clear the 1 baselined color-literal item (overlay color), and derive `--color-grid` from `--color-orange` (C2).
 - [ ] B2: Keep the project path from dominating the footer at phone width.
 - [ ] A1: Add automated axe accessibility checks for the setup and editor pages.
 - [ ] A2: Add `:disabled` and `:active` styles for buttons and fields.
@@ -37,9 +37,10 @@ Conventions: when an item is finished, move its line to the Done section at the 
 
 - [ ] T1: Add automated tests for conflict detection, the path guard, and frontmatter completeness in `server/`.
 - [ ] Consider a narrow permission rule allowing `node scratch/*.js` to cut down on prompts.
-- [ ] Decide whether `Sentinel-Prompts/` should be tracked in git.
+- [ ] Decide whether to track `Sentinel-Prompts/`; the session hook's weekly version check skips remote sessions until it is.
 
 ## Done
 
 - [x] Phase 0: interview, SPEC.md, plan approval.
 - [x] Skeleton, approved (commit 8597841).
+- [x] Gate candidates from the design audit: color literals, raw token values, and TODO format implemented; axe deferred to A1; frontmatter completeness deferred to T1.

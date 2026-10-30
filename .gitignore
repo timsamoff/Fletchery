@@ -2,3 +2,4 @@ node_modules/
 .playwright-mcp/
 scratch/
 first-prompt/
+Sentinel-Notes/.sentinel-version-check

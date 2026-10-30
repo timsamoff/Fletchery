@@ -1,0 +1,3 @@
+#!/bin/sh
+# Sentinel: message and staged-content checks. Source of truth: sentinel-gate/check.js.
+exec node "$(git rev-parse --show-toplevel)/sentinel-gate/check.js" --msg "$1"

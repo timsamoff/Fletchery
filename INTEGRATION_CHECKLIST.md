@@ -147,3 +147,35 @@ These are real touchpoints that a commit hook can't check mechanically:
 - **Format changes:** the skills surface reads the bible format independently, so a format change can pass every check in the app and still break the skills (5.1). The full-repo scan can check names. It can't check meaning.
 - **Axe checks (6.3)** need a running server and a browser. That's too heavy for each commit, so they belong in the full-repo scan or a manual command.
 - **No exceptions are proposed at this time.**
+
+## Implementation status (Sentinel 03, 2026-10-29)
+
+Built in `sentinel-gate/` and tested with real commits in a scratch clone (70 cases), a scratch remote for the push checks, and the four real past commit messages, all of which pass.
+
+**How it runs:**
+- `commit-msg` hook (`sentinel-gate/hooks/commit-msg`): message rules plus every staged-content rule. It runs all checks in one pass, rather than splitting them across a `pre-commit` hook, because only `commit-msg` can see a `Sentinel-Override:` trailer. It reads the index, never the working tree.
+- `pre-push` hook (`sentinel-gate/hooks/pre-push`): the full scan of HEAD, the messages of the commits being pushed (which catches `--no-verify` commits), and the hook-integrity check. It blocks only on violations missing from `sentinel-gate/baseline.json`, which is counted by line content, so a copy of a known line still blocks.
+- Installed by `npm install` (the `prepare` script sets `core.hooksPath`), or by hand with `npm run sentinel:install`. The hook files are tracked and executable (`100755`) and kept LF by `.gitattributes`.
+- By hand: `npm run sentinel:full` (blocking scan), `npm run sentinel:report` (every item, baseline ignored), and `npm run sentinel:spec-reviewed` (records a SPEC reread).
+- Files: `sentinel-gate/exceptions.json` (standing exceptions, where the checklist above says `sentinel-exceptions.json`), `sentinel-gate/readme-map.json` (where it says `sentinel-readme-map.json`), `sentinel-gate/known-extensions.txt`, `sentinel-gate/baseline.json`.
+
+| Item | Status |
+|---|---|
+| 1.1, 1.3, 2.1, 2.4, 2.5, 3.1, 3.2, 3.5, 4.1-4.3, 5.1 | Not gateable mechanically yet: they're runtime behavior or planned files. See Known gaps. |
+| 1.2 Hardcoded section names | Deferred: no `sections/*.json` exists to compare against. The full scan's section-consistency rule turns on when it does. |
+| 2.2, 2.3, 3.3, 3.4 | Deferred to automated tests (TODO T1). |
+| 6.1 Color literals | Implemented: `color-literal`, CSS/HTML/JS, with tokens.css exempt from this rule only. Named colors are checked in CSS and HTML attributes, not in JS strings, which is a known limit. |
+| 6.2 Raw token values | Implemented: `raw-token-value`, resolved against the staged `tokens.css` (`--line`, `--space-N`, `--border`). |
+| 6.3 Axe checks | Deferred: needs a running server and a browser (TODO A1). |
+| 6.4 Rhythm | Not gateable: checked by eye with "Show grid". |
+| 7.1 SPEC on new sections | Implemented in `spec-gate` (new section ids in `sections/*.json`). |
+| 7.2 Comments match intent | Not gateable. |
+| CLAUDE.md gate | Implemented: `claude-md-gate`. |
+| README gate, both layers | Implemented: `readme-gate` and `readme-map` (presence only, which the output says). |
+| SPEC gate | Implemented: `spec-gate`. Tooling folders (`sentinel-gate/`, `.claude/`) are exempt from the new-folder trigger. A non-blocking reread reminder runs in the full scan at each version bump or after 90 days. |
+| TODO sync and format | Implemented: `todo-sync` (hard, overridable), `todo-format` (one line, at most 200 characters, no sub-lines), and a non-blocking reminder when code changes without TODO.md. |
+| Commit message | Implemented: subject at most 100 characters; body of up to 5 `- ` bullets of at most 80 characters, with one indented continuation and at most 160 combined; prose and multi-paragraph bodies are hard blocks; attribution, agent-voice phrases, and unlisted trailers are blocked. |
+| New file type (standing default) | Implemented: `new-file-type`. It blocks once, asks three questions, and appends to `known-extensions.txt`. |
+| Exceptions and override | Implemented. `Sentinel-Override:` bypasses only the overridable rules (doc gates, TODO sync, README map, bullet count). It can't be verified as human-written. |
+
+**Pre-existing backlog (baseline, 14):** `color-literal` 1 (audit C1) and `raw-token-value` 13 (audit S1/S2), all in `public/css/base.css`.
