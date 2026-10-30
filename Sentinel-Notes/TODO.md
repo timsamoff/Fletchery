@@ -37,10 +37,10 @@ Conventions: when an item is finished, move its line to the Done section at the 
 
 - [ ] T1: Add automated tests for conflict detection, the path guard, and frontmatter completeness in `server/`.
 - [ ] Consider a narrow permission rule allowing `node scratch/*.js` to cut down on prompts.
-- [ ] Decide whether to track `Sentinel-Prompts/`; the session hook's weekly version check skips remote sessions until it is.
 
 ## Done
 
 - [x] Phase 0: interview, SPEC.md, plan approval.
 - [x] Skeleton, approved (commit 8597841).
 - [x] Gate candidates from the design audit: color literals, raw token values, and TODO format implemented; axe deferred to A1; frontmatter completeness deferred to T1.
+- [x] Sentinel-Prompts/ is gitignored by decision; the session hook's weekly version check runs only on this machine.
