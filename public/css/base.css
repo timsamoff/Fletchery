@@ -51,13 +51,13 @@ h1 {
   font-size: var(--text-h1);
   line-height: var(--leading-h1);
   font-weight: 700;
-  margin-bottom: var(--space-3); /* 40 + 16 = 2 lines */
+  margin-bottom: var(--space-3); /* two whole lines */
 }
 h2 {
   font-size: var(--text-h2);
   line-height: var(--leading-h2);
   font-weight: 700;
-  margin-bottom: var(--space-4); /* 32 + 24 = 2 lines */
+  margin-bottom: var(--space-4); /* two whole lines */
 }
 h3 {
   font-size: var(--text-h3);
@@ -115,7 +115,7 @@ code {
   border-bottom: var(--border) solid var(--color-border);
 }
 .site-header .wrap {
-  min-height: 82px; /* plus the 2px border */
+  min-height: 82px; /* 84 with the border */
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -142,7 +142,7 @@ code {
 }
 
 main {
-  padding-block: calc(var(--line) * 2); /* keeps content on the 28px lines below the 84px header */
+  padding-block: calc(var(--line) * 2); /* keeps content on the line grid below the header */
 }
 main:focus {
   outline: none;
@@ -160,7 +160,7 @@ main:focus {
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-1) var(--space-4);
-  padding-block: 12px; /* two wrapped lines (56) + 24 + 2px border = 82, so min-height holds it at 84 */
+  padding-block: 12px; /* holds at 84px even when the text wraps */
 }
 .site-footer p {
   margin: 0;
@@ -214,10 +214,10 @@ textarea {
   background: var(--color-surface);
   border: var(--border) solid var(--color-border);
   border-radius: var(--radius);
-  padding: 4px var(--space-3); /* 28 + 8 + 4 = 40 */
+  padding: 4px var(--space-3); /* 40px tall */
 }
 textarea {
-  padding-block: 12px; /* 12 + 2 on each side = one line */
+  padding-block: 12px; /* padding and border add one whole line */
   resize: vertical;
   min-height: calc(var(--line) * 6 + 28px);
 }

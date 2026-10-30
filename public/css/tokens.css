@@ -1,7 +1,4 @@
-/* Every color, size, and spacing value the app uses. Change them here.
-   Colors come from assets/fletcherling-icon.svg. Contrast on cream:
-   charcoal 11.74:1, mid charcoal 8.98:1, spine charcoal on orange 4.61:1,
-   orange 3.04:1 (focus rings, borders, marks, and large text only). */
+/* Every color, size, and spacing value the app uses. Contrast rules are in CLAUDE.md. */
 
 @font-face {
   font-family: 'Source Sans 3';

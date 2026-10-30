@@ -1,0 +1,52 @@
+# Fletcherling
+
+Local web app that walks a writer through building a Story Bible, saved as Markdown and images in `./story-bible/` inside a story project.
+
+This file and `Sentinel-Notes/` are committed to the public repo by deliberate choice, so remote sessions get the same context.
+
+## Project
+
+- Brief: `first-prompt/FLETCHERLING-PROMPT.md` (untracked; see TODO Doc1). Decisions: `docs/SPEC.md`, which wins where the two differ and serves as the design document.
+- Approved plan: `C:\Users\Tim\.claude\plans\bubbly-enchanting-trinket.md` (outside the repo; see TODO Doc1).
+- Backlog: `Sentinel-Notes/TODO.md`. Project profile: `PROJECT_PROFILE.md`.
+- Stop after each phase for Tim's review. Test in a real browser before saying anything works.
+- Load the tim-writing-style skill before writing UI copy or docs.
+- Stack: Node `http`, plain HTML/CSS/JS, no build step. Launch with `fletcherling` from a story project.
+- Tim keeps stories in `Documents/_Writing/<story>/`, each its own private git repo, and runs `fletcherling` from inside the story folder. App code and story data never mix.
+- Write one-off verification scripts to `scratch/` (gitignored), not the OS temp folder. Playwright saves to `.playwright-mcp/` (gitignored).
+
+## Design rules
+
+- Colors: icon colors only, on cream. No white text. Tokens live in `public/css/tokens.css`. Contrast on cream `#F1ECE2`: charcoal 11.74:1, mid charcoal 8.98:1, orange 3.04:1. Spine charcoal on orange is 4.61:1. Orange never carries small text. It's for button fills, focus rings, borders, status marks, link underlines, and large text.
+- Rhythm: 8px base unit, 4px baseline, 28px body line. Every vertical size is a multiple of 4, and blocks take whole 28px lines where possible. The 84px header is 82px plus a 2px border, and `main` has two lines of top padding, so content starts on a line. Text fields are 28px plus 12px padding plus a 2px border on each side, which comes to 40px for inputs and one extra line for text areas.
+- Breakpoint: 720px, repeated in two media queries because CSS custom properties can't be used there.
+
+## Working conventions
+
+- **Comments:** one or two sentences at most, saying what the code is for or why. Longer background, history, or reasoning goes here, or into `docs/SPEC.md` if it's an architectural decision.
+- **Documentation routing:** a tracked, unresolved inconsistency goes to `Sentinel-Notes/TODO.md` (plus a one-line pointer here if it could be mistaken for convention). A settled operational convention goes here. A settled architectural decision goes in `docs/SPEC.md`. Anything an external user needs goes in the README. A declined suggestion is either "not now" (TODO) or a settled rejection (here or SPEC.md, with the reason).
+- **TODO items:** one line each, and anything longer gets `Sentinel-Notes/<issue>-design-brief.md`. Move a finished item's line to the Done section at the bottom. Move a finished item's brief to `Sentinel-Notes/archive/`. Updating `TODO.md` is part of finishing the work, not a follow-up.
+- **After finishing a TODO item:** name the item most worth doing next with a reason, then start on it unless Tim redirects. TODO items carry no priority, effort, or dependency data, so the pick is judgment from the item text, and should be stated that way. If two are close, name both with a one-line reason each, then proceed on the stronger.
+- **Backlog mention:** when any distinct task reaches a natural stopping point, check whether `Sentinel-Notes/TODO.md` has open items not touched or acknowledged since the task started, and if so, name the strongest candidate before ending the response. Skip this if the backlog was already surfaced this session and nothing changed.
+- **Commits:** single-line summary by default, a few single-sentence bullets only when genuinely needed, written as Tim's own description of the change. No co-author or other trailers. Commit or push only when Tim asks, except the handoff file below.
+
+## Sessions
+
+- **Remote sessions:** Tim sometimes works away from this machine. This file and `Sentinel-Notes/` are committed so remote sessions see them.
+- **Read order at session start:** before answering the first message, whatever it is, read `Sentinel-Notes/HANDOFF.md` if it exists, then the open items in `Sentinel-Notes/TODO.md`. If a handoff exists, say briefly what it describes before starting anything else. Check it against `git status`, and say so if there are uncommitted changes it doesn't account for.
+- **Handoff:** `Sentinel-Notes/HANDOFF.md`, replacing any earlier version, under one page. Write it when work stops unfinished: Tim wraps up, a usage or context limit approaches, or a task is left partway. Rewrite it whenever the state of unfinished work changes (a step finishes, the plan changes, an attempt fails), so an abrupt end leaves it at most one step behind. Clear it once the work it describes is done. Contents:
+  1. Current task and its status
+  2. Files touched, with a one-line note on each change
+  3. Next step, specific enough to start without re-reading the chat
+  4. Open questions or decisions waiting on Tim
+  5. Anything tried that failed, so it is not repeated
+- **Usage limits (from Tim's global CLAUDE.md, word for word):**
+  - Before starting a large task, read the file. If either figure is above 90%, tell me before you begin.
+  - If a hook message or a usable file shows either figure at 95% or higher, stop and write the handoff file before doing anything else.
+  - Do not start new work after writing the handoff. Tell me it is written and wait.
+  - (The file is `~/.claude/usage.json`: usable only if `updated_at` is within 15 minutes and the reset time hasn't passed. In VS Code it's usually missing, which is expected.)
+- **Close-out:** run whenever the handoff is written and whenever a distinct task finishes.
+  1. Rewrite or clear `Sentinel-Notes/HANDOFF.md`.
+  2. Update `Sentinel-Notes/TODO.md` to match what was done.
+  3. Commit and push `Sentinel-Notes/HANDOFF.md` alone when it changes. Tim has approved this one without asking. Every other commit or push still needs his OK.
+  4. End with one line saying what was done and what was skipped, and why.

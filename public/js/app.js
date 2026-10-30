@@ -1,4 +1,4 @@
-// Fletcherling skeleton: first-run setup and one text area bound to one Markdown file.
+// First-run setup and the entry editor, with live sync and conflict handling.
 
 const ENTRY_PATH = 'premise/premise.md';
 const SAVE_DELAY_MS = 500;
