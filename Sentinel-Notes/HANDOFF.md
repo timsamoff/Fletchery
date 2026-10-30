@@ -6,9 +6,9 @@ Updated 2026-10-30. Committed through `5d49b63`. The latest commits may not be p
 
 TODO item "Premise end to end", in three steps:
 
-1. **DESIGN.md:** done (`0b90d22`), waiting on Tim's review.
+1. **DESIGN.md:** done (`0b90d22`), reviewed by Tim.
 2. **Shared core and storage interface:** done (`5d49b63`), tested in Playwright. Waiting on Tim's own browser test.
-3. **Premise on top of the core:** depth control, status, guided questions in Interview and Full form modes, and section navigation from `sections/prose.json` (only Premise linked). Fold in TODO Q1 and R4.
+3. **Premise on top of the core:** depth control, status, guided questions in Interview and Full form modes, and section navigation from `sections/prose.json` (only Premise linked). Fold in TODO R4 (Q1 is fixed).
 
 ## 2. Files touched this session
 
