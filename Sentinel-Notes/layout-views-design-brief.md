@@ -6,7 +6,7 @@ Proposed 2026-10-30. The writer can switch between views of the same bible. Each
 
 1. **Document (default):** one section at a time, with guided questions and the text area. This is where the writing happens.
 2. **Board (kanban):** every drag changes something real.
-   - **Status board, any section:** columns Empty, Draft, Settled, with entries as cards. Dropping on Settled settles the entry, and `ai-draft` becomes `ai-reviewed`. An optional depth board uses Seed, Sketch, and Sheet columns.
+   - **Status board, any section:** columns Empty, Draft, Canon, with entries as cards. Dropping on Canon marks the entry as canon, and `ai-draft` becomes `ai-reviewed`. An optional depth board uses Seed, Sketch, and Sheet columns.
    - **Plot board:** columns are acts, sequences, or chapters, with scenes as cards. Dragging reorders and moves scenes.
    - **Inbox board:** the Inbox plus section columns. Dropping a card on a section files it.
 3. **Canvas (freeform):** cards placed anywhere, grouped by nearness, with connector lines.
@@ -23,7 +23,7 @@ Recommended order: Document now. The Board (plot and status boards first) after 
 - **Drag:**
   - The card follows the pointer with slight lag, and its tilt leans with speed and direction.
   - Cards underneath slide apart to open a gap, with a small stagger.
-  - The target column rises a layer, with a heavier border and a text label ("Drop to move to Settled"), so the target is never shown by color alone.
+  - The target column rises a layer, with a heavier border and a text label ("Drop to move to Canon"), so the target is never shown by color alone.
 - **Drop (about 250-350 ms):** the card springs into its slot with a small overshoot, its shadow settles, and the neighbors close up.
 - **Cancel (Esc, or a drop outside any target):** the card springs back to its origin.
 - **Edges:** the board scrolls on its own, faster near the edge. Panning the canvas keeps some momentum and slows gently.

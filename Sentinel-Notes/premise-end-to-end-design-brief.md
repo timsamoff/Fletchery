@@ -14,7 +14,7 @@ Paused 2026-10-29 to run Sentinel. Build phase 2 of the approved plan.
 - Section list from `sections/<type>.json` (beside the page from 960px, a Sections menu below that), with Premise linked and the rest marked Not built yet.
 - Depth control. Shallower layers show above as read-only context, each with an Edit link that jumps to that depth.
 - Interview me (one question, or one Sheet part, at a time) and Full form, remembered per browser.
-- Status as a shape plus a word. Mark settled and Back to draft. Editing a settled entry returns it to draft and says so.
+- Status as a shape plus a word. Mark as canon and Back to draft (renamed from "settled"). Editing a canon entry returns it to draft and says so.
 - Skip for now, recorded in `fletcherling.json` and cleared by writing.
 - Ask Claude, disabled with a note until the bridge exists.
 - Audit items R1 (44px buttons on the grid), R4 (save status by the editor), and A2 (disabled and pressed styles).
@@ -44,4 +44,4 @@ Sheet (about a page, four paragraphs, each of the first three ending in a disast
 
 ## Also in this phase
 
-Depth control, status (empty, draft, settled, each with a text label and a shape), Skip for now, and the Ask Claude menu, shown disabled until the bridge phase. Fold in audit items A2 (disabled styles) and R4 (save status visibility).
+Depth control, status (empty, draft, canon, each with a text label and a shape), Skip for now, and the Ask Claude menu, shown disabled until the bridge phase. Fold in audit items A2 (disabled styles) and R4 (save status visibility).
