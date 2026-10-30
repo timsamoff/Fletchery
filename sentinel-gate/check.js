@@ -75,13 +75,15 @@ const QUOTED_HEX_RE = new RegExp(`['"\`]#${HEX}['"\`]`, 'i');
 
 // ---------- git ----------
 
-function git(args, { input } = {}) {
-  return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, input });
+function git(args, { input, quiet = false } = {}) {
+  const stdio = quiet ? ['pipe', 'pipe', 'ignore'] : undefined;
+  return execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, input, stdio });
 }
 
+// For lookups where "not found" is an expected answer, so git's own error message stays out of the output.
 function gitOrNull(args) {
   try {
-    return git(args);
+    return git(args, { quiet: true });
   } catch {
     return null;
   }
