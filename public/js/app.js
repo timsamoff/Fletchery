@@ -262,14 +262,10 @@ async function showEditor(settings, settingsVersion) {
           </button>
         </div>
         <div id="conflict-slot"></div>
-        <div class="context-wrap" id="context-wrap">
-          <button type="button" class="link-button" id="context-toggle" aria-controls="context" aria-expanded="false"></button>
-          <div class="context" id="context"><div class="context-inner" id="context-inner"></div></div>
-        </div>
         <div id="work-home"><div id="work"></div></div>
         <div class="button-row section-actions">
           <button type="button" class="button button-quiet" id="canon"></button>
-          <button type="button" class="button button-plain" id="skip">Skip for now</button>
+          <button type="button" class="button button-quiet" id="skip">Skip for now</button>
           <button type="button" class="button button-quiet" id="ask-ai" disabled aria-describedby="ask-ai-note">Ask AI</button>
           <p class="local-status" id="local-status" aria-hidden="true"></p>
           <button type="button" class="button" id="next-depth"></button>
@@ -296,7 +292,6 @@ async function showEditor(settings, settingsVersion) {
   });
   setNavOpen(readPref('fl-nav', 'open') === 'open');
   document.getElementById('nav-toggle').addEventListener('click', () => setNavOpen(state.navCollapsed));
-  document.getElementById('context-toggle').addEventListener('click', () => setContextOpen(!state.contextOpen));
   document.getElementById('next-depth').addEventListener('click', () => setDepth(DEPTHS[DEPTHS.indexOf(state.depth) + 1], true));
   setupFocus();
   document.getElementById('canon').addEventListener('click', toggleCanon);
@@ -373,12 +368,45 @@ function setNavOpen(open) {
 
 function setContextOpen(open) {
   state.contextOpen = open;
-  const context = document.getElementById('context');
-  context.dataset.open = String(open);
-  document.getElementById('context-inner').inert = !open;
   const toggle = document.getElementById('context-toggle');
+  if (!toggle) return;
+  document.getElementById('context').dataset.open = String(open);
+  document.getElementById('context-inner').inert = !open;
   toggle.setAttribute('aria-expanded', String(open));
-  toggle.textContent = `${open ? 'Hide' : 'Show'} ${shallowerLabels()}`;
+  toggle.setAttribute('aria-label', `${open ? 'Hide' : 'Show'} ${shallowerLabels()}`);
+}
+
+// The earlier depths, on a strip across the top of the paper. Folded, it shows the depth being expanded on one
+// line; open, it shows every earlier depth in full, each with a way back to edit it.
+function contextStrip() {
+  const shallower = DEPTHS.slice(0, DEPTHS.indexOf(state.depth));
+  if (!shallower.length) return '';
+  const label = (d) => state.section.depths[d].label;
+  const empty = (d) => `No ${label(d).toLowerCase()} yet.`;
+  const last = shallower[shallower.length - 1];
+  const layers = shallower
+    .map(
+      (d) => `
+        <section class="context-layer" aria-labelledby="context-${d}">
+          <h3 id="context-${d}">${esc(label(d))}</h3>
+          <p>${state.layers[d] ? esc(state.layers[d]) : `<span class="hint">${empty(d)}</span>`}</p>
+          <button type="button" class="link-button" data-goto="${d}">Edit ${label(d).toLowerCase()}</button>
+        </section>`,
+    )
+    .join('');
+  const open = state.contextOpen;
+  return `
+    <div class="context-strip">
+      <button type="button" class="context-toggle" id="context-toggle" aria-controls="context" aria-expanded="${open}" aria-label="${open ? 'Hide' : 'Show'} ${shallowerLabels()}">
+        <span class="context-label context-label-closed">${esc(label(last))}</span>
+        <span class="context-label context-label-open">${esc(shallowerLabels().replace(/^./, (c) => c.toUpperCase()))}</span>
+        <span class="context-peek">${esc(state.layers[last] || empty(last))}</span>
+        <svg class="context-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+      </button>
+      <div class="context" id="context" data-open="${open}">
+        <div class="context-inner" id="context-inner"${open ? '' : ' inert'}>${layers}</div>
+      </div>
+    </div>`;
 }
 
 function shallowerLabels() {
@@ -418,24 +446,6 @@ function renderDepth() {
   nextButton.hidden = !next;
   if (next) nextButton.textContent = `Go to ${state.section.depths[next].label}`;
   document.getElementById('focus-title').textContent = `${state.section.title} · ${state.section.depths[state.depth].label}`;
-
-  // Shallower layers, folded away above the question until the writer opens them, each with a way back to edit it.
-  const shallower = DEPTHS.slice(0, DEPTHS.indexOf(state.depth));
-  document.getElementById('context-wrap').hidden = !shallower.length;
-  setContextOpen(state.contextOpen && shallower.length > 0);
-  document.getElementById('context-inner').innerHTML = shallower
-    .map((d) => {
-      const label = state.section.depths[d].label;
-      const text = d === 'sheet' ? '' : state.layers[d];
-      return `
-        <section class="context-layer" aria-labelledby="context-${d}">
-          <h2 id="context-${d}">${esc(label)}</h2>
-          <p>${text ? esc(text) : `<span class="hint">No ${label.toLowerCase()} yet.</span>`}</p>
-          <button type="button" class="link-button" data-goto="${d}">Edit ${label.toLowerCase()}</button>
-        </section>`;
-    })
-    .join('');
-  document.querySelectorAll('[data-goto]').forEach((b) => b.addEventListener('click', () => setDepth(b.dataset.goto, true)));
 }
 
 // The question card and answer fields, laid out the same way at every depth. A Sheet of separate fields takes its
@@ -487,17 +497,22 @@ function renderWork() {
   // One field fills the page; the Sheet's full form stacks its parts at a fixed height.
   const fields = isSheet ? (interview ? [def.fields[step]] : def.fields) : [def.fields[0]];
   const fill = fields.length === 1;
-  work.innerHTML =
-    card +
-    fields
-      .map(
-        (f) => `
-        <div class="field writing-field${fill ? ' fill' : ''}">
-          <label for="field-${f.id}"${fill ? ' class="visually-hidden"' : ''}>${esc(f.label)}</label>
-          <textarea id="field-${f.id}" data-field="${f.id}" spellcheck="true" aria-describedby="question-text"${fill ? '' : ' rows="6"'}></textarea>
-        </div>`,
-      )
-      .join('');
+  // The paper hangs from the question panel with no gap, the earlier depths clipped across its top.
+  work.innerHTML = `${card}
+    <div class="paper">
+      ${contextStrip()}
+      ${fields
+        .map(
+          (f) => `
+          <div class="field writing-field${fill ? ' fill' : ''}">
+            <label for="field-${f.id}"${fill ? ' class="visually-hidden"' : ''}>${esc(f.label)}</label>
+            <textarea id="field-${f.id}" data-field="${f.id}" spellcheck="true" aria-describedby="question-text"${fill ? '' : ' rows="6"'}></textarea>
+          </div>`,
+        )
+        .join('')}
+    </div>`;
+  document.getElementById('context-toggle')?.addEventListener('click', () => setContextOpen(!state.contextOpen));
+  work.querySelectorAll('[data-goto]').forEach((b) => b.addEventListener('click', () => setDepth(b.dataset.goto, true)));
   work.querySelectorAll('[data-mode]').forEach((b) => {
     b.addEventListener('click', () => setMode(b.dataset.mode));
     // Tab pattern: the arrow keys, Home, and End move between the two tabs.

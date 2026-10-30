@@ -5,7 +5,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 ## Build phases
 
 - [ ] Premise end to end: depth screens, paste fix, one-box Sheet built; Sheet questions and copy to do; see [premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md).
-- [ ] Visual redesign before more feature work: steps 1-3 built, frame matched to the mockup, header and list pinned; see [visual-redesign-design-brief.md](visual-redesign-design-brief.md).
+- [ ] Visual redesign before more feature work: steps 1-3 built, frame matched, earlier depths on the paper; see [visual-redesign-design-brief.md](visual-redesign-design-brief.md).
 - [ ] Settings page, saved in fletchery-settings.json: AI choice, font, author info, paste breaks, and fade options; see [settings-page-design-brief.md](settings-page-design-brief.md).
 - [ ] Fletchery web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
 - [ ] Characters with images, the media library, relationships, and generated indexes.

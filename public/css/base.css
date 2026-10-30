@@ -23,6 +23,7 @@ body {
   min-height: 100vh;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(0, 1fr); /* one-line text, like the depth preview, can't widen the page */
 }
 
 /* Grid container: 16px gutters on phones, 32px from tablet width up. */
@@ -670,8 +671,81 @@ textarea:focus-visible {
   margin-bottom: var(--space-1);
   border-color: transparent;
 }
-.context-wrap {
-  margin-bottom: var(--space-3);
+/* The paper: hangs from the question panel with no gap, and carries the earlier depths on a cream strip across
+   its top, between the panel's deep cream and the paper's light one. */
+.paper {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: var(--color-surface);
+  border-radius: 0 0 3px 3px;
+  box-shadow: var(--shadow-paper);
+}
+.paper .writing-field {
+  margin-bottom: 0;
+}
+.paper .writing-field textarea {
+  background: transparent;
+  box-shadow: none;
+}
+.context-strip {
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-rule);
+}
+.context-toggle {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-7);
+  font: inherit;
+  text-align: left;
+  color: var(--color-text);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  transition: background-color var(--duration-fast) ease;
+}
+.context-toggle:hover {
+  background: var(--color-panel);
+}
+.context-toggle:focus-visible {
+  outline-offset: -3px;
+}
+.context-label,
+.context-layer h3 {
+  flex-shrink: 0;
+  font-size: var(--text-small);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-quiet);
+}
+.context-peek {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-writing);
+  font-size: var(--text-small);
+  transition: opacity var(--duration-fast) ease;
+}
+.context-toggle[aria-expanded='true'] .context-peek {
+  opacity: 0;
+}
+/* Folded, the row names the depth it previews; open, it names all the depths shown below it. */
+.context-toggle[aria-expanded='true'] .context-label-closed,
+.context-toggle[aria-expanded='false'] .context-label-open {
+  display: none;
+}
+.context-chevron {
+  flex-shrink: 0;
+  align-self: center;
+  transition: transform var(--duration-base) var(--ease-out);
+}
+.context-toggle[aria-expanded='true'] .context-chevron {
+  transform: rotate(180deg);
 }
 .context {
   display: grid;
@@ -686,20 +760,23 @@ textarea:focus-visible {
   min-height: 0;
 }
 .context-layer {
-  max-width: var(--measure);
-  border-left: var(--space-1) solid var(--color-border-quiet);
-  padding-left: var(--space-3);
-  margin-top: var(--space-3);
+  max-width: calc(80ch + 2 * var(--space-7));
+  padding: 0 var(--space-7) var(--space-3);
 }
-.context-layer h2 {
-  font-size: var(--text-h3);
-  line-height: var(--leading-h3);
+.context-layer h3 {
   margin: 0;
+  line-height: var(--line);
 }
 .context-layer p {
   margin: 0;
   font-family: var(--font-writing);
   white-space: pre-line; /* keeps the writer's paragraph breaks */
+}
+@media (max-width: 719px) {
+  .context-toggle,
+  .context-layer {
+    padding-inline: var(--space-3);
+  }
 }
 #work-home,
 #work {
@@ -711,7 +788,7 @@ textarea:focus-visible {
 /* The question card: the same at every depth. Two folder tabs choose the layout; the open tab shares the
    panel's color and reaches down into it, and the other sits back, shorter and darker. */
 .question-card {
-  margin-bottom: var(--space-4);
+  margin-bottom: 0;
 }
 .question-tabs {
   display: flex;
@@ -745,7 +822,7 @@ textarea:focus-visible {
 }
 .question-panel {
   background: var(--color-panel);
-  border-radius: var(--radius);
+  border-radius: var(--radius) var(--radius) 0 0; /* the paper hangs from its bottom edge */
   padding: var(--space-3) var(--space-5) 20px;
 }
 .question-panel.first-tab-open {
@@ -1027,7 +1104,7 @@ textarea:focus-visible {
 .site-footer,
 .section-nav,
 .section-head,
-.context-wrap,
+.context-strip,
 .question-card,
 .section-actions,
 .section-page > .hint,
@@ -1036,7 +1113,7 @@ textarea:focus-visible {
   transition: opacity var(--duration-fast) ease;
 }
 .is-writing .section-nav,
-.is-writing[data-fade-scope='full'] :is(.site-header, .site-footer, .section-head, .context-wrap, .question-card, .section-actions, .section-page > .hint, .entry-meta, .focus-bar) {
+.is-writing[data-fade-scope='full'] :is(.site-header, .site-footer, .section-head, .context-strip, .question-card, .section-actions, .section-page > .hint, .entry-meta, .focus-bar) {
   opacity: 0.3;
   transition: opacity 600ms ease;
 }
