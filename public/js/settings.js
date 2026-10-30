@@ -155,13 +155,26 @@ function formHtml(v) {
         <label for="set-fade-on">Fade parts of the page while you type</label>
       </div>
       <p class="settings-question">What fades</p>
-      ${radio('fadeScope', 'sidebar', 'The section list', v.fade.scope).replace('/>', `${off} />`)}
+      ${radio('fadeScope', 'sidebar', 'The sidebar', v.fade.scope).replace('/>', `${off} />`)}
       ${radio('fadeScope', 'full', 'Everything but your writing', v.fade.scope).replace('/>', `${off} />`)}
       <div class="field settings-select">
-        <label for="set-fade-pause">Bring it back after a pause of</label>
+        <label for="set-fade-pause">Fade back in after a pause of</label>
         <select id="set-fade-pause"${off}>
           ${[1, 2, 3, 5].map((s) => `<option value="${s}"${v.fade.pauseSeconds === s ? ' selected' : ''}>${s} second${s === 1 ? '' : 's'}</option>`).join('')}
         </select>
+      </div>
+    </fieldset>
+    <fieldset class="settings-preview" aria-describedby="set-ai-note">
+      <legend>AI</legend>
+      <p class="hint" id="set-ai-note">Choosing an AI arrives in a later version. Until then, Ask AI stays off.</p>
+      <p class="settings-question">AI for Ask AI</p>
+      ${radio('ai', 'none', 'None', 'none', 'Fletchery works fully without AI.').replace('/>', 'disabled />')}
+      ${radio('ai', 'claude-code', 'Claude Code on this computer', 'none', 'Uses your Claude Code session. No key needed.').replace('/>', 'disabled />')}
+      ${radio('ai', 'anthropic', 'Anthropic API', 'none', 'Uses your Anthropic API key.').replace('/>', 'disabled />')}
+      ${radio('ai', 'openrouter', 'OpenRouter', 'none', 'Reaches models from OpenAI, Google, and others with one key.').replace('/>', 'disabled />')}
+      <div class="field settings-select">
+        <label for="set-ai-key">API key</label>
+        <input type="text" id="set-ai-key" disabled autocomplete="off" />
       </div>
     </fieldset>
     <p class="hint">Saved to <code>story-bible/${SETTINGS_FILE}</code>. These settings belong to this story.</p>`;

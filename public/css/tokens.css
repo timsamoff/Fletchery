@@ -131,7 +131,7 @@
   --measure: 68ch;
   --radius: 4px;
   --border: 2px;
-  --focus-ring: 3px solid var(--color-focus);
+  --focus-ring: 1px solid var(--color-focus); /* WCAG AA asks only that focus be visible; Tim chose a hairline */
 
   /* Motion: err on the side of animation; base.css turns it off for reduced motion. */
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);

@@ -318,14 +318,21 @@ textarea:focus-visible {
   background: var(--color-panel);
   border-color: var(--color-control);
 }
-/* A soft deep-cream fill with no outline until hovered, for a secondary action beside outlined ones. */
+/* A soft deep-cream fill for a secondary action beside outlined ones; it darkens to charcoal with a light label
+   on hover. */
 .button-soft {
   background: var(--color-panel);
   border-color: var(--color-panel);
   color: var(--color-text);
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
 }
 .button-soft:hover {
+  background: var(--color-control);
   border-color: var(--color-control);
+  color: var(--color-on-dark);
 }
 .button-quiet[aria-pressed='true'] {
   border-color: var(--color-accent);
@@ -898,10 +905,6 @@ textarea:focus-visible {
   border-radius: 3px;
   padding-block: calc(var(--space-5) + var(--space-2)); /* 40px */
 }
-/* The caret already shows where the writer is, so the paper takes a hairline ring; controls keep the full one. */
-.writing-field textarea:focus-visible {
-  outline-width: 1px;
-}
 .writing-field label {
   font-size: var(--text-small);
   letter-spacing: 0.06em;
@@ -1106,6 +1109,9 @@ textarea:focus-visible {
 /* Header: the Settings button sits at the right. */
 .header-button {
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   font: inherit;
   color: var(--color-text);
   background: none;
@@ -1200,4 +1206,10 @@ textarea:focus-visible {
 .settings-select select:disabled {
   color: var(--color-text-quiet);
   cursor: not-allowed;
+}
+/* The AI section is a preview until it works: its controls are dimmed, and its note stays at full strength. */
+.settings-preview .settings-question,
+.settings-preview .choice,
+.settings-preview .settings-select {
+  opacity: 0.55;
 }

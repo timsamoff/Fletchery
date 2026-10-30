@@ -25,8 +25,12 @@ Proposed 2026-10-30. A Settings page, reached from the header, for choices that 
 - Fade while typing: on or off, what fades (the section list or everything but the writing), and the pause before it returns (1, 2, 3, or 5 seconds).
 - The question layout, folded section list, and grid overlay moved from browser storage into the file. Existing browser values are read once as starting values.
 
+- An AI section shown as a dimmed preview: None, Claude Code on this computer, Anthropic API, or OpenRouter, plus an API key field. Nothing in it works or saves yet.
+- Focus outlines are 1px everywhere (WCAG AA asks only that focus be visible). A thicker-outline switch can be added if wanted.
+
 ## Open
 
+- **API keys must not live in the story folder.** `fletchery-settings.json` sits in the story's `story-bible/`, and stories are git repos, so a key saved there would be committed. Keys need a home outside the story folder before the AI section goes live.
 - **Author info:** which fields.
 - **Text zoom** for the writer's text.
 
