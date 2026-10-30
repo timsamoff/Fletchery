@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="t d">
   <title id="t">Fletchery icon</title>
-  <desc id="d">A square book cover with a spine and a double frame. A singing bird in silhouette, perched on a post, is centered inside the frame.</desc>
+  <desc id="d">A square book cover with a spine and a double frame. An upright arrow with feathered fletching in rust orange is centered inside the frame.</desc>
   <!-- cover -->
   <rect x="24" y="24" width="464" height="464" rx="28" fill="#2A2D32"/>
   <!-- spine -->
@@ -12,14 +12,14 @@
   <!-- cover frame, centered on the cover face (x 76-488) -->
   <rect x="122" y="56" width="320" height="400" rx="6" fill="none" stroke="#E0601E" stroke-opacity=".55" stroke-width="2"/>
   <rect x="130" y="64" width="304" height="384" rx="3" fill="none" stroke="#E0601E" stroke-opacity=".3" stroke-width="1.5"/>
-  <!-- bird silhouette, bounding box centered at (282, 256) -->
-  <g transform="translate(184.8 95) scale(1.15)" fill="#E0601E">
-    <path d="M161 15 L148 42 L169 33 L146 58 C150 80 156 100 150 125 C146 150 126 172 100 180 L104 250 L88 250 L92 186 C70 188 45 200 20 226 L2 244 L0 236 L22 200 L40 160 C55 120 70 80 84 52 C92 30 108 18 124 18 C134 18 140 30 142 38 Z"/>
-    <g transform="translate(96 250) scale(.55) translate(-96 -250)">
-      <path d="M87 246 L105 246 C119 247 133 251 148 259 C131 257 117 256 104 255 L90 255 Z"/>
-      <path d="M95 250 L106 250 C113 258 119 267 123 278 C113 270 104 264 93 257 Z"/>
-      <path d="M91 248 C83 247 73 249 62 255 C75 256 85 256 95 255 Z"/>
+  <!-- arrow with fletching, bounding box centered at (282, 256) -->
+  <defs><clipPath id="v"><path d="M266,262 C276,270 296,292 302,318 L302,384 C302,398 288,410 266,418 Z"/><path d="M266,262 C256,270 236,292 230,318 L230,384 C230,398 244,410 266,418 Z"/></clipPath></defs>
+  <g transform="translate(16 -9)">
+    <g fill="#E0601E">
+      <path d="M266,104 L275,138 H257 Z"/>
+      <rect x="263" y="136" width="6" height="290" rx="2"/>
+      <path d="M266,262 C276,270 296,292 302,318 L302,384 C302,398 288,410 266,418 Z"/><path d="M266,262 C256,270 236,292 230,318 L230,384 C230,398 244,410 266,418 Z"/>
     </g>
-    <circle cx="122" cy="42" r="4.5" fill="#2A2D32"/>
+    <g stroke="#2A2D32" stroke-width="3" stroke-linecap="round" fill="none" clip-path="url(#v)"><path d="M270,320 L306,296"/><path d="M262,320 L226,296"/><path d="M270,334 L306,310"/><path d="M262,334 L226,310"/><path d="M270,348 L306,324"/><path d="M262,348 L226,324"/><path d="M270,362 L306,338"/><path d="M262,362 L226,338"/><path d="M270,376 L306,352"/><path d="M262,376 L226,352"/><path d="M270,390 L306,366"/><path d="M262,390 L226,366"/><path d="M270,404 L306,380"/><path d="M262,404 L226,380"/><path d="M270,418 L306,394"/><path d="M262,418 L226,394"/></g>
   </g>
 </svg>
