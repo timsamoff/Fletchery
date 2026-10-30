@@ -12,7 +12,7 @@ This file and `Sentinel-Notes/` are committed to the public repo by deliberate c
 - Backlog: `Sentinel-Notes/TODO.md`. Project profile: `PROJECT_PROFILE.md`.
 - Stop after each phase for Tim's review. Test in a real browser before saying anything works.
 - Load the tim-writing-style skill before writing UI copy or docs.
-- Stack: Node `http`, plain HTML/CSS/JS, no build step. Launch with `fletchery` from a story project.
+- Stack: Node `http`, plain HTML/CSS/JS, no build step yet (one is allowed; see `docs/SPEC.md`). Launch with `fletchery` from a story project.
 - Tim keeps stories in `Documents/_Writing/<story>/`, each its own private git repo, and runs `fletchery` from inside the story folder. App code and story data never mix.
 - Entry logic lives in `public/js/core/` and must run in both the browser and Node: import only the bare name `yaml` and relative paths there, never browser globals at module level. The server is a file store and knows nothing about entries.
 - Entry bodies hold `## Seed`, `## Sketch`, and `## Sheet` layers (`public/js/core/layers.js`). Never drop text the parser doesn't recognize. Frontmatter `depth` and the empty and draft statuses follow the text; only the writer marks an entry as canon (`status: canon`, read from the older `settled` too).
@@ -20,7 +20,7 @@ This file and `Sentinel-Notes/` are committed to the public repo by deliberate c
 
 ## Design rules
 
-- Colors: icon colors only, on cream. No white text. Tokens live in `public/css/tokens.css`. Contrast on cream `#F1ECE2`: charcoal 11.74:1, mid charcoal 8.98:1, orange 3.04:1. Spine charcoal on orange is 4.61:1. Orange never carries small text. It's for button fills, focus rings, borders, status marks, link underlines, and large text.
+- Colors: icon colors only, on cream. No white or light text on cream. Light text is allowed on charcoal and spine when contrast passes. Tokens live in `public/css/tokens.css`. Contrast on cream `#F1ECE2`: charcoal 11.74:1, mid charcoal 8.98:1, orange 3.04:1. Spine charcoal on orange is 4.61:1. Orange never carries small text. It's for button fills, focus rings, borders, status marks, link underlines, and large text.
 - Rhythm: 8px base unit, 4px baseline, 28px body line. Every vertical size is a multiple of 4, and blocks take whole 28px lines where possible. The 84px header is 82px plus a 2px border, and `main` has two lines of top padding, so content starts on a line. Text fields are 28px plus 12px padding plus a 2px border on each side, which comes to 40px for inputs and one extra line for text areas.
 - Breakpoint: 720px, repeated in two media queries because CSS custom properties can't be used there.
 

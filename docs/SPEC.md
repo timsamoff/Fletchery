@@ -17,6 +17,8 @@ The app is Fletchery, renamed from Fletcherling on 2026-10-30. Bibles made befor
 
 Node, with a plain HTML, CSS, and JavaScript front end and no build step. The reasons: the `@fontsource` packages for Source Sans 3 and Atkinson Hyperlegible are npm packages, `npm link` gives a global command on Windows with no extra setup, and Node's built-in recursive `fs.watch` works on Windows. Dependencies stay few, and each one needs a reason. No database.
 
+A build step is allowed (decided 2026-10-30), for example for a formatting editor. Tim runs it for the web edition. A local writer gets instructions plain enough to follow themselves or hand to their AI.
+
 ### Install and launch
 
 - The code stays in this repo. Running `npm link` once puts `fletchery` on the PATH, and edits to the repo take effect on the next launch.

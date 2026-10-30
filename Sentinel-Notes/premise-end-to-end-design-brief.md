@@ -23,6 +23,23 @@ Paused 2026-10-29 to run Sentinel. Build phase 2 of the approved plan.
 
 - Tim is sending edits to the question set. The drafts below are in `sections/*.json` as placeholders.
 
+## Tim's review (2026-10-30)
+
+Decided:
+
+- **One screen per depth.** Seed, Sketch, and Sheet each get their own screen. Finished depths show as a summary above, and moving on is a deliberate step. This replaces the single page with Depth radios, which made the writer scroll up to go deeper.
+- **Paste.** Text pasted from Google Docs arrives with single line breaks between paragraphs. Turn those into paragraph breaks on paste.
+- **Build step allowed** (recorded in SPEC.md), which makes a formatting editor practical.
+
+Open:
+
+- **What the Sheet is.** It's the expanded premise, about a page telling the whole story, not Act 1. The act labels ("Act 1, through the first disaster") made it look like acts, and they impose one structure on every story. Proposal: the Sheet expands the writer's own Sketch, one paragraph per Sketch sentence, as the Snowflake Method does. The three disasters stay a suggestion in the Sketch questions. This changes how Sheet parts are stored.
+- **Sheet questions.** Seed and Sketch show their questions in a card; the Sheet shows one gray hint per part, which reads as no questions. All three depths should present questions the same way.
+- **Explaining depths.** Nothing says what Depth means, or that a writer starts at Seed and goes deeper only when ready.
+- **Mode names.** "Interview me" and "Full form" are unclear. Candidates: "One question at a time" and "All questions."
+- **Formatting.** Either a light toolbar that writes Markdown, or a full editor that hides it. Pending which formatting Tim reaches for while drafting. Text the editor doesn't understand must never be dropped.
+- **Context view.** The read-only view of shallower depths runs paragraphs together. Fix with the formatting decision.
+
 ## Draft copy (placeholder)
 
 Why this matters: The premise is the shortest true statement of your story, and every other entry in the bible has to agree with it.

@@ -4,7 +4,9 @@ Conventions: when an item is finished, move its line to the Done section at the 
 
 ## Build phases
 
-- [ ] Premise end to end: built (canon status, Fletchery name), awaiting Tim’s review and question edits; see [premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md).
+- [ ] Premise end to end: reviewed 2026-10-30; one screen per depth, paste fix, Sheet model, and copy to do; see [premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md).
+- [ ] Visual redesign before more feature work: serif for writer text, width, links, mockups first (prompt not kept); see [visual-redesign-design-brief.md](visual-redesign-design-brief.md).
+- [ ] Settings page: font choice and author info to start; more as they come up.
 - [ ] Fletchery web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
 - [ ] Characters with images, the media library, relationships, and generated indexes.
 - [ ] Notes and media (Inbox, quick capture, maps), then the remaining sections from data for all three story types.
