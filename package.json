@@ -1,0 +1,18 @@
+{
+  "name": "fletcherling",
+  "version": "0.1.0",
+  "description": "A local web app for building a Story Bible as Markdown files.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "fletcherling": "bin/fletcherling.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@fontsource/atkinson-hyperlegible": "^5.3.0",
+    "@fontsource/source-sans-3": "^5.3.1",
+    "yaml": "^2.9.1"
+  }
+}

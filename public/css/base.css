@@ -1,0 +1,379 @@
+/* Layout and components. Every vertical size is a multiple of the 4px baseline,
+   and most blocks take whole 28px lines. Turn on "Show grid" to check. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  line-height: var(--line);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  position: relative;
+  margin: 0;
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* Grid container: 16px gutters on phones, 32px from tablet width up. */
+.wrap {
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: var(--space-3);
+}
+@media (min-width: 720px) {
+  .wrap {
+    padding-inline: var(--space-5);
+  }
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+dl,
+fieldset {
+  margin: 0;
+}
+h1 {
+  font-size: var(--text-h1);
+  line-height: var(--leading-h1);
+  font-weight: 700;
+  margin-bottom: var(--space-3); /* 40 + 16 = 2 lines */
+}
+h2 {
+  font-size: var(--text-h2);
+  line-height: var(--leading-h2);
+  font-weight: 700;
+  margin-bottom: var(--space-4); /* 32 + 24 = 2 lines */
+}
+h3 {
+  font-size: var(--text-h3);
+  line-height: var(--leading-h3);
+  font-weight: 600;
+}
+p,
+ul,
+ol,
+dl {
+  margin-bottom: var(--line);
+  max-width: var(--measure);
+}
+
+a {
+  color: var(--color-text);
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+a:hover {
+  text-decoration-thickness: 3px;
+}
+
+code {
+  font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+  font-size: 0.9em;
+  overflow-wrap: anywhere;
+}
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  left: var(--space-3);
+  top: calc(-1 * var(--space-7));
+  z-index: 10;
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: 600;
+  border-radius: var(--radius);
+}
+.skip-link:focus {
+  top: var(--space-2);
+}
+
+/* Header: 84px, three lines. */
+.site-header {
+  background: var(--color-surface);
+  border-bottom: var(--border) solid var(--color-border);
+}
+.site-header .wrap {
+  min-height: 82px; /* plus the 2px border */
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: var(--text-h2);
+  line-height: var(--leading-h2);
+  font-weight: 700;
+}
+.brand img {
+  width: 48px;
+  height: 48px;
+  display: block;
+}
+.project-title {
+  margin: 0 0 0 auto;
+  color: var(--color-text-quiet);
+  text-align: right;
+}
+
+main {
+  padding-block: calc(var(--line) * 2); /* keeps content on the 28px lines below the 84px header */
+}
+main:focus {
+  outline: none;
+}
+
+/* Footer */
+.site-footer {
+  background: var(--color-surface);
+  border-top: var(--border) solid var(--color-border);
+  font-size: var(--text-small);
+}
+.site-footer .wrap {
+  min-height: 82px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-4);
+  padding-block: 12px; /* two wrapped lines (56) + 24 + 2px border = 82, so min-height holds it at 84 */
+}
+.site-footer p {
+  margin: 0;
+}
+.project-path {
+  color: var(--color-text-quiet);
+  overflow-wrap: anywhere;
+}
+.save-status {
+  font-weight: 600;
+}
+.site-footer .button {
+  margin-left: auto;
+}
+
+/* Forms */
+.field {
+  margin-bottom: var(--line);
+  max-width: var(--measure);
+}
+label,
+legend {
+  display: block;
+  font-weight: 600;
+}
+legend {
+  padding: 0;
+  font-size: var(--text-h3);
+  line-height: var(--leading-h3);
+  margin-bottom: var(--space-2);
+}
+fieldset {
+  border: 0;
+  padding: 0;
+  margin-bottom: var(--line);
+  max-width: var(--measure);
+}
+.hint {
+  display: block;
+  color: var(--color-text-quiet);
+  font-weight: 400;
+  font-size: var(--text-small);
+}
+input[type='text'],
+textarea {
+  display: block;
+  width: 100%;
+  font: inherit;
+  line-height: var(--line);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: var(--border) solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 4px var(--space-3); /* 28 + 8 + 4 = 40 */
+}
+textarea {
+  padding-block: 12px; /* 12 + 2 on each side = one line */
+  resize: vertical;
+  min-height: calc(var(--line) * 6 + 28px);
+}
+input[type='text']:focus-visible,
+textarea:focus-visible {
+  outline-offset: 0;
+}
+
+.choice {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  column-gap: var(--space-2);
+  align-items: start;
+  padding-block: var(--space-1);
+}
+.choice input {
+  width: 20px;
+  height: 20px;
+  margin: 4px 0 0;
+  accent-color: var(--color-charcoal);
+}
+.choice label {
+  font-weight: 600;
+}
+.choice .hint {
+  grid-column: 2;
+}
+.choices-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-5);
+}
+
+/* Buttons: 42px tall. Orange buttons carry spine-charcoal labels (4.61:1). */
+.button {
+  display: inline-block;
+  font: inherit;
+  font-weight: 600;
+  line-height: var(--line);
+  padding: 5px var(--space-4);
+  border: var(--border) solid var(--color-accent);
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  cursor: pointer;
+}
+.button:hover {
+  border-color: var(--color-spine);
+}
+.button-quiet {
+  background: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+.button-quiet:hover {
+  border-color: var(--color-accent);
+}
+.button-quiet[aria-pressed='true'] {
+  border-color: var(--color-accent);
+  box-shadow: inset 0 -4px 0 var(--color-accent);
+}
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+  margin-bottom: var(--line);
+}
+
+.form-error {
+  border-left: 4px solid var(--color-accent);
+  padding-left: var(--space-3);
+  font-weight: 600;
+}
+.form-error:empty {
+  display: none;
+}
+
+/* Entry editor */
+.entry-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-4);
+  font-size: var(--text-small);
+  color: var(--color-text-quiet);
+}
+.entry-meta div {
+  display: flex;
+  gap: var(--space-1);
+}
+.entry-meta dt::after {
+  content: ':';
+}
+.entry-meta dd {
+  margin: 0;
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+/* Conflict panel */
+.conflict {
+  background: var(--color-surface);
+  border: var(--border) solid var(--color-border);
+  border-top: 8px solid var(--color-accent);
+  border-radius: var(--radius);
+  padding: var(--space-4) var(--space-4) 0;
+  margin-bottom: var(--line);
+}
+.conflict h2:focus {
+  outline: none;
+}
+.conflict-columns {
+  display: grid;
+  gap: var(--space-3) var(--space-4);
+  margin-bottom: var(--line);
+}
+@media (min-width: 720px) {
+  .conflict-columns {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.conflict textarea {
+  min-height: calc(var(--line) * 4 + 28px);
+  background: var(--color-bg);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Baseline overlay: a faint line every 4px and a stronger one every 28px. */
+.show-grid body::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 100;
+  background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0 27px,
+      var(--color-grid) 27px 28px
+    ),
+    repeating-linear-gradient(to bottom, transparent 0 3px, rgb(42 45 50 / 0.05) 3px 4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

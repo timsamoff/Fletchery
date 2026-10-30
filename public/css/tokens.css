@@ -1,0 +1,105 @@
+/* Every color, size, and spacing value the app uses. Change them here.
+   Colors come from assets/fletcherling-icon.svg. Contrast on cream:
+   charcoal 11.74:1, mid charcoal 8.98:1, spine charcoal on orange 4.61:1,
+   orange 3.04:1 (focus rings, borders, marks, and large text only). */
+
+@font-face {
+  font-family: 'Source Sans 3';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/source-sans-3-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Source Sans 3';
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  src: url('/fonts/source-sans-3-latin-400-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Source Sans 3';
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/source-sans-3-latin-600-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Source Sans 3';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/source-sans-3-latin-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/atkinson-hyperlegible-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible';
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/atkinson-hyperlegible-latin-700-normal.woff2') format('woff2');
+}
+
+:root {
+  /* Palette */
+  --color-charcoal: #2a2d32;
+  --color-spine: #1d1f23;
+  --color-charcoal-mid: #3b3f46;
+  --color-orange: #e0601e;
+  --color-cream: #f1ece2;
+  --color-cream-light: #f8f5ef;
+
+  /* Roles */
+  --color-text: var(--color-charcoal);
+  --color-text-quiet: var(--color-charcoal-mid);
+  --color-bg: var(--color-cream);
+  --color-surface: var(--color-cream-light);
+  --color-border: var(--color-charcoal);
+  --color-border-quiet: var(--color-charcoal-mid);
+  --color-accent: var(--color-orange);
+  --color-on-accent: var(--color-spine);
+  --color-focus: var(--color-orange);
+  --color-grid: rgb(224 96 30 / 0.18);
+
+  /* Type */
+  --font-body: 'Source Sans 3', system-ui, sans-serif;
+  --font-hyperlegible: 'Atkinson Hyperlegible', system-ui, sans-serif;
+
+  /* Rhythm: 8px base unit, 4px baseline, 28px body line. */
+  --unit: 8px;
+  --baseline: 4px;
+  --line: 28px;
+
+  --text-body: 18px;
+  --text-small: 16px;
+  --text-h1: 32px;
+  --leading-h1: 40px;
+  --text-h2: 24px;
+  --leading-h2: 32px;
+  --text-h3: 20px;
+  --leading-h3: 28px;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --space-7: 64px;
+
+  --measure: 68ch;
+  --radius: 4px;
+  --border: 2px;
+  --focus-ring: 3px solid var(--color-focus);
+}
+
+:root[data-font='atkinson-hyperlegible'] {
+  --font-body: var(--font-hyperlegible);
+}
