@@ -265,7 +265,7 @@ async function showEditor(settings, settingsVersion) {
         <div id="work-home"><div id="work"></div></div>
         <div class="button-row section-actions">
           <button type="button" class="button button-quiet" id="canon"></button>
-          <button type="button" class="button button-quiet" id="skip">Skip for now</button>
+          <button type="button" class="button button-soft" id="skip">Skip for now</button>
           <button type="button" class="button button-quiet" id="ask-ai" disabled aria-describedby="ask-ai-note">Ask AI</button>
           <p class="local-status" id="local-status" aria-hidden="true"></p>
           <button type="button" class="button" id="next-depth"></button>
@@ -373,17 +373,23 @@ function setContextOpen(open) {
   document.getElementById('context').dataset.open = String(open);
   document.getElementById('context-inner').inert = !open;
   toggle.setAttribute('aria-expanded', String(open));
-  toggle.setAttribute('aria-label', `${open ? 'Hide' : 'Show'} ${shallowerLabels()}`);
+  toggle.textContent = contextLinkText();
 }
 
-// The earlier depths, on a strip across the top of the paper. Folded, it shows the depth being expanded on one
-// line; open, it shows every earlier depth in full, each with a way back to edit it.
+const contextLinkText = () => `${state.contextOpen ? 'Hide' : 'Show'} ${shallowerLabels()}`;
+
+// The link beside the layout tabs that shows or hides the earlier depths.
+function contextLink() {
+  if (state.depth === DEPTHS[0]) return '';
+  return `<button type="button" class="link-button context-link" id="context-toggle" aria-controls="context" aria-expanded="${state.contextOpen}">${contextLinkText()}</button>`;
+}
+
+// The earlier depths, on a cream strip that slides open across the top of the paper, each with a way back to edit it.
 function contextStrip() {
   const shallower = DEPTHS.slice(0, DEPTHS.indexOf(state.depth));
   if (!shallower.length) return '';
   const label = (d) => state.section.depths[d].label;
   const empty = (d) => `No ${label(d).toLowerCase()} yet.`;
-  const last = shallower[shallower.length - 1];
   const layers = shallower
     .map(
       (d) => `
@@ -396,15 +402,9 @@ function contextStrip() {
     .join('');
   const open = state.contextOpen;
   return `
-    <div class="context-strip">
-      <button type="button" class="context-toggle" id="context-toggle" aria-controls="context" aria-expanded="${open}" aria-label="${open ? 'Hide' : 'Show'} ${shallowerLabels()}">
-        <span class="context-label context-label-closed">${esc(label(last))}</span>
-        <span class="context-label context-label-open">${esc(shallowerLabels().replace(/^./, (c) => c.toUpperCase()))}</span>
-        <span class="context-peek">${esc(state.layers[last] || empty(last))}</span>
-        <svg class="context-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
-      </button>
-      <div class="context" id="context" data-open="${open}">
-        <div class="context-inner" id="context-inner"${open ? '' : ' inert'}>${layers}</div>
+    <div class="context" id="context" data-open="${open}">
+      <div class="context-inner" id="context-inner"${open ? '' : ' inert'}>
+        <div class="context-strip">${layers}</div>
       </div>
     </div>`;
 }
@@ -479,8 +479,11 @@ function renderWork() {
     </div>`;
   const card = `
     <div class="question-card">
-      <div class="question-tabs" role="tablist" aria-label="Question layout">
-        ${tab('interview', 'Interview me')}${tab('full', 'Full form')}
+      <div class="question-tabs-row">
+        <div class="question-tabs" role="tablist" aria-label="Question layout">
+          ${tab('interview', 'Interview me')}${tab('full', 'Full form')}
+        </div>
+        ${contextLink()}
       </div>
       <section class="question-panel${interview ? ' first-tab-open' : ''}" id="question-panel" role="tabpanel" aria-labelledby="tab-${state.mode}">
         <div class="question-nav">

@@ -318,14 +318,13 @@ textarea:focus-visible {
   background: var(--color-panel);
   border-color: var(--color-control);
 }
-/* Text-only until hovered, for secondary actions beside outlined ones. */
-.button-plain {
-  background: transparent;
-  border-color: transparent;
+/* A soft deep-cream fill with no outline until hovered, for a secondary action beside outlined ones. */
+.button-soft {
+  background: var(--color-panel);
+  border-color: var(--color-panel);
   color: var(--color-text);
 }
-.button-plain:hover {
-  background: var(--color-panel);
+.button-soft:hover {
   border-color: var(--color-control);
 }
 .button-quiet[aria-pressed='true'] {
@@ -691,61 +690,7 @@ textarea:focus-visible {
 .context-strip {
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-rule);
-}
-.context-toggle {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-3);
-  width: 100%;
-  padding: var(--space-2) var(--space-7);
-  font: inherit;
-  text-align: left;
-  color: var(--color-text);
-  background: none;
-  border: 0;
-  cursor: pointer;
-  transition: background-color var(--duration-fast) ease;
-}
-.context-toggle:hover {
-  background: var(--color-panel);
-}
-.context-toggle:focus-visible {
-  outline-offset: -3px;
-}
-.context-label,
-.context-layer h3 {
-  flex-shrink: 0;
-  font-size: var(--text-small);
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-text-quiet);
-}
-.context-peek {
-  flex: 1;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-family: var(--font-writing);
-  font-size: var(--text-small);
-  transition: opacity var(--duration-fast) ease;
-}
-.context-toggle[aria-expanded='true'] .context-peek {
-  opacity: 0;
-}
-/* Folded, the row names the depth it previews; open, it names all the depths shown below it. */
-.context-toggle[aria-expanded='true'] .context-label-closed,
-.context-toggle[aria-expanded='false'] .context-label-open {
-  display: none;
-}
-.context-chevron {
-  flex-shrink: 0;
-  align-self: center;
-  transition: transform var(--duration-base) var(--ease-out);
-}
-.context-toggle[aria-expanded='true'] .context-chevron {
-  transform: rotate(180deg);
+  padding-top: var(--space-3);
 }
 .context {
   display: grid;
@@ -765,15 +710,20 @@ textarea:focus-visible {
 }
 .context-layer h3 {
   margin: 0;
+  font-size: var(--text-small);
   line-height: var(--line);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-quiet);
 }
 .context-layer p {
   margin: 0;
   font-family: var(--font-writing);
+  font-size: var(--text-small); /* the same size as its Edit link */
   white-space: pre-line; /* keeps the writer's paragraph breaks */
 }
 @media (max-width: 719px) {
-  .context-toggle,
   .context-layer {
     padding-inline: var(--space-3);
   }
@@ -789,6 +739,15 @@ textarea:focus-visible {
    panel's color and reaches down into it, and the other sits back, shorter and darker. */
 .question-card {
   margin-bottom: 0;
+}
+.question-tabs-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--space-4);
+}
+.context-link {
+  display: inline-block;
 }
 .question-tabs {
   display: flex;
@@ -916,6 +875,10 @@ textarea:focus-visible {
   border-color: transparent;
   border-radius: 3px;
   padding-block: calc(var(--space-5) + var(--space-2)); /* 40px */
+}
+/* The caret already shows where the writer is, so the paper takes a hairline ring; controls keep the full one. */
+.writing-field textarea:focus-visible {
+  outline-width: 1px;
 }
 .writing-field label {
   font-size: var(--text-small);
