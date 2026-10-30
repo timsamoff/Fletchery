@@ -36,7 +36,10 @@ Unpushed: `3f8fbfc`, `509aff7`, `afa6c6a`, `0e3696d`, `982b838`.
 
 ## 3. Next step
 
-Ask Tim to OK pushing the five commits. Then check Focus below 720px: `.focus-slot` padding drops to 16px there while `.focus-done` keeps `right: 32px`, so Done may crowd the tab row or the earlier-depths link on phones.
+Ask Tim to OK pushing the commits (`d4e4ed1` and the five before it). Then fix this bug in Focus, which Tim reported with screenshots:
+- **Overlap at mid widths:** the absolutely positioned Done covers "Show seed and sketch" until the tab row wraps. Reserve room for Done in the tab row, for example padding-right on `.focus-slot .question-tabs-row` equal to Done's width plus a gap, so the link wraps before it reaches Done.
+- **The wrapped link:** once it drops to its own line, it sits on the sheet's cream at the left edge. Tim wants it on the question panel's color (`--color-panel`) and inset like the panel's contents (`--space-5`).
+- **Phones:** Tim says Focus looks fine at narrower widths otherwise.
 
 ## 4. Open questions for Tim
 
