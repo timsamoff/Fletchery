@@ -233,12 +233,16 @@ async function showEditor(settings, settingsVersion) {
   }
   state.section = state.sectionSet.sections.find((s) => s.built);
 
+  document.body.classList.add('editor-view');
   view.innerHTML = `
     <div class="workspace" id="workspace">
       <nav class="section-nav" aria-label="Sections">
-        <button type="button" class="button button-quiet nav-toggle" id="nav-toggle" aria-controls="nav-details">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path><path class="nav-toggle-chevron" d="M15 10l-2 2 2 2"></path></svg>
-        </button>
+        <div class="nav-head">
+          <p class="nav-label" aria-hidden="true">Story bible</p>
+          <button type="button" class="button button-quiet nav-toggle" id="nav-toggle" aria-controls="nav-details">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path><path class="nav-toggle-chevron" d="M15 10l-2 2 2 2"></path></svg>
+          </button>
+        </div>
         <details id="nav-details" class="nav-full"${WIDE.matches ? ' open' : ''}>
           <summary>Sections</summary>
           <div id="nav-lists"></div>
@@ -246,6 +250,7 @@ async function showEditor(settings, settingsVersion) {
         <ol class="nav-rail" id="nav-rail"></ol>
       </nav>
       <div class="section-page">
+        <div class="section-main">
         <div class="section-head">
           <h1 id="section-title"></h1>
           <div class="depth-steps" id="depth-steps" role="group" aria-label="Depth"></div>
@@ -264,10 +269,11 @@ async function showEditor(settings, settingsVersion) {
         <div id="work-home"><div id="work"></div></div>
         <div class="button-row section-actions">
           <button type="button" class="button button-quiet" id="canon"></button>
-          <button type="button" class="button button-quiet" id="skip">Skip for now</button>
+          <button type="button" class="button button-plain" id="skip">Skip for now</button>
           <button type="button" class="button button-quiet" id="ask-claude" disabled aria-describedby="ask-claude-note">Ask Claude</button>
           <p class="local-status" id="local-status" aria-hidden="true"></p>
           <button type="button" class="button" id="next-depth"></button>
+        </div>
         </div>
         <p class="hint" id="ask-claude-note">Ask Claude arrives with the Claude Code bridge.</p>
         <dl class="entry-meta" id="entry-meta"></dl>
@@ -487,7 +493,7 @@ function renderWork() {
       .map(
         (f) => `
         <div class="field writing-field${fill ? ' fill' : ''}">
-          <label for="field-${f.id}">${esc(f.label)}</label>
+          <label for="field-${f.id}"${fill ? ' class="visually-hidden"' : ''}>${esc(f.label)}</label>
           <textarea id="field-${f.id}" data-field="${f.id}" spellcheck="true" aria-describedby="question-text"${fill ? '' : ' rows="6"'}></textarea>
         </div>`,
       )

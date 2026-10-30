@@ -27,7 +27,6 @@ body {
 /* Grid container: 16px gutters on phones, 32px from tablet width up. */
 .wrap {
   width: 100%;
-  max-width: 1600px;
   margin-inline: auto;
   padding-inline: var(--space-3);
 }
@@ -314,6 +313,16 @@ textarea:focus-visible {
   background: var(--color-panel);
   border-color: var(--color-control);
 }
+/* Text-only until hovered, for secondary actions beside outlined ones. */
+.button-plain {
+  background: transparent;
+  border-color: transparent;
+  color: var(--color-text);
+}
+.button-plain:hover {
+  background: var(--color-panel);
+  border-color: var(--color-control);
+}
 .button-quiet[aria-pressed='true'] {
   border-color: var(--color-accent);
   box-shadow: inset 0 -4px 0 var(--color-accent);
@@ -360,38 +369,75 @@ textarea:focus-visible {
 
 /* Section workspace: the section list beside the page from 960px, where it folds to a strip of status
    shapes; a disclosure menu above the page on narrower screens. */
+/* The editor runs edge to edge: the section list meets the header and the window's left edge. */
+.editor-view main {
+  padding-block: 0;
+}
+.editor-view #view {
+  padding-inline: 0;
+}
 @media (min-width: 960px) {
   .workspace {
     display: grid;
     grid-template-columns: 264px minmax(0, 1fr);
-    gap: 0 var(--space-6);
-    align-items: start;
+    min-height: calc(100dvh - 84px); /* the window less the header */
     transition: grid-template-columns var(--duration-base) var(--ease-out);
   }
   .workspace.nav-collapsed {
     grid-template-columns: 72px minmax(0, 1fr);
   }
   .section-nav {
-    position: sticky;
-    top: var(--line);
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: 'toggle' 'list';
+    grid-template-rows: auto 1fr;
+    grid-template-areas: 'head' 'list';
+    align-content: start;
     overflow: hidden;
     background: var(--color-panel);
-    border-radius: var(--radius);
-    padding-block: var(--space-2) var(--space-3);
+    padding-block: var(--space-4);
+    margin-bottom: 0;
   }
   .section-nav summary {
     display: none;
   }
-  .nav-toggle {
-    grid-area: toggle;
-    justify-self: end;
-    margin: 0 var(--space-2) var(--space-2);
+  .nav-head {
+    grid-area: head;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-3) var(--space-2) var(--space-5);
   }
-  .nav-collapsed .nav-toggle {
-    justify-self: center;
+  .nav-collapsed .nav-head {
+    justify-content: center;
+    padding-inline: 0;
+  }
+  .nav-label {
+    margin: 0;
+    font-size: var(--text-small);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-quiet);
+    white-space: nowrap;
+    transition: opacity var(--duration-fast) ease;
+  }
+  .nav-collapsed .nav-label {
+    display: none;
+  }
+  .section-nav .nav-list a,
+  .section-nav .nav-list .nav-item-off {
+    padding: var(--space-2) var(--space-4) var(--space-2) calc(var(--space-5) - var(--space-1));
+  }
+  .section-nav .nav-areas {
+    border-top: 0;
+    padding-top: 0;
+  }
+  .nav-areas::before {
+    content: '';
+    display: block;
+    height: 1px;
+    background: var(--color-rule);
+    margin: 0 var(--space-4) calc(var(--space-3) - 1px) var(--space-5);
   }
   .nav-full,
   .nav-rail {
@@ -428,9 +474,12 @@ textarea:focus-visible {
   }
 }
 @media (max-width: 959px) {
-  .section-nav .nav-toggle,
+  .section-nav .nav-head,
   .section-nav .nav-rail {
     display: none;
+  }
+  .section-nav {
+    padding: var(--space-4) var(--space-3) 0;
   }
 }
 .section-nav {
@@ -525,9 +574,19 @@ textarea:focus-visible {
 
 /* Section page: one layout at every depth. The page fills the window, and a single field grows to fill the page. */
 .section-page {
+  padding: var(--space-5) calc(var(--space-7) + var(--space-2)) var(--line);
+  min-width: 0;
+}
+@media (max-width: 959px) {
+  .section-page {
+    padding: 0 var(--space-3) var(--line);
+  }
+}
+/* The first screen ends at the action row; notes and metadata sit below the fold. */
+.section-main {
   display: flex;
   flex-direction: column;
-  min-height: calc(100dvh - 168px - 4 * var(--line)); /* the window less the header, footer, and main's padding */
+  min-height: calc(100dvh - 84px - var(--space-5)); /* the window less the header and the top padding */
 }
 .section-head {
   display: flex;
@@ -741,9 +800,15 @@ textarea:focus-visible {
   line-height: var(--leading-h3);
 }
 
-/* Writing fields: the surface takes the width, and right padding keeps the text column near 80 characters. */
+/* Writing fields: paper lifting off the cream, with no border; the orange focus ring marks the one in use. The
+   surface takes the width, and right padding keeps the text column near 80 characters. */
 .writing-field {
   max-width: none;
+}
+.writing-field textarea {
+  border-color: transparent;
+  border-radius: 3px;
+  padding-block: calc(var(--space-5) + var(--space-2)); /* 40px */
 }
 .writing-field label {
   font-size: var(--text-small);
@@ -753,7 +818,7 @@ textarea:focus-visible {
   margin-bottom: var(--space-1);
 }
 .writing-field textarea {
-  padding-inline: var(--space-5) max(var(--space-5), calc(100% - 80ch - var(--space-5)));
+  padding-inline: var(--space-7) max(var(--space-7), calc(100% - 80ch - var(--space-7)));
 }
 @media (max-width: 719px) {
   .writing-field textarea {

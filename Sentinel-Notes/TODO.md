@@ -5,7 +5,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 ## Build phases
 
 - [ ] Premise end to end: reviewed 2026-10-30; one screen per depth and paste fix built; Sheet model and copy to do; see [premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md).
-- [ ] Visual redesign before more feature work: steps 1-3 built, step 3 (links, fade, paste) awaiting review; see [visual-redesign-design-brief.md](visual-redesign-design-brief.md).
+- [ ] Visual redesign before more feature work: steps 1-3 built, frame matched to the mockup; awaiting review; see [visual-redesign-design-brief.md](visual-redesign-design-brief.md).
 - [ ] Settings page: font, author info, paste breaks, and fade on/off, scope, and timing; see [settings-page-design-brief.md](settings-page-design-brief.md).
 - [ ] Fletchery web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
 - [ ] Characters with images, the media library, relationships, and generated indexes.
