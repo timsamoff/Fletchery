@@ -6,7 +6,7 @@ Decided 2026-10-30. The settled decisions are in `docs/SPEC.md` under "Web editi
 
 A static build of Fletcherling that runs from any web host, with no install and no Node server. The writer picks two things on first run, and can change either later in settings:
 
-1. **AI:** none, or an Anthropic API key.
+1. **AI:** none, Anthropic, or OpenRouter.
 2. **Storage:** this computer, or Google Drive.
 
 The local edition (`fletcherling` launched from a story folder, with Claude Code as the AI) stays as it is. All editions read and write the same bible format, so a bible can move between them.
@@ -28,14 +28,28 @@ The local edition (`fletcherling` launched from a story folder, with Claude Code
 
 The first-run screen and the settings page list these losses plainly before the writer confirms.
 
-**With an API key:**
+**Providers (researched 2026-10-30):**
+
+| Provider | From a static page | Status |
+|---|---|---|
+| Anthropic | Works, with the direct-browser-access header | At launch |
+| OpenRouter | Works. OAuth PKCE sign-in runs in the browser with no backend, so the writer clicks "Connect" instead of pasting a key. One account reaches OpenAI, Google, Anthropic, Meta, and other models. | At launch |
+| Google Gemini direct | Likely works; not confirmed in Google's docs | Later, if asked for |
+| OpenAI direct | Unreliable: reports conflict on whether it accepts browser calls | Use OpenRouter instead |
+| Ollama (local models) | Works once the writer adds the site to `OLLAMA_ORIGINS` and restarts Ollama | Later, if asked for |
+
+- **Adapter:** each provider implements one interface: connect, forget, list models, send a request, and estimate cost when possible.
+- **Validation:** models differ in how reliably they follow a format. Every response is validated against the expected proposal or draft structure before anything is written. On failure, the writer sees "This response couldn't be used" with the option to retry, and no file changes.
+- **Testing:** each provider and its default model gets the same set of format tests before release.
+
+**With a connected provider:**
 - **Key handling:**
-  - The key is stored only in this browser (localStorage), and sent only to `api.anthropic.com`, with the direct-browser-access header.
-  - The settings page states that the key stays on this device, that anyone with access to this browser profile could read it, and that API use is billed to the writer's Anthropic account, separately from any Claude subscription.
+  - The key (or OpenRouter token) is stored only in this browser (localStorage), and sent only to that provider. Anthropic calls use the direct-browser-access header.
+  - The settings page states that the key stays on this device, that anyone with access to this browser profile could read it, and that API use is billed to the writer's provider account, separately from any Claude or ChatGPT subscription.
   - A "Forget key" control removes it.
 - **Context:** each request sends `BIBLE.md`, the current entry, and the entries it links to, trimmed to a token budget. The AI sees only what's sent, unlike Claude Code, which reads the whole folder.
 - **Writing rules:** results come back as proposals (shown side by side, with Accept and Reject) or new `ai-draft` entries, the same as with Claude Code.
-- **Settings:** a model choice (default: the current Sonnet), and a per-request cost estimate when it's practical.
+- **Settings:** a model choice (Anthropic default: the current Sonnet), and a per-request cost estimate when it's practical.
 
 ## Storage choice
 

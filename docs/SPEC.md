@@ -56,11 +56,12 @@ Fletcherling writes no ignore files. Everything in `story-bible/`, including `.f
 
 Fletcherling also runs as a static web app, with no install and no server. Working detail and open questions are in `Sentinel-Notes/web-edition-design-brief.md`.
 
-- **AI is a choice.** A writer can work without AI or add an Anthropic API key. Choosing no AI shows plainly which features go away. The guided interview, depths, status, indexes, `BIBLE.md`, link suggestions, and the structural audit all work without AI.
+- **AI is a choice.** A writer can work without AI, or connect a provider: Anthropic (API key) or OpenRouter (sign-in or key), which reaches OpenAI, Google, and other models. Choosing no AI shows plainly which features go away. The guided interview, depths, status, indexes, `BIBLE.md`, link suggestions, and the structural audit all work without AI.
+- **Provider interface.** Each provider sits behind one adapter interface, so more can be added later (direct Gemini, local Ollama). Every AI response is validated against the expected proposal or draft format before anything is written, and a response that fails shows a clear message instead of producing a broken file.
 - **Storage is a choice.** On this computer (a folder the writer picks), or Google Drive. The bible format is identical in both, and in the local edition.
 - **Same rules for AI writing.** API-generated content follows the same rules as Claude Code: proposals for existing text, `author: ai-draft` for new entries, and nothing settled without the writer.
 - **Shared core.** Entry templates, index and `BIBLE.md` generation, link handling, and the audit live in browser-side modules behind one storage interface. The local server becomes one storage backend among several.
-- **Network.** The web edition contacts Google only when Drive storage is chosen, and Anthropic only when an API key is entered. Fonts stay self-hosted, and nothing else leaves the browser.
+- **Network.** The web edition contacts Google only when Drive storage is chosen, and an AI provider only when one is connected. Fonts stay self-hosted, and nothing else leaves the browser.
 - **Out of scope:** GitHub storage.
 
 ## Defaults adopted for ambiguities in the prompt
