@@ -43,6 +43,28 @@
   src: url('/fonts/atkinson-hyperlegible-latin-700-normal.woff2') format('woff2');
 }
 
+@font-face {
+  font-family: 'Literata';
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/literata-latin-400-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Literata';
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  src: url('/fonts/literata-latin-400-italic.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Literata';
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+  src: url('/fonts/literata-latin-600-normal.woff2') format('woff2');
+}
+
 :root {
   /* Palette */
   --color-charcoal: #2a2d32;
@@ -51,6 +73,7 @@
   --color-orange: #e0601e;
   --color-cream: #f1ece2;
   --color-cream-light: #f8f5ef;
+  --color-cream-deep: #eae3d5;
 
   /* Roles */
   --color-text: var(--color-charcoal);
@@ -63,10 +86,19 @@
   --color-on-accent: var(--color-spine);
   --color-focus: var(--color-orange);
   --color-grid: rgb(224 96 30 / 0.18);
+  --color-panel: var(--color-cream-deep);
+  --color-on-dark: var(--color-cream-light);
+  --color-control: var(--color-charcoal);
+  --color-control-hover: var(--color-spine);
+  --color-rule: rgb(42 45 50 / 0.2);
+  --shadow-paper: 0 1px 0 rgb(29 31 35 / 0.08), 0 16px 32px -22px rgb(29 31 35 / 0.4);
 
-  /* Type */
+  /* Type. The writer's own text is set in the serif; the interface stays in the sans. */
   --font-body: 'Source Sans 3', system-ui, sans-serif;
   --font-hyperlegible: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-serif: 'Literata', Georgia, serif;
+  --font-writing: var(--font-serif);
+  --text-writing: 20px;
 
   /* Rhythm: 8px base unit, 4px baseline, 28px body line. */
   --unit: 8px;
@@ -95,6 +127,11 @@
   --radius: 4px;
   --border: 2px;
   --focus-ring: 3px solid var(--color-focus);
+
+  /* Motion: err on the side of animation; base.css turns it off for reduced motion. */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 300ms;
 }
 
 :root[data-font='atkinson-hyperlegible'] {

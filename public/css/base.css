@@ -48,9 +48,10 @@ fieldset {
   margin: 0;
 }
 h1 {
+  font-family: var(--font-serif);
   font-size: var(--text-h1);
   line-height: var(--leading-h1);
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: var(--space-3); /* two whole lines */
 }
 h2 {
@@ -111,8 +112,8 @@ code {
 
 /* Header: 84px, three lines. */
 .site-header {
-  background: var(--color-surface);
-  border-bottom: var(--border) solid var(--color-border);
+  background: var(--color-bg);
+  border-bottom: var(--border) solid var(--color-rule);
 }
 .site-header .wrap {
   min-height: 82px; /* 84 with the border */
@@ -126,19 +127,25 @@ code {
   gap: var(--space-2);
   color: var(--color-text);
   text-decoration: none;
-  font-size: var(--text-h2);
-  line-height: var(--leading-h2);
+  font-size: var(--text-h3);
+  line-height: var(--leading-h3);
   font-weight: 700;
 }
 .brand img {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   display: block;
 }
 .project-title {
-  margin: 0 0 0 auto;
-  color: var(--color-text-quiet);
-  text-align: right;
+  margin: 0;
+  padding-left: var(--space-3);
+  border-left: 1px solid var(--color-rule);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--text-h3);
+}
+.project-title:empty {
+  display: none;
 }
 
 main {
@@ -150,8 +157,8 @@ main:focus {
 
 /* Footer */
 .site-footer {
-  background: var(--color-surface);
-  border-top: var(--border) solid var(--color-border);
+  background: var(--color-bg);
+  border-top: var(--border) solid var(--color-rule);
   font-size: var(--text-small);
 }
 .site-footer .wrap {
@@ -220,6 +227,10 @@ textarea {
   padding-block: 12px; /* padding and border add one whole line */
   resize: vertical;
   min-height: calc(var(--line) * 6 + 28px);
+  font-family: var(--font-writing);
+  font-size: var(--text-writing);
+  border-color: var(--color-border-quiet);
+  box-shadow: var(--shadow-paper);
 }
 textarea.short {
   min-height: calc(var(--line) * 3); /* two lines of text plus padding and border */
@@ -254,29 +265,35 @@ textarea:focus-visible {
   gap: 0 var(--space-5);
 }
 
-/* Buttons: 44px tall, and a row of them takes two lines. Orange buttons carry spine-charcoal labels (4.61:1). */
+/* Buttons: 44px tall, and a row of them takes two lines. Primary buttons are charcoal with cream labels (12.7:1). */
 .button {
   display: inline-block;
   font: inherit;
   font-weight: 600;
   line-height: var(--line);
   padding: 6px var(--space-4);
-  border: var(--border) solid var(--color-accent);
+  border: var(--border) solid var(--color-control);
   border-radius: var(--radius);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
+  background: var(--color-control);
+  color: var(--color-on-dark);
   cursor: pointer;
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
 }
 .button:hover {
-  border-color: var(--color-spine);
+  background: var(--color-control-hover);
+  border-color: var(--color-control-hover);
 }
 .button-quiet {
   background: transparent;
-  border-color: var(--color-border);
+  border-color: var(--color-control);
   color: var(--color-text);
 }
 .button-quiet:hover {
-  border-color: var(--color-accent);
+  background: var(--color-panel);
+  border-color: var(--color-control);
 }
 .button-quiet[aria-pressed='true'] {
   border-color: var(--color-accent);
@@ -363,13 +380,18 @@ textarea:focus-visible {
 .nav-list a,
 .nav-item-off {
   display: block;
-  padding-left: var(--space-3);
+  padding: 0 var(--space-2) 0 var(--space-3);
   border-left: var(--space-1) solid transparent;
   text-decoration: none;
   color: var(--color-text);
+  transition: background-color var(--duration-fast) ease;
+}
+.nav-list a:hover {
+  background: var(--color-panel);
 }
 .nav-list a[aria-current='page'] {
   border-left-color: var(--color-accent);
+  background: var(--color-surface);
   font-weight: 700;
 }
 .nav-item-off {
@@ -400,9 +422,13 @@ textarea:focus-visible {
   margin: 0;
   padding: 0 var(--space-2);
   line-height: calc(var(--line) - 2 * var(--border)); /* with the border, one line */
-  border: var(--border) solid var(--color-border);
+  border: var(--border) solid var(--color-border-quiet);
   border-radius: var(--radius);
+  font-size: var(--text-small);
   font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-quiet);
 }
 .guide {
   margin-bottom: var(--line);
@@ -462,6 +488,7 @@ textarea:focus-visible {
 }
 .context-layer p {
   margin: 0;
+  font-family: var(--font-writing);
 }
 .local-status {
   min-height: var(--line);

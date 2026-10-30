@@ -28,7 +28,14 @@ Mockups: https://claude.ai/artifact/XuVSsW4zdE8JQQvqwQAemM (private).
 - **Links:** the fletching mark (two small orange chevrons after the link text, shifting right on hover). An arrow underline was compared and not chosen.
 - **Writer's text size:** the same at every depth (20px Literata on the 28px line). A zoom option for the writer's text is worth adding with the formatting editor.
 - **Motion:** err on the side of animation (CLAUDE.md design rule). The section list animates its width as it opens and closes, crossfading between the full list and the strip.
+- **Focus sheet questions:** the same question area as the depth screens, mode buttons and Back and Next included (the board 3 mockup doesn't match; build it to match boards 1 and 2).
 - **Focus animation:** Rise. The sheet rises about 48px as it fades in over a dark backdrop, and sinks back on close. Fade, Lift, and Dim the room were compared.
+
+## Build
+
+1. Foundation (built 2026-10-30): Literata for the writer's text, new tokens (deep cream, rule, paper shadow, motion), charcoal primary buttons with cream labels, quieter header with the project title in serif italic, restyled section list and status label.
+2. Section page: one layout for every depth with the question card on top, the writing surface filling the screen, the animated section list, and Focus with Rise.
+3. Details: fletching links, fading chrome while typing, and the Google Docs paste fix.
 
 ## Open
 

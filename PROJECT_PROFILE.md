@@ -21,7 +21,7 @@ The app was renamed from Fletcherling to Fletchery on 2026-10-30. The fields bel
 ## Values for `[PROJECT-SPECIFIC]` brackets
 
 - **Project name:** Fletchery (confirmed by the user; matches `README.md` title and `package.json` `name`).
-- **Tech stack:** JavaScript (ES modules) on Node 20+ (developed on Node 25.2). Server uses Node's built-in `http`, `fs`, and recursive `fs.watch`; no framework. Front end is plain HTML, CSS, and JavaScript with no build step. Package manager: npm (`package.json`, `package-lock.json`). Dependencies: `@fontsource/source-sans-3`, `@fontsource/atkinson-hyperlegible`, `yaml`.
+- **Tech stack:** JavaScript (ES modules) on Node 20+ (developed on Node 25.2). Server uses Node's built-in `http`, `fs`, and recursive `fs.watch`; no framework. Front end is plain HTML, CSS, and JavaScript with no build step. Package manager: npm (`package.json`, `package-lock.json`). Dependencies: `@fontsource/source-sans-3`, `@fontsource/atkinson-hyperlegible`, `@fontsource/literata`, `yaml`.
 - **Application surfaces:**
   1. The local web app: CLI launcher (`bin/fletchery.js`), server (`server/`), and browser front end (`public/`). One surface; the three folders share one process and one API.
   - Planned, not yet built: Claude Code skills (`skills/`) and an install script (`scripts/`). These will be a second surface that reads the same bible format but shares no code with the app.

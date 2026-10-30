@@ -8,7 +8,7 @@ import { Watcher } from './watch.js';
 
 const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PUBLIC_DIR = path.join(APP_DIR, 'public');
-const FONT_DIRS = ['source-sans-3', 'atkinson-hyperlegible'].map((name) =>
+const FONT_DIRS = ['source-sans-3', 'atkinson-hyperlegible', 'literata'].map((name) =>
   path.join(APP_DIR, 'node_modules', '@fontsource', name, 'files'),
 );
 const ICON = path.join(APP_DIR, 'assets', 'fletchery-icon.svg');
