@@ -9,6 +9,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Characters with images, the media library, relationships, and generated indexes.
 - [ ] Notes and media (Inbox, quick capture, maps), then the remaining sections from data for all three story types.
 - [ ] Bridge: request queue, proposals, `BIBLE.md`, the four skills, and the install script.
+- [ ] Layout views (document, board, canvas, outline) with animated drag and drop; see [layout-views-design-brief.md](layout-views-design-brief.md).
 - [ ] Accessibility and responsiveness pass, tested with the keyboard and at 320px and ultra-wide.
 - [ ] README: install, launch, directory layout, and handing a bible to Claude Code.
 - [ ] Later, only with approval: a `claude -p` "Run now" option for Ask Claude.
