@@ -1,0 +1,76 @@
+# Web edition: design brief
+
+Decided 2026-10-30. The settled decisions are in `docs/SPEC.md` under "Web edition". This brief holds the detail and the open questions.
+
+## What it is
+
+A static build of Fletcherling that runs from any web host, with no install and no Node server. The writer picks two things on first run, and can change either later in settings:
+
+1. **AI:** none, or an Anthropic API key.
+2. **Storage:** this computer, or Google Drive.
+
+The local edition (`fletcherling` launched from a story folder, with Claude Code as the AI) stays as it is. All editions read and write the same bible format, so a bible can move between them.
+
+## AI choice
+
+**Without AI**, the writer keeps:
+- the guided interview and full form, depths, status, and Skip for now
+- entries, folders, images, sidecars, and the media library
+- Notes, the Inbox, and quick capture
+- generated indexes and `BIBLE.md`
+- link suggestions
+- the structural audit: broken links, missing alt text, unfiled Inbox items, and ages against the timeline from structured dates
+
+**Without AI**, the writer loses:
+- Ask Claude: AI interviews that follow up on answers, expand this, check against the rest of the bible, and suggest what's missing
+- AI suggestions for where to file Inbox items
+- contradiction checks that need judgment, beyond what structured fields allow
+
+The first-run screen and the settings page list these losses plainly before the writer confirms.
+
+**With an API key:**
+- **Key handling:**
+  - The key is stored only in this browser (localStorage), and sent only to `api.anthropic.com`, with the direct-browser-access header.
+  - The settings page states that the key stays on this device, that anyone with access to this browser profile could read it, and that API use is billed to the writer's Anthropic account, separately from any Claude subscription.
+  - A "Forget key" control removes it.
+- **Context:** each request sends `BIBLE.md`, the current entry, and the entries it links to, trimmed to a token budget. The AI sees only what's sent, unlike Claude Code, which reads the whole folder.
+- **Writing rules:** results come back as proposals (shown side by side, with Accept and Reject) or new `ai-draft` entries, the same as with Claude Code.
+- **Settings:** a model choice (default: the current Sonnet), and a per-request cost estimate when it's practical.
+
+## Storage choice
+
+**This computer:**
+- **Chrome and Edge:** the writer picks a folder, through the File System Access API (`showDirectoryPicker`), and the app reads and writes it directly. Permission is re-requested on each visit, since browsers don't keep it.
+- **Outside edits:** with `FileSystemObserver` (Chrome 133+, still experimental), edits made outside the app, such as by Claude Code, appear live. Without it, the app re-checks when the tab regains focus.
+- **Conflict detection:** works as in the local edition. Before writing, the app compares the file with the version it loaded, and asks if they differ.
+- **Firefox and Safari:** neither supports writing to a folder, and neither plans to. Recommended default: suggest Google Drive. If the writer still wants local, offer "Open a bible" (read a folder) plus "Save a copy" (download a zip) as a manual round trip, with a clear note that the app doesn't save on its own in this mode. Don't offer browser-only storage (OPFS) as a home for the bible, since clearing site data deletes it.
+
+**Google Drive:**
+- **Sign-in:** through Google Identity Services, with only a client ID and no secret.
+- **Scope:** `drive.file`, so the app sees only files it created or the writer picked. Google classifies this scope as non-sensitive. It still needs basic OAuth app verification before the public can use it without a warning screen, and that requires a privacy policy page and a verified domain.
+- **Layout:** the app creates `Fletcherling/<working title>/story-bible/` in the writer's Drive, with the same layout as on disk.
+- **Conflict detection:** before writing, the app checks the file's revision against the one it loaded. Drive has no push notifications for a static page, so it re-checks on focus and on a slow interval.
+
+## Architecture changes (do these before Premise phase 2)
+
+- **Shared core (`public/js/core/`):**
+  - entry templates from `sections/*.json`
+  - Markdown and frontmatter parsing and serialization
+  - index and `BIBLE.md` generation
+  - link suggestion and link rewriting for Move to library and Move to entry
+  - the audit
+- **Storage interface:** `list`, `read` (returns content and a version), `write(path, content, baseVersion)` (refuses on a version mismatch), `delete`, `move`, and `changes` (a push or polling stream).
+- **Backends:**
+  - `LocalServerStore`: the current Node server, now reduced to file I/O, path guarding, and watching
+  - `FolderStore`: File System Access
+  - `DriveStore`
+  - `ZipStore`: import and export only
+- **Builds:** the local edition serves the same front end with `LocalServerStore`. The web edition is the same front end, deployed static, with `FolderStore` or `DriveStore`.
+- **Moves:** the server's frontmatter and serialization code moves into the core. Server-side writes then just store what the page sends, and the path guard and atomic writes stay on the server.
+
+## Open questions
+
+- **Hosting:** GitHub Pages from this repo, or another static host? Drive verification needs a domain Tim controls, plus a privacy policy page.
+- **Claude Code with the web edition:** in "this computer" mode, the folder is an ordinary story folder, so Claude Code can work in it, and the request queue could still apply. Offer that as a third AI option ("Claude Code on this computer"), or keep the web edition to none or an API key?
+- **Build order:** build the shared core and storage interface now, with the web edition itself after the local edition's phases? Or ship the web edition earlier?
+- **Drive and Claude Code:** the Drive for desktop sync client would put a Drive bible on disk where Claude Code could reach it. Mention this in docs, or leave it out?

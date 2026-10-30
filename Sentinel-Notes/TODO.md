@@ -5,6 +5,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 ## Build phases
 
 - [ ] Premise end to end: see [premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md).
+- [ ] Web edition (AI optional, local or Drive storage): build the shared core and storage interface first; see [web-edition-design-brief.md](web-edition-design-brief.md).
 - [ ] Characters with images, the media library, relationships, and generated indexes.
 - [ ] Notes and media (Inbox, quick capture, maps), then the remaining sections from data for all three story types.
 - [ ] Bridge: request queue, proposals, `BIBLE.md`, the four skills, and the install script.

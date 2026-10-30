@@ -52,6 +52,17 @@ Fletcherling writes no ignore files. Everything in `story-bible/`, including `.f
 - **Security.** The server binds to `127.0.0.1`, checks the `Host` header, and refuses writes from any other `Origin`.
 - **Rhythm.** Base unit 8px, body 18px on a 28px line height, a 4px baseline grid, and a "Show grid" overlay for checking it.
 
+## Web edition (decided 2026-10-30)
+
+Fletcherling also runs as a static web app, with no install and no server. Working detail and open questions are in `Sentinel-Notes/web-edition-design-brief.md`.
+
+- **AI is a choice.** A writer can work without AI or add an Anthropic API key. Choosing no AI shows plainly which features go away. The guided interview, depths, status, indexes, `BIBLE.md`, link suggestions, and the structural audit all work without AI.
+- **Storage is a choice.** On this computer (a folder the writer picks), or Google Drive. The bible format is identical in both, and in the local edition.
+- **Same rules for AI writing.** API-generated content follows the same rules as Claude Code: proposals for existing text, `author: ai-draft` for new entries, and nothing settled without the writer.
+- **Shared core.** Entry templates, index and `BIBLE.md` generation, link handling, and the audit live in browser-side modules behind one storage interface. The local server becomes one storage backend among several.
+- **Network.** The web edition contacts Google only when Drive storage is chosen, and Anthropic only when an API key is entered. Fonts stay self-hosted, and nothing else leaves the browser.
+- **Out of scope:** GitHub storage.
+
 ## Defaults adopted for ambiguities in the prompt
 
 Each of these is a default. Any of them can be changed during plan review.
@@ -67,4 +78,4 @@ Each of these is a default. Any of them can be changed during plan review.
 9. **Saving.** The browser saves about 500 ms after typing stops, and on blur. Each save carries the version the browser last loaded. If the file changed on disk since then, the server refuses the write and the page shows both versions and asks which to keep.
 10. **Story type.** It's asked once, but it can be changed later in settings, with a warning. Changing it never deletes files.
 11. **Font setting.** The typeface choice (Source Sans 3 or Atkinson Hyperlegible) is stored in `fletcherling.json` with the rest of the project settings.
-12. **Fonts and the network.** Fonts come from `@fontsource` at `npm install` time and are served locally. The running app makes no external requests.
+12. **Fonts and the network.** Fonts come from `@fontsource` at `npm install` time and are served locally. The local edition makes no external requests. The web edition's exceptions are listed above.
