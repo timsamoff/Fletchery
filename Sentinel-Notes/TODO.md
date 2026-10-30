@@ -37,6 +37,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 
 ## Setup
 
+- [ ] G1: Decide whether the spec gate's structural triggers should also require `DESIGN.md` in the same commit.
 - [ ] T1: Add automated tests for conflict detection, the path guard, and frontmatter completeness in `server/`.
 - [ ] Consider a narrow permission rule allowing `node scratch/*.js` to cut down on prompts.
 

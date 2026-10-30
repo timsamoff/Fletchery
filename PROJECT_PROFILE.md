@@ -25,7 +25,7 @@ Produced by Sentinel `00-project-discovery.md`, version 1.6.1, on 2026-10-29.
   - Planned, not yet built: Claude Code skills (`skills/`) and an install script (`scripts/`). These will be a second surface that reads the same bible format but shares no code with the app.
 - **Design/token system file:** `public/css/tokens.css` (CSS custom properties for palette, type, rhythm, and spacing; `public/css/base.css` consumes them).
 - **Recurring unit of work:** a bible section (confirmed by the user). Adding one touches its data file in `sections/`, the section page, server read and write, generated indexes, `BIBLE.md`, and the skills.
-- **Existing design document:** `docs/SPEC.md` (agreed decisions, wins over the brief). Supporting: `first-prompt/FLETCHERLING-PROMPT.md` (the original brief, untracked) and the approved plan at `C:\Users\Tim\.claude\plans\bubbly-enchanting-trinket.md` (outside the repo).
+- **Existing design document:** `DESIGN.md` (architecture overview, added 2026-10-30). `docs/SPEC.md` holds the agreed decisions and wins over the brief. Supporting: `first-prompt/FLETCHERLING-PROMPT.md` (the original brief, untracked) and the approved plan at `C:\Users\Tim\.claude\plans\bubbly-enchanting-trinket.md` (outside the repo).
 
 ## VCS and release
 

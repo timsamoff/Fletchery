@@ -6,7 +6,7 @@ This file and `Sentinel-Notes/` are committed to the public repo by deliberate c
 
 ## Project
 
-- Brief: `first-prompt/FLETCHERLING-PROMPT.md`, deliberately kept out of git (gitignored, never committed). Remote sessions can't see it; `docs/SPEC.md` carries the decisions they need. Decisions: `docs/SPEC.md`, which wins where the two differ and serves as the design document.
+- Brief: `first-prompt/FLETCHERLING-PROMPT.md`, deliberately kept out of git (gitignored, never committed). Remote sessions can't see it; `docs/SPEC.md` carries the decisions they need. Decisions: `docs/SPEC.md`, which wins where the two differ. Architecture overview: `DESIGN.md`.
 - Approved plan: `C:\Users\Tim\.claude\plans\bubbly-enchanting-trinket.md` (outside the repo; see TODO Doc1).
 - Backlog: `Sentinel-Notes/TODO.md`. Project profile: `PROJECT_PROFILE.md`.
 - Stop after each phase for Tim's review. Test in a real browser before saying anything works.
@@ -24,7 +24,7 @@ This file and `Sentinel-Notes/` are committed to the public repo by deliberate c
 ## Working conventions
 
 - **Comments:** one or two sentences at most, saying what the code is for or why. Longer background, history, or reasoning goes here, or into `docs/SPEC.md` if it's an architectural decision.
-- **Documentation routing:** a tracked, unresolved inconsistency goes to `Sentinel-Notes/TODO.md` (plus a one-line pointer here if it could be mistaken for convention). A settled operational convention goes here. A settled architectural decision goes in `docs/SPEC.md`. Anything an external user needs goes in the README. A declined suggestion is either "not now" (TODO) or a settled rejection (here or SPEC.md, with the reason).
+- **Documentation routing:** a tracked, unresolved inconsistency goes to `Sentinel-Notes/TODO.md` (plus a one-line pointer here if it could be mistaken for convention). A settled operational convention goes here. A settled architectural decision goes in `docs/SPEC.md`, and `DESIGN.md` changes whenever the decision changes how the parts fit together. Anything an external user needs goes in the README. A declined suggestion is either "not now" (TODO) or a settled rejection (here or SPEC.md, with the reason).
 - **TODO items:** one line each, and anything longer gets `Sentinel-Notes/<issue>-design-brief.md`. Move a finished item's line to the Done section at the bottom. Move a finished item's brief to `Sentinel-Notes/archive/`. Updating `TODO.md` is part of finishing the work, not a follow-up.
 - **After finishing a TODO item:** name the item most worth doing next with a reason, then start on it unless Tim redirects. TODO items carry no priority, effort, or dependency data, so the pick is judgment from the item text, and should be stated that way. If two are close, name both with a one-line reason each, then proceed on the stronger.
 - **Backlog mention:** when any distinct task reaches a natural stopping point, check whether `Sentinel-Notes/TODO.md` has open items not touched or acknowledged since the task started, and if so, name the strongest candidate before ending the response. Skip this if the backlog was already surfaced this session and nothing changed.
