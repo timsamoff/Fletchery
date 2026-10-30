@@ -836,6 +836,8 @@ textarea:focus-visible {
   max-width: none;
 }
 .writing-field textarea {
+  scrollbar-width: thin; /* matches the section list */
+  scrollbar-color: var(--color-rule) transparent;
   border-color: transparent;
   border-radius: 3px;
   padding-block: calc(var(--space-5) + var(--space-2)); /* 40px */
