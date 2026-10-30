@@ -8,6 +8,7 @@ Written 2026-10-30. All three steps of the visual redesign are built. Step 3 is 
   - fletching links,
   - the section list fading while typing (cut back from the full interface on 2026-10-30 because the full fade was disruptive; the full scope stays behind `data-fade-scope="full"`),
   - the Google Docs paste fix, which Tim confirmed.
+- **Frame matched to the mockup** in `02ecbdd`: full width, an edge-to-edge section list, borderless paper fields, wider margins. Waiting on Tim's look.
 - **Settings page** ([settings-page-design-brief.md](settings-page-design-brief.md)): briefed, not built. It covers paste breaks, plus fade on/off, scope, and timing.
 
 ## 2. Files touched in step 3
@@ -23,7 +24,7 @@ Wait for Tim's review of step 3. After that, the strongest open items:
 
 ## 4. Open questions for Tim
 
-- Text area boundaries: Tim will comment once the layout is more final.
+- Where settings are saved: personal preferences in the browser and story-level ones in `fletchery.json` was proposed, with no answer yet.
 - The tablet tier from the brief isn't designed yet. The app still has 720px and 960px points only.
 
 ## 5. Tried and failed
