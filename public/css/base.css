@@ -1225,3 +1225,9 @@ textarea:focus-visible {
 .settings-preview .settings-select {
   opacity: 0.55;
 }
+.settings-text {
+  margin-bottom: var(--space-3);
+}
+.settings-text input {
+  margin-top: var(--space-1);
+}

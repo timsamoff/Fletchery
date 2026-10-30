@@ -7,6 +7,7 @@ const SAVE_DELAY_MS = 300;
 
 const DEFAULTS = {
   version: 1,
+  author: { name: '', coAuthors: '' }, // as credited, so a pen name works
   interfaceFont: 'source-sans-3', // or 'atkinson-hyperlegible'
   writingFont: 'literata', // or 'interface'
   paste: 'paragraphs', // or 'lines'
@@ -123,6 +124,8 @@ export class Settings {
 
 // ---------- The Settings panel ----------
 
+const escAttr = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+
 const radio = (name, value, label, current, hint) => `
   <div class="choice">
     <input type="radio" id="set-${name}-${value}" name="${name}" value="${value}"${current === value ? ' checked' : ''}${hint ? ` aria-describedby="set-${name}-${value}-hint"` : ''} />
@@ -133,6 +136,19 @@ const radio = (name, value, label, current, hint) => `
 function formHtml(v) {
   const off = v.fade.on ? '' : ' disabled';
   return `
+    <fieldset>
+      <legend>Credit</legend>
+      <div class="field settings-text">
+        <label for="set-author-name">Author</label>
+        <span class="hint" id="set-author-name-hint">As the story is credited. A pen name works.</span>
+        <input type="text" id="set-author-name" aria-describedby="set-author-name-hint" autocomplete="name" value="${escAttr(v.author.name)}" />
+      </div>
+      <div class="field settings-text">
+        <label for="set-author-co">Co-authors</label>
+        <span class="hint" id="set-author-co-hint">Optional. Separate names with commas.</span>
+        <input type="text" id="set-author-co" aria-describedby="set-author-co-hint" autocomplete="off" value="${escAttr(v.author.coAuthors)}" />
+      </div>
+    </fieldset>
     <fieldset>
       <legend>Your writing</legend>
       <p class="settings-question">Font for your text</p>
@@ -199,6 +215,8 @@ export function setupSettingsPanel(settings) {
       body.querySelectorAll('[name=fadeScope], #set-fade-pause').forEach((el) => (el.disabled = !e.target.checked));
     });
     body.querySelector('#set-fade-pause').addEventListener('change', (e) => settings.update({ fade: { pauseSeconds: Number(e.target.value) } }));
+    body.querySelector('#set-author-name').addEventListener('input', (e) => settings.update({ author: { name: e.target.value.trim() } }));
+    body.querySelector('#set-author-co').addEventListener('input', (e) => settings.update({ author: { coAuthors: e.target.value.trim() } }));
   };
 
   opener.addEventListener('click', () => {
