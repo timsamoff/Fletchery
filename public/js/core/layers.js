@@ -5,6 +5,7 @@ export const DEPTHS = ['seed', 'sketch', 'sheet'];
 const HEADINGS = { seed: 'Seed', sketch: 'Sketch', sheet: 'Sheet' };
 
 // sheetFields: [{ id, label }] in order. Returns { preamble, seed, sketch, sheet: { [id]: text }, sheetExtra, extra }.
+// With no sheetFields, the Sheet is one free-text box and all of it lands in sheetExtra.
 export function parseLayers(body, sheetFields = []) {
   const layers = { preamble: '', seed: '', sketch: '', sheet: {}, sheetExtra: '', extra: '' };
   const lines = body.replace(/\r\n/g, '\n').split('\n');
@@ -68,7 +69,7 @@ export function serializeLayers(layers, sheetFields = []) {
 
 // The deepest layer that has any text, or 'seed'.
 export function deepestFilled(layers) {
-  if (Object.values(layers.sheet ?? {}).some(Boolean)) return 'sheet';
+  if (Object.values(layers.sheet ?? {}).some(Boolean) || layers.sheetExtra) return 'sheet';
   if (layers.sketch) return 'sketch';
   return 'seed';
 }

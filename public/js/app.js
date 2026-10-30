@@ -214,7 +214,8 @@ const state = {
   conflict: null, // { disk, confirming }
 };
 
-const sheetFields = () => state.section.depths.sheet.fields;
+// A Sheet with its own questions is one box, like Seed and Sketch. Otherwise each field is a ### part.
+const sheetFields = () => (state.section.depths.sheet.questions ? [] : state.section.depths.sheet.fields);
 const composedBody = () => serializeLayers(state.layers, sheetFields());
 const isDirty = () => composedBody() !== state.savedBody;
 const entryPath = () => state.section.file;
@@ -439,11 +440,12 @@ function renderDepth() {
   document.querySelectorAll('[data-goto]').forEach((b) => b.addEventListener('click', () => setDepth(b.dataset.goto, true)));
 }
 
-// The question card and answer fields, laid out the same way at every depth. Sheet questions come from its fields.
+// The question card and answer fields, laid out the same way at every depth. A Sheet of separate fields takes its
+// questions from them.
 function renderWork() {
   const def = state.section.depths[state.depth];
   const work = document.getElementById('work');
-  const isSheet = state.depth === 'sheet';
+  const isSheet = state.depth === 'sheet' && !def.questions; // a Sheet of separate fields
   const interview = state.mode === 'interview';
   const questions = isSheet ? def.fields.map((f) => f.question) : def.questions;
   const step = Math.min(state.step, questions.length - 1);
@@ -539,11 +541,13 @@ function renderWork() {
 }
 
 function fieldValue(id) {
+  if (id === 'sheet') return state.layers.sheetExtra;
   return id === 'seed' || id === 'sketch' ? state.layers[id] : (state.layers.sheet[id] ?? '');
 }
 
 function setFieldValue(id, value) {
   if (id === 'seed' || id === 'sketch') state.layers[id] = value;
+  else if (id === 'sheet') state.layers.sheetExtra = value;
   else state.layers.sheet[id] = value;
 }
 

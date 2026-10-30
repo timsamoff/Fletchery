@@ -35,12 +35,13 @@
         "sheet": {
           "label": "Sheet",
           "guide": "About a page, in four paragraphs. Each of the first three ends in a disaster.",
-          "fields": [
-            { "id": "act1", "label": "Act 1, through the first disaster", "question": "Who, where, and what’s normal, up to the first disaster that commits them?" },
-            { "id": "act2a", "label": "Act 2, through the second disaster", "question": "How does their first attempt to fix things lead to the second disaster?" },
-            { "id": "act2b", "label": "Act 2, through the third disaster", "question": "What do they try next, and what failure forces the final act?" },
-            { "id": "act3", "label": "Act 3 and the ending", "question": "How does it resolve, and what does it cost them?" }
-          ]
+          "questions": [
+            "Who, where, and what’s normal, up to the first disaster that commits them?",
+            "How does their first attempt to fix things lead to the second disaster?",
+            "What do they try next, and what failure forces the final act?",
+            "How does it resolve, and what does it cost them?"
+          ],
+          "fields": [{ "id": "sheet", "label": "Premise in about a page" }]
         }
       }
     },

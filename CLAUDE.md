@@ -15,7 +15,7 @@ This file and `Sentinel-Notes/` are committed to the public repo by deliberate c
 - Stack: Node `http`, plain HTML/CSS/JS, no build step yet (one is allowed; see `docs/SPEC.md`). Launch with `fletchery` from a story project.
 - Tim keeps stories in `Documents/_Writing/<story>/`, each its own private git repo, and runs `fletchery` from inside the story folder. App code and story data never mix.
 - Entry logic lives in `public/js/core/` and must run in both the browser and Node: import only the bare name `yaml` and relative paths there, never browser globals at module level. The server is a file store and knows nothing about entries.
-- Entry bodies hold `## Seed`, `## Sketch`, and `## Sheet` layers (`public/js/core/layers.js`). Never drop text the parser doesn't recognize. Frontmatter `depth` and the empty and draft statuses follow the text; only the writer marks an entry as canon (`status: canon`, read from the older `settled` too).
+- Entry bodies hold `## Seed`, `## Sketch`, and `## Sheet` layers (`public/js/core/layers.js`). A Sheet whose section data has its own `questions` (the Premise) is one box of free text; a Sheet of `fields` stores each as a `###` part. Never drop text the parser doesn't recognize. Frontmatter `depth` and the empty and draft statuses follow the text; only the writer marks an entry as canon (`status: canon`, read from the older `settled` too).
 - Write one-off verification scripts to `scratch/` (gitignored), not the OS temp folder. Playwright saves to `.playwright-mcp/` (gitignored).
 
 ## Design rules

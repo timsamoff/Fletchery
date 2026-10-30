@@ -84,7 +84,7 @@ What each section covers is in the approved plan and `first-prompt/FLETCHERLING-
 
 ### Entry depths (built 2026-10-30)
 
-An entry's body holds up to three layers under `## Seed`, `## Sketch`, and `## Sheet` headings, and Sheet fields are `###` subsections named by their labels. Only layers with text are written. A body with no layer headings is read as the Seed, and text the app doesn't recognize is kept. Frontmatter `depth` is the deepest layer with text. Status is empty or draft from the text, and canon only by the writer. Editing a canon entry's text returns it to draft. (Renamed from "settled" on 2026-10-30: "canon" is the term writers use for established bible facts, and "final" would imply a fact never changes. Files with `status: settled` read as canon.)
+An entry's body holds up to three layers under `## Seed`, `## Sketch`, and `## Sheet` headings. A Sheet whose section data gives it its own `questions` is one box of free text, like Seed and Sketch (the Premise, decided 2026-10-30). A Sheet made of separate fields, as Characters will be, stores each field as a `###` subsection named by its label. Only layers with text are written. A body with no layer headings is read as the Seed, and text the app doesn't recognize is kept. Frontmatter `depth` is the deepest layer with text. Status is empty or draft from the text, and canon only by the writer. Editing a canon entry's text returns it to draft. (Renamed from "settled" on 2026-10-30: "canon" is the term writers use for established bible facts, and "final" would imply a fact never changes. Files with `status: settled` read as canon.)
 
 ## Web edition (decided 2026-10-30)
 
