@@ -16,11 +16,22 @@ Tim wrote a redesign prompt (pasted in session and deliberately not kept in the 
 - **Canvas.** The whole app isn't a canvas. The planned canvas view in [layout-views-design-brief.md](layout-views-design-brief.md) stays open.
 - **Reference.** `Sentinel-Notes/screenshots/` holds the Storyflow reference. It's a third-party interface, so the folder is gitignored. What carries over: tall column cards in sequence with thin connectors, full-width images inside cards, and separation by tone instead of heavy borders. Not its dark theme or its canvas.
 
+## Mockup review (2026-10-30)
+
+Mockups: https://claude.ai/artifact/XuVSsW4zdE8JQQvqwQAemM (private).
+
+- **Serif:** Literata.
+- **One layout for every depth.** Seed, Sketch, and Sheet share the same layout. The question or prompt sits above the writing surface, never beside it.
+- **Section list:** the writer can show or hide it on every depth. Hidden, it collapses to a strip of status shapes.
+- **Focus:** available from every depth.
+- **Receding controls:** Tim leans toward Fade (dim the chrome while typing) over Tuck, and may change his mind.
+- **Links:** Tim likes the fletching mark but doubts it works mid-sentence. An arrow underline (a translucent orange line ending in a small arrowhead, opaque on hover) was added to compare.
+
 ## Open
 
 - **Links.** No underlines. Tim wants a distinctive touch of the app's own. Constraint: a link must differ from the text around it by more than color (WCAG 1.4.1), and charcoal links in charcoal text get no help from color, so it needs a visible mark.
 - **Width.** Tim finds the 68ch writing area confining. To try: a wider measure with larger type (about 20-21px, up to about 80ch); a writing surface that takes the width while navigation collapses and guidance moves to a margin; a focus mode that opens the field as a near full-screen sheet; fields that grow with their text instead of scrolling.
 - **Receding controls.** Whether controls fade while the writer types. Tim wants a couple of examples before deciding. Hidden controls cost discoverability and keyboard reach.
 - **Writing size by depth.** A Seed is one sentence, so its field shouldn't look like it wants a page. Size follows the depth.
-- **Serif.** Candidates: Literata (made for long reading on screens, bookish), Source Serif 4 (Source Sans 3's companion), Newsreader (editorial, with optical sizes).
-- **Mockups.** Show the width options and the receding-controls examples side by side before building.
+- **Fade and contrast.** Dimmed chrome fails contrast while it's dimmed. It has to come back at full contrast the moment the writer pauses or reaches for it.
+- **Arrow underline at rest.** At 40% opacity the orange line is faint. Check that it still reads as a link for low-vision writers.
