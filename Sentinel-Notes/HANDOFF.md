@@ -1,39 +1,38 @@
 # Handoff
 
-Updated 2026-10-30. Committed through `db92857` (plus this handoff). Check `git status -sb` for unpushed commits.
+Written 2026-10-30 for the first session after Tim renames the local folder (`Documents/Fletcherling`, probably to `Documents/Fletchery`). Everything is committed and pushed through `17acc0d`.
 
 ## 1. Current task and status
 
-The app was renamed to Fletchery on 2026-10-30. The command is `fletchery`. The GitHub repo is now `timsamoff/Fletchery`. The local folder still has the old name.
+- **The app is Fletchery.** It was renamed from Fletcherling on 2026-10-30. The command is `fletchery`, and the GitHub repo is `timsamoff/Fletchery`. Only the local folder still had the old name when this was written.
+- **Fresh session:** Claude Code keys project memory and settings to the folder path, so this session starts without the previous conversation. Nothing was lost: the project memory folder was empty, and every decision lives in the repo (CLAUDE.md, `docs/SPEC.md`, `DESIGN.md`, `Sentinel-Notes/`). The approved plan is outside the repo, at `C:\Users\Tim\.claude\plans\bubbly-enchanting-trinket.md`, and doesn't depend on the folder name.
+- **Build status:** Premise end to end is **built and waiting on Tim's review**. That includes the shared core, depths, Interview and Full form, canon status, Skip, and the section list. Tim is also sending edits to the Premise question set.
 
+## 2. Files touched
 
-TODO item "Premise end to end": **built, waiting on Tim's review.** Steps 1 (DESIGN.md), 2 (shared core), and 3 (Premise on the core) are done and tested in Playwright.
+None since the last commit. This handoff only.
 
-## 2. Files touched (this phase)
+## 3. Next steps, in order
 
-- `sections/prose.json`, `screenplay.json`, `game.json`: section IDs and titles, with Premise fully defined using the drafted questions as placeholders.
-- `public/js/core/layers.js`: the Seed, Sketch, and Sheet layers in an entry body.
-- `public/js/core/entry.js`: `updateEntry` with the status rules (settling, and the drop back to draft on edit).
-- `public/js/app.js`: section list, depth control, Interview and Full form, settling, Skip, and save status by the editor.
-- `public/css/base.css`: workspace and nav layout, question card, context layers, 44px buttons on the grid, disabled and pressed states.
-- `server/server.js`: serves `/sections/*.json`.
-- `README.md`, `sentinel-gate/readme-map.json`, `docs/SPEC.md` (section lists, entry depths), `DESIGN.md`, `CLAUDE.md`, TODO, Premise brief, checklist.
-- `sentinel-gate/check.js`: quiet git lookups.
-
-## 3. Next step
-
-Wait for Tim's review of Premise. Apply his question edits to `sections/*.json` when they arrive. After approval, the next build phase is Characters with images, the media library, relationships, and indexes, or the web edition's remaining core work. Ask which.
+1. **Relink the command.** From the new folder, run `npm link`, then `fletchery --help`. If `fletchery` still points at the old path, run `npm unlink -g fletchery` first, then link again.
+2. **Check the quality gate.** Run `git config --get core.hooksPath`, which should print `sentinel-gate/hooks`. It's a relative path stored in `.git`, so it should survive the rename. Then run `npm run sentinel:full`, which should pass with 14 known backlog items.
+3. **Confirm the session hook.** If this session started by showing this handoff, it works from the new path. If not, check `.claude/settings.json` (it uses `$CLAUDE_PROJECT_DIR`).
+4. **Update the old folder path in the docs.** It appears in CLAUDE.md (`Documents/Fletcherling`, in the Project section), `docs/SPEC.md` (the Environment section and the Name section), and `PROJECT_PROFILE.md`. Find them with `git grep -n "Documents.Fletcherling"`. `first-prompt/FLETCHERLING-PROMPT.md` is Tim's brief and keeps its name.
+5. **Then the build work:** ask Tim for his Premise review and question edits. Question edits go in `sections/*.json` with no code changes.
 
 ## 4. Open questions for Tim
 
 - **Premise:** review, and edits to the question set.
-- **Layout views brief:** which views, one file per scene or not, and whether to prototype first.
+- **What next after Premise:** Characters (images, media library, relationships, indexes), or more of the web edition's shared core. Ask which.
+- **Layout views brief:** which views, one file per scene or not, and whether to prototype the drag and drop first.
 - **Web edition brief:** hosting, a Claude Code option in local-folder mode, build order, and Drive for desktop.
 - **G1:** should the spec gate also require DESIGN.md?
 
 ## 5. Tried and failed
 
-- `fetch()` followed by `process.exit()` crashed Node on Windows. The session hook uses `node:https`.
-- Port tables (netstat, Get-NetTCPConnection) are unreliable here. Stop a test server by command line: `Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" | Where-Object { $_.CommandLine -match 'fletchery' }`, then `Stop-Process`, then confirm with a request.
-- The `yaml` browser build has no default export. Import `parse` and `stringify` by name.
-- Inline `<button>` elements sit on the text baseline and add a pixel. Use `display: block` for button-styled links.
+- **Stopping test servers:** port tables (netstat, Get-NetTCPConnection) are unreliable on this machine. Stop a test server by command line: `Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" | Where-Object { $_.CommandLine -match 'fletchery' }`, then `Stop-Process`, then confirm with a request to the port.
+- **Session hook:** `fetch()` followed by `process.exit()` crashed Node on Windows, so the hook uses `node:https`.
+- **YAML import:** the `yaml` browser build has no default export. Import `parse` and `stringify` by name.
+- **Button-styled links:** inline `<button>` elements sit on the text baseline and add a pixel. Use `display: block`.
+- **Bulk edits with backslashes:** bulk renames with `sed` through Git Bash mishandle backslash paths. Use a small Node script in `scratch/` instead.
+- **Brief edits and the gate:** wording-only edits to a design brief trip the gate's `todo-sync` check. Tim's choice is to note the change on the brief's TODO line, keeping the line at or under 200 characters.
