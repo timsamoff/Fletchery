@@ -998,14 +998,12 @@ textarea:focus-visible {
   min-height: 0;
   resize: none;
 }
-/* Compact, so it centers in the 44px tab row with an even 6px above and below instead of resting on the panel. */
+/* Full size, centered in the band between the sheet's top edge and the question panel: that band is the 32px
+   padding plus the 44px tab row, so a 44px button sits 16px from each. */
 .focus-done {
-  margin-left: auto;
-  align-self: center;
-  height: var(--space-5);
-  padding: 0 var(--space-3);
-  font-size: var(--text-small);
-  line-height: calc(var(--space-5) - 2 * var(--border));
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-5);
 }
 @media (max-width: 719px) {
   .focus-slot {
