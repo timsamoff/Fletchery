@@ -1169,6 +1169,9 @@ textarea:focus-visible {
   border-bottom: 1px solid var(--color-rule);
 }
 .settings-bar h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   margin: 0;
   font-family: var(--font-serif);
   font-weight: 600;
