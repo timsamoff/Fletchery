@@ -84,6 +84,7 @@ function applyPrefs(v) {
   if (!v.fade.on) fadeChrome(false);
   root.classList.toggle('show-grid', v.layout.grid);
   document.getElementById('grid-toggle').setAttribute('aria-pressed', String(v.layout.grid));
+  if (document.getElementById('entry-meta')) renderStatus(); // the credited name in "Written by"
 }
 
 // Bibles made before the rename have fletcherling.json. Move it to fletchery.json, unchanged, on first open.
@@ -431,7 +432,17 @@ function renderStatus() {
   const row = (label, value) => `<div><dt>${label}</dt><dd>${esc(value ?? 'not set')}</dd></div>`;
   const depthLabel = state.section.depths[fm.depth]?.label ?? fm.depth;
   document.getElementById('entry-meta').innerHTML =
-    row('Depth', depthLabel) + row('Status', st.word) + row('Author', fm.author) + row('Updated', updated);
+    row('Depth', depthLabel) + row('Status', st.word) + row('Written by', writtenBy(fm.author)) + row('Updated', updated);
+}
+
+// Frontmatter `author` records who wrote the text (writer, ai-draft, ai-reviewed), not a name. Shown with the
+// writer's credited name from Settings.
+function writtenBy(provenance) {
+  const { name, coAuthors } = prefs.values.author;
+  const writer = [name, coAuthors].filter(Boolean).join(', ') || 'you';
+  if (provenance === 'ai-draft') return 'AI draft';
+  if (provenance === 'ai-reviewed') return `AI draft, reviewed by ${writer}`;
+  return writer;
 }
 
 function renderDepth() {

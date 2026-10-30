@@ -998,9 +998,14 @@ textarea:focus-visible {
   min-height: 0;
   resize: none;
 }
+/* Compact, so it centers in the 44px tab row with an even 6px above and below instead of resting on the panel. */
 .focus-done {
   margin-left: auto;
   align-self: center;
+  height: var(--space-5);
+  padding: 0 var(--space-3);
+  font-size: var(--text-small);
+  line-height: calc(var(--space-5) - 2 * var(--border));
 }
 @media (max-width: 719px) {
   .focus-slot {
