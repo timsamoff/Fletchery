@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Starts Fletcherling for the story project in the current directory.
+// Starts Fletchery for the story project in the current directory.
 import { spawn } from 'node:child_process';
 import { createServer } from '../server/server.js';
 
@@ -13,7 +13,7 @@ for (let i = 0; i < args.length; i++) {
   else if (arg === '--port') startPort = Number(args[++i]);
   else if (arg.startsWith('--port=')) startPort = Number(arg.slice(7));
   else if (arg === '--help' || arg === '-h') {
-    console.log('Usage: fletcherling [--port <number>] [--no-open]\n\nRun it from a story project folder. The bible is kept in ./story-bible/.');
+    console.log('Usage: fletchery [--port <number>] [--no-open]\n\nRun it from a story project folder. The bible is kept in ./story-bible/.');
     process.exit(0);
   } else {
     console.error(`Unknown option: ${arg}`);
@@ -32,7 +32,7 @@ const port = await createServer(projectDir).listen(startPort);
 // server that happens to hold the same port on the IPv6 address.
 const url = `http://127.0.0.1:${port}/`;
 
-console.log(`Fletcherling is running for ${projectDir}`);
+console.log(`Fletchery is running for ${projectDir}`);
 console.log(`Open ${url}`);
 console.log('Press Ctrl+C to stop.');
 

@@ -4,12 +4,12 @@ Decided 2026-10-30. The settled decisions are in `docs/SPEC.md` under "Web editi
 
 ## What it is
 
-A static build of Fletcherling that runs from any web host, with no install and no Node server. The writer picks two things on first run, and can change either later in settings:
+A static build of Fletchery that runs from any web host, with no install and no Node server. The writer picks two things on first run, and can change either later in settings:
 
 1. **AI:** none, Anthropic, or OpenRouter.
 2. **Storage:** this computer, or Google Drive.
 
-The local edition (`fletcherling` launched from a story folder, with Claude Code as the AI) stays as it is. All editions read and write the same bible format, so a bible can move between them.
+The local edition (`fletchery` launched from a story folder, with Claude Code as the AI) stays as it is. All editions read and write the same bible format, so a bible can move between them.
 
 ## AI choice
 
@@ -62,7 +62,7 @@ The first-run screen and the settings page list these losses plainly before the 
 **Google Drive:**
 - **Sign-in:** through Google Identity Services, with only a client ID and no secret.
 - **Scope:** `drive.file`, so the app sees only files it created or the writer picked. Google classifies this scope as non-sensitive. It still needs basic OAuth app verification before the public can use it without a warning screen, and that requires a privacy policy page and a verified domain.
-- **Layout:** the app creates `Fletcherling/<working title>/story-bible/` in the writer's Drive, with the same layout as on disk.
+- **Layout:** the app creates `Fletchery/<working title>/story-bible/` in the writer's Drive, with the same layout as on disk.
 - **Conflict detection:** before writing, the app checks the file's revision against the one it loaded. Drive has no push notifications for a static page, so it re-checks on focus and on a slow interval.
 
 ## Architecture changes (do these before Premise phase 2)
@@ -95,7 +95,7 @@ Decided 2026-10-30: both editions stay. README, first-run screens, settings, and
 
 | | Local edition | Web edition |
 |---|---|---|
-| Install | Node and one `npm` command; launch with `fletcherling` in a story folder | None; open a web page |
+| Install | Node and one `npm` command; launch with `fletchery` in a story folder | None; open a web page |
 | Browsers | Any | Folder storage in Chrome and Edge; Google Drive anywhere; zip open and save in Firefox and Safari |
 | Live sync with outside edits | Yes, through the file watcher | In Chrome and Edge, through `FileSystemObserver` (experimental) or a re-check on focus; Drive re-checks on focus and on an interval |
 | AI | Claude Code, through the request queue, on the writer's Claude plan | None, or Anthropic or OpenRouter, billed per use to the writer's own provider account |

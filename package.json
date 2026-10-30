@@ -1,11 +1,11 @@
 {
-  "name": "fletcherling",
+  "name": "fletchery",
   "version": "0.1.0",
   "description": "A local web app for building a Story Bible as Markdown files.",
   "license": "MIT",
   "type": "module",
   "bin": {
-    "fletcherling": "bin/fletcherling.js"
+    "fletchery": "bin/fletchery.js"
   },
   "engines": {
     "node": ">=20"

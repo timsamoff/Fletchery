@@ -4,12 +4,12 @@ Conventions: when an item is finished, move its line to the Done section at the 
 
 ## Build phases
 
-- [ ] Premise end to end: built, status renamed to canon, waiting on Tim’s review and question edits; see [premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md).
-- [ ] Web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
+- [ ] Premise end to end: built (canon status, Fletchery name), awaiting Tim’s review and question edits; see [premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md).
+- [ ] Fletchery web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
 - [ ] Characters with images, the media library, relationships, and generated indexes.
 - [ ] Notes and media (Inbox, quick capture, maps), then the remaining sections from data for all three story types.
 - [ ] Bridge: request queue, proposals, `BIBLE.md`, the four skills, and the install script.
-- [ ] Layout views (document, board, canvas, outline) with animated drag and drop, status board uses canon; see [layout-views-design-brief.md](layout-views-design-brief.md).
+- [ ] Layout views (document, board, canvas, outline), animated drag and drop, canon status board, Fletchery name; see [layout-views-design-brief.md](layout-views-design-brief.md).
 - [ ] Accessibility and responsiveness pass, tested with the keyboard and at 320px and ultra-wide.
 - [ ] README: install, launch, directory layout, handing a bible to Claude Code, and the edition comparison from the web edition brief.
 - [ ] Later, only with approval: a `claude -p` "Run now" option for Ask Claude.
@@ -43,7 +43,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [x] Gate candidates from the design audit: color literals, raw token values, and TODO format implemented; axe deferred to A1; frontmatter completeness deferred to T1.
 - [x] Sentinel-Prompts/ is gitignored by decision; the session hook's weekly version check runs only on this machine.
 - [x] Q1: Give entries created by `PUT /api/entry` the full seven-field frontmatter, and parse the current file once.
-- [x] Q2: Return a clear error for a broken `fletcherling.json`, and make the page show it instead of the setup form.
+- [x] Q2: Return a clear error for a broken `fletchery.json`, and make the page show it instead of the setup form.
 - [x] Q3: Share one helper for the saved-state update in `save()` and the conflict overwrite in `app.js`.
 - [x] Shared core, first step: `entry.js`, `store.js`, and the server reduced to a file store.
 - [x] R1: Put buttons on the 4px baseline (42px now) to match SPEC.md.

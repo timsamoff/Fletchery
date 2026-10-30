@@ -15,7 +15,7 @@ Paused 2026-10-29 to run Sentinel. Build phase 2 of the approved plan.
 - Depth control. Shallower layers show above as read-only context, each with an Edit link that jumps to that depth.
 - Interview me (one question, or one Sheet part, at a time) and Full form, remembered per browser.
 - Status as a shape plus a word. Mark as canon and Back to draft (renamed from "settled"). Editing a canon entry returns it to draft and says so.
-- Skip for now, recorded in `fletcherling.json` and cleared by writing.
+- Skip for now, recorded in `fletchery.json` and cleared by writing.
 - Ask Claude, disabled with a note until the bridge exists.
 - Audit items R1 (44px buttons on the grid), R4 (save status by the editor), and A2 (disabled and pressed styles).
 

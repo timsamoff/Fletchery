@@ -344,7 +344,7 @@ function ruleDocGates(src) {
       ...sectionFiles,
       ...added(/^(server|public\/js|skills|scripts)\//),
       staged('server/server.js') && addedLinesMatch('server/server.js', /route === '/) ? 'server/server.js (new route)' : null,
-      staged('bin/fletcherling.js') && addedLinesMatch('bin/fletcherling.js', /'--[a-z][a-z-]*/) ? 'bin/fletcherling.js (new flag)' : null,
+      staged('bin/fletchery.js') && addedLinesMatch('bin/fletchery.js', /'--[a-z][a-z-]*/) ? 'bin/fletchery.js (new flag)' : null,
     ],
     'Record the new section, feature, or decision in CLAUDE.md in this commit. Did anything change that a future session needs to know?',
   );
@@ -353,7 +353,7 @@ function ruleDocGates(src) {
     'readme-gate',
     'README.md',
     [
-      staged('bin/fletcherling.js') ? 'bin/fletcherling.js' : null,
+      staged('bin/fletchery.js') ? 'bin/fletchery.js' : null,
       pkgChanged(['bin', 'engines']) ? 'package.json (bin or engines)' : null,
       ...sectionFiles,
       ...changed(/^(skills|scripts)\//),

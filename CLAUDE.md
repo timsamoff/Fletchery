@@ -1,4 +1,4 @@
-# Fletcherling
+# Fletchery
 
 Local web app that walks a writer through building a Story Bible, saved as Markdown and images in `./story-bible/` inside a story project.
 
@@ -6,13 +6,14 @@ This file and `Sentinel-Notes/` are committed to the public repo by deliberate c
 
 ## Project
 
+- Renamed from Fletcherling on 2026-10-30. The local folder (`Documents/Fletcherling`) and the GitHub repo still use the old name until Tim renames them. Dated records (the design audit report, commit history) keep the old name.
 - Brief: `first-prompt/FLETCHERLING-PROMPT.md`, deliberately kept out of git (gitignored, never committed). Remote sessions can't see it; `docs/SPEC.md` carries the decisions they need. Decisions: `docs/SPEC.md`, which wins where the two differ. Architecture overview: `DESIGN.md`.
 - Approved plan: `C:\Users\Tim\.claude\plans\bubbly-enchanting-trinket.md` (outside the repo; see TODO Doc1).
 - Backlog: `Sentinel-Notes/TODO.md`. Project profile: `PROJECT_PROFILE.md`.
 - Stop after each phase for Tim's review. Test in a real browser before saying anything works.
 - Load the tim-writing-style skill before writing UI copy or docs.
-- Stack: Node `http`, plain HTML/CSS/JS, no build step. Launch with `fletcherling` from a story project.
-- Tim keeps stories in `Documents/_Writing/<story>/`, each its own private git repo, and runs `fletcherling` from inside the story folder. App code and story data never mix.
+- Stack: Node `http`, plain HTML/CSS/JS, no build step. Launch with `fletchery` from a story project.
+- Tim keeps stories in `Documents/_Writing/<story>/`, each its own private git repo, and runs `fletchery` from inside the story folder. App code and story data never mix.
 - Entry logic lives in `public/js/core/` and must run in both the browser and Node: import only the bare name `yaml` and relative paths there, never browser globals at module level. The server is a file store and knows nothing about entries.
 - Entry bodies hold `## Seed`, `## Sketch`, and `## Sheet` layers (`public/js/core/layers.js`). Never drop text the parser doesn't recognize. Frontmatter `depth` and the empty and draft statuses follow the text; only the writer marks an entry as canon (`status: canon`, read from the older `settled` too).
 - Write one-off verification scripts to `scratch/` (gitignored), not the OS temp folder. Playwright saves to `.playwright-mcp/` (gitignored).

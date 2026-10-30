@@ -1,5 +1,7 @@
 # Design and code quality audit
 
+The app was renamed from Fletcherling to Fletchery on 2026-10-30. This report is a dated record, so it keeps the old name and file paths.
+
 Sentinel `01-design-quality-audit.md` 1.6.1, run 2026-10-29 against commit `8597841` (skeleton).
 
 **Domain:** full visual GUI (web). **Surfaces:** one, the local web app (`bin/`, `server/`, `public/`), with one token system (`public/css/tokens.css`). The planned skills surface doesn't exist yet.

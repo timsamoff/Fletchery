@@ -4,7 +4,8 @@ import { DEPTHS, deepestFilled, parseLayers, serializeLayers } from './core/laye
 import { LocalServerStore, StoreConflict } from './core/store.js';
 
 const store = new LocalServerStore();
-const SETTINGS_PATH = 'fletcherling.json';
+const SETTINGS_PATH = 'fletchery.json';
+const LEGACY_SETTINGS_PATH = 'fletcherling.json'; // the app's name before 2026-10-30
 const SAVE_DELAY_MS = 500;
 const WIDE = window.matchMedia('(min-width: 960px)');
 const STATUS = {
@@ -60,24 +61,36 @@ async function start() {
   try {
     const info = await store.info();
     document.getElementById('project-path').textContent = info.projectDir;
-    const file = await store.read(SETTINGS_PATH);
+    const file = await readSettingsFile();
     if (!file.exists) return showSetup();
     let settings;
     try {
       settings = JSON.parse(file.content);
     } catch {
-      return showProblem('The settings file can’t be read', 'story-bible/fletcherling.json isn’t valid JSON. Fix it in an editor, then reload this page.');
+      return showProblem('The settings file can’t be read', 'story-bible/fletchery.json isn’t valid JSON. Fix it in an editor, then reload this page.');
     }
     showEditor(settings, file.version);
   } catch (err) {
-    showProblem('Fletcherling couldn’t start', err.message);
+    showProblem('Fletchery couldn’t start', err.message);
   }
+}
+
+// Bibles made before the rename have fletcherling.json. Move it to fletchery.json, unchanged, on first open.
+async function readSettingsFile() {
+  const file = await store.read(SETTINGS_PATH);
+  if (file.exists) return file;
+  const legacy = await store.read(LEGACY_SETTINGS_PATH);
+  if (!legacy.exists) return file;
+  const version = await store.write(SETTINGS_PATH, legacy.content, null);
+  await store.delete(LEGACY_SETTINGS_PATH, legacy.version);
+  setStatus('Renamed story-bible/fletcherling.json to fletchery.json.');
+  return { exists: true, content: legacy.content, version };
 }
 
 function applySettings(settings) {
   document.documentElement.dataset.font = settings.font ?? 'source-sans-3';
   document.getElementById('project-title').textContent = settings.title;
-  document.title = `${settings.title} · Fletcherling`;
+  document.title = `${settings.title} · Fletchery`;
 }
 
 function setupGridToggle() {
@@ -102,7 +115,7 @@ async function loadSectionSet(storyType) {
 function showSetup() {
   view.innerHTML = `
     <h1>Set up this story bible</h1>
-    <p>Fletcherling keeps the bible in a <code>story-bible</code> folder in this project. These questions are asked once.</p>
+    <p>Fletchery keeps the bible in a <code>story-bible</code> folder in this project. These questions are asked once.</p>
     <form id="setup" novalidate>
       <fieldset>
         <legend>What type of story are you writing?</legend>
@@ -516,7 +529,7 @@ async function toggleCanon() {
   document.getElementById('canon').focus();
 }
 
-// Skips live in fletcherling.json. A conflicting write rereads the file and tries once more.
+// Skips live in fletchery.json. A conflicting write rereads the file and tries once more.
 async function setSkipped(value) {
   for (let attempt = 0; attempt < 2; attempt++) {
     const next = { ...state.settings, sections: { ...(state.settings.sections ?? {}) } };
@@ -604,7 +617,7 @@ function renderConflict() {
   slot.innerHTML = `
     <section class="conflict" aria-labelledby="conflict-heading">
       <h2 id="conflict-heading" tabindex="-1">This file changed on disk</h2>
-      <p>The file was edited outside Fletcherling while you had unsaved changes here. Nothing has been overwritten. Choose which version to keep.</p>
+      <p>The file was edited outside Fletchery while you had unsaved changes here. Nothing has been overwritten. Choose which version to keep.</p>
       <div class="conflict-columns">
         <div>
           <label for="conflict-disk">Version on disk</label>

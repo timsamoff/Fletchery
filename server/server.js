@@ -11,7 +11,7 @@ const PUBLIC_DIR = path.join(APP_DIR, 'public');
 const FONT_DIRS = ['source-sans-3', 'atkinson-hyperlegible'].map((name) =>
   path.join(APP_DIR, 'node_modules', '@fontsource', name, 'files'),
 );
-const ICON = path.join(APP_DIR, 'assets', 'fletcherling-icon.svg');
+const ICON = path.join(APP_DIR, 'assets', 'fletchery-icon.svg');
 const SECTIONS_DIR = path.join(APP_DIR, 'sections');
 // Browser build of the yaml package, mapped to the bare name "yaml" by the page's import map.
 const YAML_DIR = path.join(APP_DIR, 'node_modules', 'yaml', 'browser', 'dist');
@@ -43,7 +43,7 @@ export function createServer(projectDir) {
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       const origin = req.headers.origin;
       if (!origin || !allowedHosts().map((h) => `http://${h}`).includes(origin)) {
-        return send(res, 403, { error: 'Writes are accepted only from the Fletcherling page.' });
+        return send(res, 403, { error: 'Writes are accepted only from the Fletchery page.' });
       }
     }
 

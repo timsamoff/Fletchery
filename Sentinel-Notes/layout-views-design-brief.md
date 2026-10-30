@@ -12,7 +12,7 @@ Proposed 2026-10-30. The writer can switch between views of the same bible. Each
 3. **Canvas (freeform):** cards placed anywhere, grouped by nearness, with connector lines.
    - **Relationship map:** drawing a line between two characters creates a relationship entry.
    - **Idea board:** for Notes and media.
-   - **Positions:** stored in `story-bible/.fletcherling/layout.json`, never in entries. `BIBLE.md` tells the AI to ignore that file.
+   - **Positions:** stored in `story-bible/.fletchery/layout.json`, never in entries. `BIBLE.md` tells the AI to ignore that file.
 4. **Outline:** a compact, keyboard-friendly tree of sections and entries. It doubles as navigation and as the accessible alternative to dragging.
 
 Recommended order: Document now. The Board (plot and status boards first) after Characters exists, since a board needs several entries. The Canvas later, as its own phase. The Outline folded into navigation.

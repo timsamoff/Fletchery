@@ -1,14 +1,14 @@
-# Fletcherling architecture
+# Fletchery architecture
 
-This document describes how Fletcherling is built and how its parts fit together. Decisions and their reasons are recorded in `docs/SPEC.md`. Working conventions for agents are in `CLAUDE.md`.
+This document describes how Fletchery is built and how its parts fit together. Decisions and their reasons are recorded in `docs/SPEC.md`. Working conventions for agents are in `CLAUDE.md`.
 
 ## Overview
 
-Fletcherling walks a writer through building a Story Bible: a directory of Markdown files with YAML frontmatter, plus images and their metadata sidecars. The directory is the product. A later AI-assisted writing session reads it as the source of truth for the story, so the app never stores anything a plain text editor couldn't read.
+Fletchery walks a writer through building a Story Bible: a directory of Markdown files with YAML frontmatter, plus images and their metadata sidecars. The directory is the product. A later AI-assisted writing session reads it as the source of truth for the story, so the app never stores anything a plain text editor couldn't read.
 
-Fletcherling runs in two editions that share one front end and one file format:
+Fletchery runs in two editions that share one front end and one file format:
 
-- **Local edition:** a small Node server launched with `fletcherling` from inside a story project. It reads and writes `./story-bible/`, watches it for outside edits, and uses Claude Code as its AI through a request queue.
+- **Local edition:** a small Node server launched with `fletchery` from inside a story project. It reads and writes `./story-bible/`, watches it for outside edits, and uses Claude Code as its AI through a request queue.
 - **Web edition (planned):** the same front end served as static files. Storage is a folder the writer picks or Google Drive, and AI is optional, through an Anthropic or OpenRouter connection.
 
 ## Current structure
@@ -17,7 +17,7 @@ As of the Premise step:
 
 | Path | Role |
 |---|---|
-| `bin/fletcherling.js` | Launcher. Parses `--port` and `--no-open`, finds a free port from 3000, starts the server, and opens the browser at `127.0.0.1`. |
+| `bin/fletchery.js` | Launcher. Parses `--port` and `--no-open`, finds a free port from 3000, starts the server, and opens the browser at `127.0.0.1`. |
 | `server/server.js` | HTTP server: static files, section definitions, fonts from `node_modules/@fontsource`, the browser build of `yaml` at `/vendor/yaml/`, the file API, and server-sent events. |
 | `server/bible.js` | File storage inside `story-bible/`: the path guard, atomic writes, list, delete, move, and content hashing. It knows nothing about entries. |
 | `server/watch.js` | Recursive `fs.watch` on the bible. It reports a change only when a file's content hash differs from the last one seen or written. |
@@ -90,15 +90,15 @@ The core talks to storage only through one interface:
 
 | Route | Edition | How it works |
 |---|---|---|
-| Claude Code | Local | "Ask Claude" writes a request file to `story-bible/.fletcherling/requests/`. The `fletcherling-process` skill handles it in a Claude Code session and writes the results back. |
+| Claude Code | Local | "Ask Claude" writes a request file to `story-bible/.fletchery/requests/`. The `fletchery-process` skill handles it in a Claude Code session and writes the results back. |
 | Provider adapter | Web | Anthropic or OpenRouter, called from the browser with the writer's own key or sign-in. Every response is validated before anything is written. |
 
-Both routes follow the same writing rules. Changes to existing text become proposal files in `story-bible/.fletcherling/proposals/`, which the writer accepts or rejects. New entries are marked `author: ai-draft` until the writer marks them as canon.
+Both routes follow the same writing rules. Changes to existing text become proposal files in `story-bible/.fletchery/proposals/`, which the writer accepts or rejects. New entries are marked `author: ai-draft` until the writer marks them as canon.
 
 ### Views
 
-The writer can switch between views of the same files: document (default), board, canvas, and outline. Each view writes its changes back to the files, so it never holds state of its own. The one exception is canvas card positions, which live in `story-bible/.fletcherling/layout.json`. A shared drag engine, built on pointer events with FLIP animation and spring easing, serves the board and canvas. Details are in `Sentinel-Notes/layout-views-design-brief.md`.
+The writer can switch between views of the same files: document (default), board, canvas, and outline. Each view writes its changes back to the files, so it never holds state of its own. The one exception is canvas card positions, which live in `story-bible/.fletchery/layout.json`. A shared drag engine, built on pointer events with FLIP animation and spring easing, serves the board and canvas. Details are in `Sentinel-Notes/layout-views-design-brief.md`.
 
 ### Claude Code skills
 
-The `skills/` folder will hold four Claude Code skills (`fletcherling-interview`, `-process`, `-read`, `-audit`), installed into `~/.claude/skills/` by a script. They read the bible format directly and share no code with the app, so any change to the format must be made in both places.
+The `skills/` folder will hold four Claude Code skills (`fletchery-interview`, `-process`, `-read`, `-audit`), installed into `~/.claude/skills/` by a script. They read the bible format directly and share no code with the app, so any change to the format must be made in both places.

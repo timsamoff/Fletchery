@@ -4,6 +4,9 @@ Updated 2026-10-30. Committed through `db92857` (plus this handoff). Check `git 
 
 ## 1. Current task and status
 
+The app was renamed to Fletchery on 2026-10-30. The command is `fletchery`. The folder and the GitHub repo still have the old name.
+
+
 TODO item "Premise end to end": **built, waiting on Tim's review.** Steps 1 (DESIGN.md), 2 (shared core), and 3 (Premise on the core) are done and tested in Playwright.
 
 ## 2. Files touched (this phase)
@@ -31,6 +34,6 @@ Wait for Tim's review of Premise. Apply his question edits to `sections/*.json` 
 ## 5. Tried and failed
 
 - `fetch()` followed by `process.exit()` crashed Node on Windows. The session hook uses `node:https`.
-- netstat on this machine lists stale `LISTENING` lines and is unreliable for finding test servers. Check with `curl` on the port, find the PID with `netstat -ano | grep ":PORT "`, then confirm with `curl` after `taskkill`.
+- Port tables (netstat, Get-NetTCPConnection) are unreliable here. Stop a test server by command line: `Get-CimInstance Win32_Process -Filter "Name = 'node.exe'" | Where-Object { $_.CommandLine -match 'fletchery' }`, then `Stop-Process`, then confirm with a request.
 - The `yaml` browser build has no default export. Import `parse` and `stringify` by name.
 - Inline `<button>` elements sit on the text baseline and add a pixel. Use `display: block` for button-styled links.

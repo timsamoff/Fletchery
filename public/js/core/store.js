@@ -55,7 +55,7 @@ export class LocalServerStore {
         body: body ? JSON.stringify(body) : undefined,
       });
     } catch {
-      throw new StoreError('Fletcherling isn’t responding. Is it still running in the terminal?');
+      throw new StoreError('Fletchery isn’t responding. Is it still running in the terminal?');
     }
     const data = await res.json().catch(() => ({}));
     if (res.status === 409) throw new StoreConflict(data.current);

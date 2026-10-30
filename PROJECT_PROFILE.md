@@ -1,6 +1,8 @@
-# Project profile: Fletcherling
+# Project profile: Fletchery
 
 Produced by Sentinel `00-project-discovery.md`, version 1.6.1, on 2026-10-29.
+
+The app was renamed from Fletcherling to Fletchery on 2026-10-30. The fields below use the new name. The local folder and the GitHub repo still have the old one.
 
 ## Run type
 
@@ -18,10 +20,10 @@ Produced by Sentinel `00-project-discovery.md`, version 1.6.1, on 2026-10-29.
 
 ## Values for `[PROJECT-SPECIFIC]` brackets
 
-- **Project name:** Fletcherling (confirmed by the user; matches `README.md` title and `package.json` `name`).
+- **Project name:** Fletchery (confirmed by the user; matches `README.md` title and `package.json` `name`).
 - **Tech stack:** JavaScript (ES modules) on Node 20+ (developed on Node 25.2). Server uses Node's built-in `http`, `fs`, and recursive `fs.watch`; no framework. Front end is plain HTML, CSS, and JavaScript with no build step. Package manager: npm (`package.json`, `package-lock.json`). Dependencies: `@fontsource/source-sans-3`, `@fontsource/atkinson-hyperlegible`, `yaml`.
 - **Application surfaces:**
-  1. The local web app: CLI launcher (`bin/fletcherling.js`), server (`server/`), and browser front end (`public/`). One surface; the three folders share one process and one API.
+  1. The local web app: CLI launcher (`bin/fletchery.js`), server (`server/`), and browser front end (`public/`). One surface; the three folders share one process and one API.
   - Planned, not yet built: Claude Code skills (`skills/`) and an install script (`scripts/`). These will be a second surface that reads the same bible format but shares no code with the app.
 - **Design/token system file:** `public/css/tokens.css` (CSS custom properties for palette, type, rhythm, and spacing; `public/css/base.css` consumes them).
 - **Recurring unit of work:** a bible section (confirmed by the user). Adding one touches its data file in `sections/`, the section page, server read and write, generated indexes, `BIBLE.md`, and the skills.
