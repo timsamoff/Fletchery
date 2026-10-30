@@ -4,7 +4,7 @@ Updated 2026-10-30. Committed through `db92857` (plus this handoff). Check `git 
 
 ## 1. Current task and status
 
-The app was renamed to Fletchery on 2026-10-30. The command is `fletchery`. The folder and the GitHub repo still have the old name.
+The app was renamed to Fletchery on 2026-10-30. The command is `fletchery`. The GitHub repo is now `timsamoff/Fletchery`. The local folder still has the old name.
 
 
 TODO item "Premise end to end": **built, waiting on Tim's review.** Steps 1 (DESIGN.md), 2 (shared core), and 3 (Premise on the core) are done and tested in Playwright.

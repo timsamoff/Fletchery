@@ -11,7 +11,7 @@ This file records the decisions agreed in Phase 0. The build prompt in `first-pr
 
 ### Name
 
-The app is Fletchery, renamed from Fletcherling on 2026-10-30. Bibles made before then have `story-bible/fletcherling.json`, which the app renames to `fletchery.json` the first time it opens them. The local repo folder and the GitHub repo keep the old name until Tim renames them.
+The app is Fletchery, renamed from Fletcherling on 2026-10-30. Bibles made before then have `story-bible/fletcherling.json`, which the app renames to `fletchery.json` the first time it opens them. The GitHub repo was renamed to `timsamoff/Fletchery` the same day. The local folder keeps the old name until Tim renames it.
 
 ### Stack
 

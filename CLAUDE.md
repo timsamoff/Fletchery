@@ -6,7 +6,7 @@ This file and `Sentinel-Notes/` are committed to the public repo by deliberate c
 
 ## Project
 
-- Renamed from Fletcherling on 2026-10-30. The local folder (`Documents/Fletcherling`) and the GitHub repo still use the old name until Tim renames them. Dated records (the design audit report, commit history) keep the old name.
+- Renamed from Fletcherling on 2026-10-30. The GitHub repo is now `timsamoff/Fletchery`. The local folder (`Documents/Fletcherling`) keeps the old name until Tim renames it. Dated records (the design audit report, commit history) keep the old name.
 - Brief: `first-prompt/FLETCHERLING-PROMPT.md`, deliberately kept out of git (gitignored, never committed). Remote sessions can't see it; `docs/SPEC.md` carries the decisions they need. Decisions: `docs/SPEC.md`, which wins where the two differ. Architecture overview: `DESIGN.md`.
 - Approved plan: `C:\Users\Tim\.claude\plans\bubbly-enchanting-trinket.md` (outside the repo; see TODO Doc1).
 - Backlog: `Sentinel-Notes/TODO.md`. Project profile: `PROJECT_PROFILE.md`.

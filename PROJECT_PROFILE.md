@@ -2,7 +2,7 @@
 
 Produced by Sentinel `00-project-discovery.md`, version 1.6.1, on 2026-10-29.
 
-The app was renamed from Fletcherling to Fletchery on 2026-10-30. The fields below use the new name. The local folder and the GitHub repo still have the old one.
+The app was renamed from Fletcherling to Fletchery on 2026-10-30. The fields below use the new name. The GitHub repo was renamed the same day. The local folder still has the old name.
 
 ## Run type
 
@@ -32,7 +32,7 @@ The app was renamed from Fletcherling to Fletchery on 2026-10-30. The fields bel
 ## VCS and release
 
 - **VCS:** git. 2 commits, 1 author (Tim Samoff). Branch `main`, 1 commit ahead of `origin/main` (not pushed).
-- **Remote:** `https://github.com/timsamoff/Fletcherling.git`, **public**.
+- **Remote:** `https://github.com/timsamoff/Fletchery.git` (renamed from `Fletcherling` on 2026-10-30; GitHub redirects the old URL), **public**.
 - **Commit-message convention detected:** single-line subjects, no bodies, no prefixes (both commits). This matches the user's global preference: single-line summaries by default, a few single-sentence bullets only when genuinely needed, no co-author trailers.
 - **Version/release status:** `package.json` version `0.1.0`; no tags or releases. Pre-release.
 
