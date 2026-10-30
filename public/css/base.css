@@ -925,8 +925,9 @@ textarea:focus-visible {
   }
 }
 
-/* While the writer types, everything around the field fades back; it returns on a pause or a pointer movement.
-   Dimmed text is below contrast only while it's dimmed. */
+/* While the writer types, the section list fades back; it returns on a pause or a pointer movement. With
+   data-fade-scope="full" on <html> (a coming setting), everything around the field fades. Dimmed text is below
+   contrast only while it's dimmed. */
 .site-header,
 .site-footer,
 .section-nav,
@@ -940,7 +941,8 @@ textarea:focus-visible {
 .focus-bar {
   transition: opacity var(--duration-fast) ease;
 }
-.is-writing :is(.site-header, .site-footer, .section-nav, .section-head, .why, .context-wrap, .question-card, .section-actions, .section-page > .hint, .entry-meta, .focus-bar) {
+.is-writing .section-nav,
+.is-writing[data-fade-scope='full'] :is(.site-header, .site-footer, .section-head, .why, .context-wrap, .question-card, .section-actions, .section-page > .hint, .entry-meta, .focus-bar) {
   opacity: 0.3;
   transition: opacity 600ms ease;
 }

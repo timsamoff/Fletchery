@@ -614,8 +614,8 @@ function onPaste(event) {
   }
 }
 
-// While the writer types, everything around the field fades back. A pause, a pointer movement, or leaving the
-// field brings it back at full contrast.
+// While the writer types, the section list fades back (base.css says what fades). A pause, a pointer movement,
+// or leaving the field brings it back at full contrast.
 const FADE_PAUSE_MS = 2000;
 let fadeTimer = null;
 function fadeChrome(on) {
