@@ -29,7 +29,7 @@ Decided:
 
 - **One screen per depth** (built 2026-10-30 with the redesign's step 2). Seed, Sketch, and Sheet each get their own screen. Finished depths fold away above the question, and a "Go to" button moves to the next depth. This replaces the single page with Depth radios, which made the writer scroll up to go deeper.
 - **Sheet questions** now show in the same card as Seed and Sketch, with the mode buttons and Back and Next.
-- **Paste.** Text pasted from Google Docs arrives with single line breaks between paragraphs. Turn those into paragraph breaks on paste.
+- **Paste** (built 2026-10-30). Text pasted from Google Docs arrives with single line breaks between paragraphs. A multi-line paste now gets a blank line between paragraphs, and stays in the undo history.
 - **Build step allowed** (recorded in SPEC.md), which makes a formatting editor practical.
 
 Open:

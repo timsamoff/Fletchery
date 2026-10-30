@@ -504,8 +504,15 @@ function renderWork() {
   });
   work.querySelectorAll('textarea[data-field]').forEach((t) => {
     t.value = fieldValue(t.dataset.field);
-    t.addEventListener('input', () => onInput(t));
-    t.addEventListener('blur', () => save());
+    t.addEventListener('input', () => {
+      onInput(t);
+      fadeChrome(true);
+    });
+    t.addEventListener('paste', onPaste);
+    t.addEventListener('blur', () => {
+      fadeChrome(false);
+      save();
+    });
   });
   work.querySelectorAll('[data-step]').forEach((b) =>
     b.addEventListener('click', () => {
@@ -586,6 +593,41 @@ function setupFocus() {
     close();
   });
 }
+
+// Google Docs and most word processors copy paragraphs with single line breaks, which Markdown reads as one
+// paragraph. A multi-line paste gets a blank line between paragraphs.
+function onPaste(event) {
+  const text = event.clipboardData?.getData('text/plain');
+  if (!text || !text.includes('\n')) return;
+  event.preventDefault();
+  const paragraphs = text
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .map((line) => line.trimEnd())
+    .filter((line) => line.trim());
+  const joined = paragraphs.join('\n\n');
+  // insertText keeps the paste in the undo history. setRangeText is the fallback where it's unsupported.
+  if (!document.execCommand('insertText', false, joined)) {
+    const t = event.target;
+    t.setRangeText(joined, t.selectionStart, t.selectionEnd, 'end');
+    t.dispatchEvent(new Event('input'));
+  }
+}
+
+// While the writer types, everything around the field fades back. A pause, a pointer movement, or leaving the
+// field brings it back at full contrast.
+const FADE_PAUSE_MS = 2000;
+let fadeTimer = null;
+function fadeChrome(on) {
+  clearTimeout(fadeTimer);
+  document.documentElement.classList.toggle('is-writing', on);
+  if (on) fadeTimer = setTimeout(() => fadeChrome(false), FADE_PAUSE_MS);
+}
+document.addEventListener('pointermove', (e) => {
+  if (Math.abs(e.movementX) + Math.abs(e.movementY) > 4 && document.documentElement.classList.contains('is-writing')) {
+    fadeChrome(false);
+  }
+});
 
 function onInput(textarea) {
   setFieldValue(textarea.dataset.field, textarea.value);

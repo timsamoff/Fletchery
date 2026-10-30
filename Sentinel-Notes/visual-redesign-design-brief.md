@@ -36,7 +36,7 @@ Mockups: https://claude.ai/artifact/XuVSsW4zdE8JQQvqwQAemM (private).
 
 1. Foundation (built 2026-10-30): Literata for the writer's text, new tokens (deep cream, rule, paper shadow, motion), charcoal primary buttons with cream labels, quieter header with the project title in serif italic, restyled section list and status label.
 2. Section page (built 2026-10-30): one layout for every depth with depth steps beside the title, the question card on top (identical at Seed, Sketch, and Sheet, mode buttons included), the shallower depths folded behind a toggle, a single field filling the page, the section list folding to a status strip with an animated width from 960px, Focus as a dialog that rises in, and a "Go to" button for the next depth. The page container widened from 1120px to 1600px.
-3. Details: fletching links, fading chrome while typing, and the Google Docs paste fix.
+3. Details (built 2026-10-30): fletching links (an orange chevron mark after links in text and link buttons; no underline), everything but the field fading to 30% while typing and returning after a 2-second pause, a pointer movement, or leaving the field, and the Google Docs paste fix.
 
 ## Open
 
