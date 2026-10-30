@@ -21,11 +21,14 @@ Tim wrote a redesign prompt (pasted in session and deliberately not kept in the 
 Mockups: https://claude.ai/artifact/XuVSsW4zdE8JQQvqwQAemM (private).
 
 - **Serif:** Literata.
-- **One layout for every depth.** Seed, Sketch, and Sheet share the same layout. The question or prompt sits above the writing surface, never beside it.
+- **One layout for every depth.** Seed, Sketch, and Sheet share the same layout. The question sits above the writing surface, never beside it, and looks the same at every depth: a count and guide line, the question in large sans, and Back and Next to the right.
 - **Section list:** the writer can show or hide it on every depth. Hidden, it collapses to a strip of status shapes.
 - **Focus:** available from every depth.
 - **Receding controls:** Tim leans toward Fade (dim the chrome while typing) over Tuck, and may change his mind.
-- **Links:** Tim likes the fletching mark but doubts it works mid-sentence. An arrow underline (a translucent orange line ending in a small arrowhead, opaque on hover) was added to compare.
+- **Links:** the fletching mark (two small orange chevrons after the link text, shifting right on hover). An arrow underline was compared and not chosen.
+- **Writer's text size:** the same at every depth (20px Literata on the 28px line). A zoom option for the writer's text is worth adding with the formatting editor.
+- **Motion:** err on the side of animation (CLAUDE.md design rule). The section list animates its width as it opens and closes, crossfading between the full list and the strip.
+- **Focus animation:** four compared on the canvas: Fade, Rise, Lift (the writing surface grows to fill the screen), and Dim the room (it grows while the page fades to cream). Not chosen yet.
 
 ## Open
 
@@ -34,4 +37,4 @@ Mockups: https://claude.ai/artifact/XuVSsW4zdE8JQQvqwQAemM (private).
 - **Receding controls.** Whether controls fade while the writer types. Tim wants a couple of examples before deciding. Hidden controls cost discoverability and keyboard reach.
 - **Writing size by depth.** A Seed is one sentence, so its field shouldn't look like it wants a page. Size follows the depth.
 - **Fade and contrast.** Dimmed chrome fails contrast while it's dimmed. It has to come back at full contrast the moment the writer pauses or reaches for it.
-- **Arrow underline at rest.** At 40% opacity the orange line is faint. Check that it still reads as a link for low-vision writers.
+- **Links that wrap.** The fletching mark keeps a link on one line, so a long link drops whole to the next line.
