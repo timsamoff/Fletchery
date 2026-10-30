@@ -769,6 +769,9 @@ textarea:focus-visible {
 .question-card {
   margin-bottom: 0;
 }
+.question-card {
+  container-type: inline-size;
+}
 .question-tabs-row {
   display: flex;
   flex-wrap: wrap;
@@ -777,6 +780,37 @@ textarea:focus-visible {
 }
 .context-link {
   display: inline-block;
+}
+/* In Focus, the tab row keeps Done's width (plus a gap) clear, so the link can never run under it. */
+.focus-slot .question-tabs-row {
+  padding-right: calc(96px + var(--space-3));
+}
+/* When the row gets narrow, the link moves to its own line on the panel's color, inset like the panel's contents,
+   so it reads as the top of the panel. It switches at a set width rather than wrapping on its own. */
+@container (max-width: 560px) {
+  .context-link {
+    flex: 1 0 100%;
+    text-align: left;
+    background: var(--color-panel);
+    padding: var(--space-2) var(--space-5) 0;
+    border-radius: 0 var(--radius) 0 0;
+  }
+  .question-tabs-row:has(.context-link) + .question-panel {
+    border-top-right-radius: 0;
+  }
+}
+@container (max-width: 720px) {
+  .focus-slot .context-link {
+    flex: 1 0 100%;
+    text-align: left;
+    background: var(--color-panel);
+    padding: var(--space-2) var(--space-5) 0;
+    border-radius: 0 var(--radius) 0 0;
+    margin-right: calc(-1 * (96px + var(--space-3))); /* on its own line it runs under the space kept for Done */
+  }
+  .focus-slot .question-tabs-row:has(.context-link) + .question-panel {
+    border-top-right-radius: 0;
+  }
 }
 .question-tabs {
   display: flex;
@@ -1004,6 +1038,7 @@ textarea:focus-visible {
   position: absolute;
   top: var(--space-3);
   right: var(--space-5);
+  min-width: 96px; /* the space the tab row keeps clear for it */
 }
 @media (max-width: 719px) {
   .focus-slot {
