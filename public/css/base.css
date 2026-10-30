@@ -735,6 +735,10 @@ textarea:focus-visible {
   text-transform: uppercase;
   color: var(--color-text-quiet);
 }
+/* The heading is all capitals and sits high, so the link needs a little more room to look evenly spaced. */
+.context-layer .link-button {
+  margin-top: var(--space-1);
+}
 .context-layer p {
   margin: 0;
   font-family: var(--font-writing);
