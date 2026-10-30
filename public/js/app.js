@@ -202,6 +202,8 @@ const state = {
   depth: 'seed', // the depth being worked on (a page choice; frontmatter depth follows the text)
   mode: readPref('fl-mode', 'interview'), // 'interview' or 'full'
   step: 0, // current question or Sheet part in Interview mode
+  navCollapsed: false, // wide screens only: the section list folded to a strip of status shapes
+  contextOpen: false, // shallower depths shown above the question
   baseVersion: null, // stored version the editor is based on
   baseContent: null, // that version's full file content, frontmatter included
   savedBody: '', // body as last loaded or saved, normalized
@@ -232,42 +234,53 @@ async function showEditor(settings, settingsVersion) {
   state.section = state.sectionSet.sections.find((s) => s.built);
 
   view.innerHTML = `
-    <div class="workspace">
+    <div class="workspace" id="workspace">
       <nav class="section-nav" aria-label="Sections">
-        <details id="nav-details"${WIDE.matches ? ' open' : ''}>
+        <button type="button" class="button button-quiet nav-toggle" id="nav-toggle" aria-controls="nav-details">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path><path class="nav-toggle-chevron" d="M15 10l-2 2 2 2"></path></svg>
+        </button>
+        <details id="nav-details" class="nav-full"${WIDE.matches ? ' open' : ''}>
           <summary>Sections</summary>
           <div id="nav-lists"></div>
         </details>
+        <ol class="nav-rail" id="nav-rail"></ol>
       </nav>
       <div class="section-page">
         <div class="section-head">
           <h1 id="section-title"></h1>
+          <div class="depth-steps" id="depth-steps" role="group" aria-label="Depth"></div>
           <p class="status-badge" id="status-badge"></p>
+          <button type="button" class="button button-quiet focus-open" id="focus-open">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
+            Focus
+          </button>
         </div>
         <p class="why" id="section-why"></p>
         <div id="conflict-slot"></div>
-        <fieldset class="depth-control">
-          <legend>Depth</legend>
-          <div class="choices-inline" id="depth-choices"></div>
-        </fieldset>
-        <p class="hint guide" id="depth-guide"></p>
-        <div class="mode-toggle" role="group" aria-label="Question layout">
-          <button type="button" class="button button-quiet" data-mode="interview">Interview me</button>
-          <button type="button" class="button button-quiet" data-mode="full">Full form</button>
+        <div class="context-wrap" id="context-wrap">
+          <button type="button" class="link-button" id="context-toggle" aria-controls="context" aria-expanded="false"></button>
+          <div class="context" id="context"><div class="context-inner" id="context-inner"></div></div>
         </div>
-        <div id="context"></div>
-        <div id="work"></div>
-        <p class="local-status" id="local-status" aria-hidden="true"></p>
+        <div id="work-home"><div id="work"></div></div>
         <div class="button-row section-actions">
-          <button type="button" class="button" id="canon"></button>
+          <button type="button" class="button button-quiet" id="canon"></button>
           <button type="button" class="button button-quiet" id="skip">Skip for now</button>
           <button type="button" class="button button-quiet" id="ask-claude" disabled aria-describedby="ask-claude-note">Ask Claude</button>
+          <p class="local-status" id="local-status" aria-hidden="true"></p>
+          <button type="button" class="button" id="next-depth"></button>
         </div>
         <p class="hint" id="ask-claude-note">Ask Claude arrives with the Claude Code bridge.</p>
         <dl class="entry-meta" id="entry-meta"></dl>
         <p class="hint file-note" id="file-note"></p>
       </div>
-    </div>`;
+    </div>
+    <dialog class="focus-dialog" id="focus-dialog" aria-labelledby="focus-title">
+      <div class="focus-bar">
+        <h2 id="focus-title"></h2>
+        <button type="button" class="button" id="focus-done">Done</button>
+      </div>
+      <div class="focus-slot" id="focus-slot"></div>
+    </dialog>`;
 
   document.getElementById('section-title').textContent = state.section.title;
   document.getElementById('section-why').textContent = state.section.why;
@@ -276,15 +289,11 @@ async function showEditor(settings, settingsVersion) {
   WIDE.addEventListener('change', (e) => {
     if (e.matches) document.getElementById('nav-details').open = true;
   });
-  document.getElementById('depth-choices').innerHTML = DEPTHS.map(
-    (d) => `
-      <div class="choice">
-        <input type="radio" id="depth-${d}" name="depth" value="${d}" />
-        <label for="depth-${d}">${esc(state.section.depths[d].label)}</label>
-      </div>`,
-  ).join('');
-  document.querySelectorAll('[name=depth]').forEach((r) => r.addEventListener('change', () => setDepth(r.value, false)));
-  document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
+  setNavOpen(readPref('fl-nav', 'open') === 'open');
+  document.getElementById('nav-toggle').addEventListener('click', () => setNavOpen(state.navCollapsed));
+  document.getElementById('context-toggle').addEventListener('click', () => setContextOpen(!state.contextOpen));
+  document.getElementById('next-depth').addEventListener('click', () => setDepth(DEPTHS[DEPTHS.indexOf(state.depth) + 1], true));
+  setupFocus();
   document.getElementById('canon').addEventListener('click', toggleCanon);
   document.getElementById('skip').addEventListener('click', skipSection);
 
@@ -332,6 +341,44 @@ function renderNav() {
   document.getElementById('nav-lists').innerHTML = `
     <ol class="nav-list">${sections.map(item).join('')}</ol>
     <ul class="nav-list nav-areas">${(state.sectionSet.areas ?? []).map(item).join('')}</ul>`;
+
+  // The folded list: one status shape per section, with the name for screen readers and as a tooltip.
+  const railItem = (s) => {
+    if (s.id === state.section.id) {
+      const st = statusOf();
+      const note = skipped() ? 'skipped' : st.word.toLowerCase();
+      return `<li><a href="#" aria-current="page" title="${esc(s.title)}"><span aria-hidden="true">${skipped() ? '–' : st.shape}</span><span class="visually-hidden">${esc(s.title)}, ${note}</span></a></li>`;
+    }
+    return `<li><span class="nav-item-off" title="${esc(s.title)}, not built yet"><span aria-hidden="true">○</span><span class="visually-hidden">${esc(s.title)}, not built yet</span></span></li>`;
+  };
+  document.getElementById('nav-rail').innerHTML = sections.map(railItem).join('');
+}
+
+// Wide screens only; below 960px the list is a disclosure menu and this has no visible effect.
+function setNavOpen(open) {
+  state.navCollapsed = !open;
+  writePref('fl-nav', open ? 'open' : 'collapsed');
+  document.getElementById('workspace').classList.toggle('nav-collapsed', !open);
+  const toggle = document.getElementById('nav-toggle');
+  toggle.setAttribute('aria-expanded', String(open));
+  toggle.setAttribute('aria-label', open ? 'Hide sections' : 'Show sections');
+  document.getElementById('nav-details').inert = !open && WIDE.matches;
+  document.getElementById('nav-rail').inert = open || !WIDE.matches;
+}
+
+function setContextOpen(open) {
+  state.contextOpen = open;
+  const context = document.getElementById('context');
+  context.dataset.open = String(open);
+  document.getElementById('context-inner').inert = !open;
+  const toggle = document.getElementById('context-toggle');
+  toggle.setAttribute('aria-expanded', String(open));
+  toggle.textContent = `${open ? 'Hide' : 'Show'} ${shallowerLabels()}`;
+}
+
+function shallowerLabels() {
+  const labels = DEPTHS.slice(0, DEPTHS.indexOf(state.depth)).map((d) => state.section.depths[d].label.toLowerCase());
+  return labels.join(' and ');
 }
 
 function renderStatus() {
@@ -350,13 +397,28 @@ function renderStatus() {
 }
 
 function renderDepth() {
-  document.getElementById(`depth-${state.depth}`).checked = true;
-  document.getElementById('depth-guide').textContent = state.section.depths[state.depth].guide;
-  document.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)));
+  document.getElementById('depth-steps').innerHTML = DEPTHS.map(
+    (d) =>
+      `<button type="button" class="depth-step" data-depth="${d}"${d === state.depth ? ' aria-current="step"' : ''}>${esc(state.section.depths[d].label)}</button>`,
+  ).join('');
+  document.querySelectorAll('[data-depth]').forEach((b) =>
+    b.addEventListener('click', () => {
+      setDepth(b.dataset.depth, false);
+      document.querySelector(`[data-depth="${b.dataset.depth}"]`).focus();
+    }),
+  );
 
-  // Shallower layers stay in view as read-only context, each with a way back to edit it.
+  const next = DEPTHS[DEPTHS.indexOf(state.depth) + 1];
+  const nextButton = document.getElementById('next-depth');
+  nextButton.hidden = !next;
+  if (next) nextButton.textContent = `Go to ${state.section.depths[next].label}`;
+  document.getElementById('focus-title').textContent = `${state.section.title} · ${state.section.depths[state.depth].label}`;
+
+  // Shallower layers, folded away above the question until the writer opens them, each with a way back to edit it.
   const shallower = DEPTHS.slice(0, DEPTHS.indexOf(state.depth));
-  document.getElementById('context').innerHTML = shallower
+  document.getElementById('context-wrap').hidden = !shallower.length;
+  setContextOpen(state.contextOpen && shallower.length > 0);
+  document.getElementById('context-inner').innerHTML = shallower
     .map((d) => {
       const label = state.section.depths[d].label;
       const text = d === 'sheet' ? '' : state.layers[d];
@@ -371,42 +433,50 @@ function renderDepth() {
   document.querySelectorAll('[data-goto]').forEach((b) => b.addEventListener('click', () => setDepth(b.dataset.goto, true)));
 }
 
-// The questions and answer fields for the current depth and mode.
+// The question card and answer fields, laid out the same way at every depth. Sheet questions come from its fields.
 function renderWork() {
   const def = state.section.depths[state.depth];
   const work = document.getElementById('work');
-  if (state.depth === 'sheet') {
-    const fields = def.fields;
-    const shown = state.mode === 'interview' ? [fields[Math.min(state.step, fields.length - 1)]] : fields;
-    work.innerHTML =
-      (state.mode === 'interview' ? stepper(state.step, fields.length, 'Part') : '') +
-      shown
-        .map(
-          (f) => `
-          <div class="field">
-            <label for="field-${f.id}">${esc(f.label)}</label>
-            <span class="hint" id="hint-${f.id}">${esc(f.question)}</span>
-            <textarea id="field-${f.id}" data-field="${f.id}" rows="6" spellcheck="true" aria-describedby="hint-${f.id}"></textarea>
-          </div>`,
-        )
-        .join('');
-  } else {
-    const field = def.fields[0];
-    const questions = def.questions;
-    const prompt =
-      state.mode === 'interview'
-        ? `<div class="question-card">
-             <p class="question-count">Question ${state.step + 1} of ${questions.length}</p>
-             <p class="question" id="question-text" aria-live="polite">${esc(questions[state.step])}</p>
-             ${stepButtons(state.step, questions.length)}
-           </div>`
-        : `<ol class="question-list" id="question-text">${questions.map((q) => `<li>${esc(q)}</li>`).join('')}</ol>`;
-    work.innerHTML = `${prompt}
-      <div class="field">
-        <label for="field-${field.id}">${esc(field.label)}</label>
-        <textarea id="field-${field.id}" data-field="${field.id}"${state.depth === 'seed' ? ' class="short" rows="2"' : ' rows="8"'} spellcheck="true" aria-describedby="question-text"></textarea>
-      </div>`;
-  }
+  const isSheet = state.depth === 'sheet';
+  const interview = state.mode === 'interview';
+  const questions = isSheet ? def.fields.map((f) => f.question) : def.questions;
+  const step = Math.min(state.step, questions.length - 1);
+  const guide = def.guide.charAt(0).toLowerCase() + def.guide.slice(1);
+  const count = interview ? `Question ${step + 1} of ${questions.length}` : `${questions.length} questions`;
+  const modeButton = (mode, label) =>
+    `<button type="button" class="mode-button" data-mode="${mode}" aria-pressed="${state.mode === mode}">${label}</button>`;
+  const card = `
+    <section class="question-card" aria-label="Questions">
+      <div class="question-meta">
+        <p class="question-count">${count} · ${esc(guide)}</p>
+        <div class="mode-toggle" role="group" aria-label="Question layout">
+          ${modeButton('interview', 'Interview me')}${modeButton('full', 'Full form')}
+        </div>
+      </div>
+      ${
+        interview
+          ? `<div class="question-row">
+               <p class="question" id="question-text" aria-live="polite">${esc(questions[step])}</p>
+               ${stepButtons(step, questions.length)}
+             </div>`
+          : `<ol class="question-list" id="question-text">${questions.map((q) => `<li>${esc(q)}</li>`).join('')}</ol>`
+      }
+    </section>`;
+  // One field fills the page; the Sheet's full form stacks its parts at a fixed height.
+  const fields = isSheet ? (interview ? [def.fields[step]] : def.fields) : [def.fields[0]];
+  const fill = fields.length === 1;
+  work.innerHTML =
+    card +
+    fields
+      .map(
+        (f) => `
+        <div class="field writing-field${fill ? ' fill' : ''}">
+          <label for="field-${f.id}">${esc(f.label)}</label>
+          <textarea id="field-${f.id}" data-field="${f.id}" spellcheck="true" aria-describedby="question-text"${fill ? '' : ' rows="6"'}></textarea>
+        </div>`,
+      )
+      .join('');
+  work.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
   work.querySelectorAll('textarea[data-field]').forEach((t) => {
     t.value = fieldValue(t.dataset.field);
     t.addEventListener('input', () => onInput(t));
@@ -421,13 +491,6 @@ function renderWork() {
       (same ?? work.querySelector('[data-step]:not([disabled])'))?.focus();
     }),
   );
-}
-
-function stepper(step, count, noun) {
-  return `<div class="question-card stepper">
-    <p class="question-count" aria-live="polite">${noun} ${step + 1} of ${count}</p>
-    ${stepButtons(step, count)}
-  </div>`;
 }
 
 function stepButtons(step, count) {
@@ -458,8 +521,45 @@ function setMode(mode) {
   state.mode = mode;
   state.step = 0;
   writePref('fl-mode', mode);
-  renderDepth();
   renderWork();
+  document.querySelector(`#work [data-mode="${mode}"]`).focus();
+}
+
+// Focus opens the question and fields as a sheet over the page. The same #work element moves in and back,
+// so its listeners, values, and cursor survive.
+function setupFocus() {
+  const dialog = document.getElementById('focus-dialog');
+  const opener = document.getElementById('focus-open');
+  opener.addEventListener('click', () => {
+    document.getElementById('focus-slot').append(document.getElementById('work'));
+    dialog.showModal();
+    requestAnimationFrame(() => dialog.classList.add('is-open'));
+    dialog.querySelector('textarea')?.focus();
+  });
+  const close = () => {
+    if (!dialog.open || !dialog.classList.contains('is-open')) return;
+    dialog.classList.remove('is-open');
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      dialog.removeEventListener('transitionend', onEnd);
+      dialog.close();
+      document.getElementById('work-home').append(document.getElementById('work'));
+      opener.focus();
+    };
+    // Children's transitions bubble up too, so wait for the dialog's own. The timer covers reduced motion.
+    const onEnd = (e) => {
+      if (e.target === dialog) finish();
+    };
+    dialog.addEventListener('transitionend', onEnd);
+    setTimeout(finish, 400);
+  };
+  document.getElementById('focus-done').addEventListener('click', close);
+  dialog.addEventListener('cancel', (e) => {
+    e.preventDefault();
+    close();
+  });
 }
 
 function onInput(textarea) {

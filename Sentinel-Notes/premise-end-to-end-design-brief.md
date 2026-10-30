@@ -27,18 +27,18 @@ Paused 2026-10-29 to run Sentinel. Build phase 2 of the approved plan.
 
 Decided:
 
-- **One screen per depth.** Seed, Sketch, and Sheet each get their own screen. Finished depths show as a summary above, and moving on is a deliberate step. This replaces the single page with Depth radios, which made the writer scroll up to go deeper.
+- **One screen per depth** (built 2026-10-30 with the redesign's step 2). Seed, Sketch, and Sheet each get their own screen. Finished depths fold away above the question, and a "Go to" button moves to the next depth. This replaces the single page with Depth radios, which made the writer scroll up to go deeper.
+- **Sheet questions** now show in the same card as Seed and Sketch, with the mode buttons and Back and Next.
 - **Paste.** Text pasted from Google Docs arrives with single line breaks between paragraphs. Turn those into paragraph breaks on paste.
 - **Build step allowed** (recorded in SPEC.md), which makes a formatting editor practical.
 
 Open:
 
 - **What the Sheet is.** It's the expanded premise, about a page telling the whole story, not Act 1. The act labels ("Act 1, through the first disaster") made it look like acts, and they impose one structure on every story. Proposal: the Sheet expands the writer's own Sketch, one paragraph per Sketch sentence, as the Snowflake Method does. The three disasters stay a suggestion in the Sketch questions. This changes how Sheet parts are stored.
-- **Sheet questions.** Seed and Sketch show their questions in a card; the Sheet shows one gray hint per part, which reads as no questions. All three depths should present questions the same way.
 - **Explaining depths.** Nothing says what Depth means, or that a writer starts at Seed and goes deeper only when ready.
 - **Mode names.** "Interview me" and "Full form" are unclear. Candidates: "One question at a time" and "All questions."
 - **Formatting.** Either a light toolbar that writes Markdown, or a full editor that hides it. Pending which formatting Tim reaches for while drafting. Text the editor doesn't understand must never be dropped.
-- **Context view.** The read-only view of shallower depths runs paragraphs together. Fix with the formatting decision.
+- **Context view.** The read-only view of shallower depths now keeps paragraph breaks (fixed 2026-10-30). Formatting there waits on the formatting decision.
 
 ## Draft copy (placeholder)
 
