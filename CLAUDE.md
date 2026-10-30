@@ -22,7 +22,7 @@ This file and `Sentinel-Notes/` are committed to the public repo by deliberate c
 
 - Colors: icon colors only, on cream. No white or light text on cream. Light text is allowed on charcoal and spine when contrast passes. Tokens live in `public/css/tokens.css`. Contrast on cream `#F1ECE2`: charcoal 11.74:1, mid charcoal 8.98:1, orange 3.04:1. Spine charcoal on orange is 4.61:1. Orange never carries small text. It's for button fills, focus rings, borders, status marks, link underlines, and large text.
 - Rhythm: 8px base unit, 4px baseline, 28px body line. Every vertical size is a multiple of 4, and blocks take whole 28px lines where possible. The 84px header is 82px plus a 2px border, and `main` has two lines of top padding, so content starts on a line. Text fields are 28px plus 12px padding plus a 2px border on each side, which comes to 40px for inputs and one extra line for text areas.
-- Motion: err on the side of animation for most things (opening, closing, moving, and state changes). Always honor `prefers-reduced-motion`.
+- Motion: a modern, fluid feel is a global aesthetic choice. Err on the side of animation for most things (opening, closing, moving, and state changes), short (150-300ms) and eased: indicators glide, content slides in the direction of travel, heights ease, lists stagger in, swapped text cross-fades. Always honor `prefers-reduced-motion`; scripted animations go through `animate()` in `app.js`, which does. Tim may change or remove individual animations.
 - Breakpoint: 720px, repeated in two media queries because CSS custom properties can't be used there.
 
 ## Working conventions

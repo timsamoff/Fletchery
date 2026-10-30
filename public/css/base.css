@@ -630,8 +630,24 @@ textarea:focus-visible {
   margin-bottom: var(--space-2);
 }
 .depth-steps {
+  position: relative;
   display: flex;
   gap: var(--space-5);
+}
+/* One orange indicator glides to the current step; app.js sets its width and position. */
+.depth-indicator {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 0;
+  height: 3px;
+  background: var(--color-accent);
+  pointer-events: none;
+}
+.depth-steps.is-ready .depth-indicator {
+  transition:
+    transform 260ms var(--ease-out),
+    width 260ms var(--ease-out);
 }
 .depth-step {
   font: inherit;
@@ -649,7 +665,9 @@ textarea:focus-visible {
 }
 .depth-step[aria-current='step'] {
   font-weight: 700;
-  border-bottom-color: var(--color-accent);
+}
+.depth-step[aria-current='step']:hover {
+  border-bottom-color: transparent;
 }
 .status-badge {
   margin: 0 0 var(--space-3) auto;

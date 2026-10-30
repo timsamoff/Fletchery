@@ -416,7 +416,12 @@ function shallowerLabels() {
 
 function renderStatus() {
   const st = statusOf();
-  document.getElementById('status-badge').innerHTML = `<span aria-hidden="true">${st.shape}</span> ${st.word}`;
+  const badge = document.getElementById('status-badge');
+  // The label flips over when the status changes, not on first draw.
+  const changed = badge.dataset.word && badge.dataset.word !== st.word;
+  badge.dataset.word = st.word;
+  badge.innerHTML = `<span aria-hidden="true">${st.shape}</span> ${st.word}`;
+  if (changed) animate(badge, [{ transform: 'rotateX(90deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 260 });
   const button = document.getElementById('canon');
   const isCanon = normalizeStatus(state.frontmatter.status) === 'canon';
   button.textContent = isCanon ? 'Back to draft' : 'Mark as canon';
@@ -430,16 +435,22 @@ function renderStatus() {
 }
 
 function renderDepth() {
-  document.getElementById('depth-steps').innerHTML = DEPTHS.map(
-    (d) =>
-      `<button type="button" class="depth-step" data-depth="${d}"${d === state.depth ? ' aria-current="step"' : ''}>${esc(state.section.depths[d].label)}</button>`,
-  ).join('');
-  document.querySelectorAll('[data-depth]').forEach((b) =>
-    b.addEventListener('click', () => {
-      setDepth(b.dataset.depth, false);
-      document.querySelector(`[data-depth="${b.dataset.depth}"]`).focus();
-    }),
-  );
+  // The steps are built once and then only re-marked, so the orange indicator can glide between them.
+  const steps = document.getElementById('depth-steps');
+  if (!steps.children.length) {
+    steps.innerHTML =
+      DEPTHS.map(
+        (d) => `<button type="button" class="depth-step" data-depth="${d}">${esc(state.section.depths[d].label)}</button>`,
+      ).join('') + '<span class="depth-indicator" aria-hidden="true"></span>';
+    steps.querySelectorAll('[data-depth]').forEach((b) => b.addEventListener('click', () => setDepth(b.dataset.depth, false)));
+    new ResizeObserver(placeDepthIndicator).observe(steps);
+    requestAnimationFrame(() => steps.classList.add('is-ready'));
+  }
+  steps.querySelectorAll('[data-depth]').forEach((b) => {
+    if (b.dataset.depth === state.depth) b.setAttribute('aria-current', 'step');
+    else b.removeAttribute('aria-current');
+  });
+  placeDepthIndicator();
 
   const next = DEPTHS[DEPTHS.indexOf(state.depth) + 1];
   const nextButton = document.getElementById('next-depth');
@@ -542,6 +553,7 @@ function renderWork() {
     b.addEventListener('click', () => {
       state.step = step + Number(b.dataset.step);
       renderWork();
+      riseIn(document.getElementById('question-text'), { duration: 180 });
       // Keep focus on the same arrow, or on the other one when this end of the list disables it.
       const same = work.querySelector(`[data-step="${b.dataset.step}"]:not([disabled])`);
       (same ?? work.querySelector('[data-step]:not([disabled])'))?.focus();
@@ -551,6 +563,7 @@ function renderWork() {
     b.addEventListener('click', () => {
       state.step = Number(b.dataset.question);
       renderWork();
+      riseIn(document.getElementById('question-text'), { duration: 180 });
       work.querySelector(`[data-question="${b.dataset.question}"]`).focus();
     }),
   );
@@ -567,19 +580,60 @@ function setFieldValue(id, value) {
   else state.layers.sheet[id] = value;
 }
 
+function placeDepthIndicator() {
+  const current = document.querySelector('#depth-steps [aria-current]');
+  const indicator = document.querySelector('#depth-steps .depth-indicator');
+  if (!current || !indicator) return;
+  indicator.style.width = `${current.offsetWidth}px`;
+  indicator.style.transform = `translateX(${current.offsetLeft}px)`;
+}
+
+// ---------- Motion ----------
+// The house style is modern and fluid: indicators glide, content slides in the direction of travel, heights
+// ease, lists stagger in, and swapped text cross-fades. Animations started from script don't see the CSS
+// reduced-motion rule, so they all go through animate().
+
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const EASE_OUT = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
+
+function animate(el, keyframes, options = {}) {
+  if (!el || reducedMotion.matches) return;
+  el.animate(keyframes, { duration: 220, easing: EASE_OUT, ...options });
+}
+
+const riseIn = (el, options) => animate(el, [{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], options);
+
 function setDepth(depth, focusField) {
+  const direction = Math.sign(DEPTHS.indexOf(depth) - DEPTHS.indexOf(state.depth));
   state.depth = depth;
   state.step = 0;
   renderDepth();
   renderWork();
+  // Deeper slides in from the right, shallower from the left, like turning the pages of one document.
+  if (direction) {
+    animate(document.getElementById('work'), [
+      { opacity: 0, transform: `translateX(${direction * 16}px)` },
+      { opacity: 1, transform: 'none' },
+    ]);
+  }
   if (focusField) document.querySelector('#work textarea')?.focus();
 }
 
 function setMode(mode) {
+  const before = document.querySelector('#work .question-panel')?.offsetHeight;
   state.mode = mode;
   state.step = 0;
   writePref('fl-mode', mode);
   renderWork();
+  const panel = document.querySelector('#work .question-panel');
+  if (before) {
+    animate(panel, [
+      { height: `${before}px`, overflow: 'hidden' },
+      { height: `${panel.offsetHeight}px`, overflow: 'hidden' },
+    ]);
+  }
+  if (mode === 'full') panel.querySelectorAll('.question-list li').forEach((li, i) => riseIn(li, { delay: i * 40, fill: 'backwards' }));
+  else riseIn(document.getElementById('question-text'));
   document.querySelector(`#work [data-mode="${mode}"]`).focus();
 }
 
