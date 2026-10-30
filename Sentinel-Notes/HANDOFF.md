@@ -20,7 +20,7 @@ Written 2026-10-30. All three steps of the visual redesign are built. Step 3 is 
 
 Wait for Tim's review of step 3. After that, the strongest open items:
 - **The Settings page**: first settle where each setting lives (the brief's Open section), then build it.
-- **The Premise brief's open decisions:** the Sheet model and the names for the two question layouts.
+- **The Premise brief's open decisions:** the Sheet's questions (the Sheet is now one box, built in `45fa9c2`) and the names for the two question layouts.
 
 ## 4. Open questions for Tim
 
