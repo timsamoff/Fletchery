@@ -943,16 +943,19 @@ textarea:focus-visible {
   margin-top: var(--line);
 }
 
-/* Focus: the question and fields on a sheet over the page. It rises as it fades in, and sinks back on close. */
+/* Focus: the question and fields on a sheet over the page, inset evenly from the window on every side. It rises as
+   it fades in, and sinks back on close. Only the writer's text scrolls inside it. */
 .focus-dialog {
-  width: min(1248px, 100vw - 2 * var(--space-3));
-  height: min(820px, 100dvh - 2 * var(--space-3));
+  inset: var(--space-5); /* the window less any scrollbar, unlike 100vw */
+  margin: 0;
+  width: auto;
+  height: auto;
   max-width: none;
   max-height: none;
   padding: 0;
   border: 0;
   border-radius: var(--radius);
-  background: var(--color-surface);
+  background: var(--color-bg);
   color: var(--color-text);
   box-shadow: var(--shadow-sheet);
   opacity: 0;
@@ -977,25 +980,27 @@ textarea:focus-visible {
 .focus-dialog.is-open::backdrop {
   opacity: 1;
 }
-.focus-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  padding: var(--space-3) var(--space-5);
-  border-bottom: 1px solid var(--color-rule);
-}
-.focus-bar h2 {
-  margin: 0;
-  font-size: var(--text-h3);
-  line-height: var(--leading-h3);
-}
 .focus-slot {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow: auto;
-  padding: var(--space-5) var(--space-6);
+  overflow: hidden;
+  padding: var(--space-5);
+}
+.focus-slot #work,
+.focus-slot .paper,
+.focus-slot .writing-field.fill {
+  min-height: 0;
+}
+.focus-slot .writing-field.fill textarea {
+  flex: 1 1 0;
+  min-height: 0;
+  resize: none;
+}
+.focus-done {
+  margin-left: auto;
+  align-self: center;
 }
 @media (max-width: 719px) {
   .focus-slot {
@@ -1087,7 +1092,7 @@ textarea:focus-visible {
 }
 
 /* While the writer types, the section list fades back; it returns on a pause or a pointer movement. With
-   data-fade-scope="full" on <html> (a coming setting), everything around the field fades. Dimmed text is below
+   data-fade-scope="full" on <html> (the Settings choice), everything around the field fades. Dimmed text is below
    contrast only while it's dimmed. */
 .site-header,
 .site-footer,
@@ -1097,12 +1102,11 @@ textarea:focus-visible {
 .question-card,
 .section-actions,
 .section-page > .hint,
-.entry-meta,
-.focus-bar {
+.entry-meta {
   transition: opacity var(--duration-fast) ease;
 }
 .is-writing .section-nav,
-.is-writing[data-fade-scope='full'] :is(.site-header, .site-footer, .section-head, .context-strip, .question-card, .section-actions, .section-page > .hint, .entry-meta, .focus-bar) {
+.is-writing[data-fade-scope='full'] :is(.site-header, .site-footer, .section-head, .context-strip, .question-card, .section-actions, .section-page > .hint, .entry-meta) {
   opacity: 0.3;
   transition: opacity 600ms ease;
 }

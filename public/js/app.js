@@ -206,6 +206,7 @@ const state = {
   step: 0, // current question or Sheet part in Interview mode
   navCollapsed: false, // wide screens only: the section list folded to a strip of status shapes
   contextOpen: false, // shallower depths shown above the question
+  focusOpen: false, // the question and fields are in the Focus sheet
   baseVersion: null, // stored version the editor is based on
   baseContent: null, // that version's full file content, frontmatter included
   savedBody: '', // body as last loaded or saved, normalized
@@ -278,11 +279,7 @@ async function showEditor(settings, settingsVersion) {
         <p class="hint file-note" id="file-note"></p>
       </div>
     </div>
-    <dialog class="focus-dialog" id="focus-dialog" aria-labelledby="focus-title">
-      <div class="focus-bar">
-        <h2 id="focus-title"></h2>
-        <button type="button" class="button" id="focus-done">Done</button>
-      </div>
+    <dialog class="focus-dialog" id="focus-dialog">
       <div class="focus-slot" id="focus-slot"></div>
     </dialog>`;
 
@@ -459,7 +456,7 @@ function renderDepth() {
   const nextButton = document.getElementById('next-depth');
   nextButton.hidden = !next;
   if (next) nextButton.textContent = `Go to ${state.section.depths[next].label}`;
-  document.getElementById('focus-title').textContent = `${state.section.title} · ${state.section.depths[state.depth].label}`;
+  document.getElementById('focus-dialog').setAttribute('aria-label', `Focus: ${state.section.title}, ${state.section.depths[state.depth].label}`);
 }
 
 // The question card and answer fields, laid out the same way at every depth. A Sheet of separate fields takes its
@@ -498,6 +495,7 @@ function renderWork() {
           ${tab('interview', 'Interview me')}${tab('full', 'Full form')}
         </div>
         ${contextLink()}
+        ${state.focusOpen ? '<button type="button" class="button focus-done" id="focus-done">Done</button>' : ''}
       </div>
       <section class="question-panel${interview ? ' first-tab-open' : ''}" id="question-panel" role="tabpanel" aria-labelledby="tab-${state.mode}">
         <div class="question-nav">
@@ -529,6 +527,7 @@ function renderWork() {
         .join('')}
     </div>`;
   document.getElementById('context-toggle')?.addEventListener('click', () => setContextOpen(!state.contextOpen));
+  document.getElementById('focus-done')?.addEventListener('click', () => closeFocus());
   work.querySelectorAll('[data-goto]').forEach((b) => b.addEventListener('click', () => setDepth(b.dataset.goto, true)));
   work.querySelectorAll('[data-mode]').forEach((b) => {
     b.addEventListener('click', () => setMode(b.dataset.mode));
@@ -642,16 +641,37 @@ function setMode(mode) {
 
 // Focus opens the question and fields as a sheet over the page. The same #work element moves in and back,
 // so its listeners, values, and cursor survive.
+let closeFocus = () => {};
+
+// The writer's place in the box: a text box keeps its selection even after it loses focus, so read it first.
+function caretSnapshot() {
+  const t = document.querySelector('#work textarea');
+  return t ? { field: t.dataset.field, start: t.selectionStart, end: t.selectionEnd, scroll: t.scrollTop } : null;
+}
+
+function restoreCaret(snap) {
+  const t = document.querySelector('#work textarea');
+  if (!t) return;
+  t.focus();
+  if (snap && t.dataset.field === snap.field) {
+    t.setSelectionRange(snap.start, snap.end);
+    t.scrollTop = snap.scroll;
+  }
+}
+
 function setupFocus() {
   const dialog = document.getElementById('focus-dialog');
   const opener = document.getElementById('focus-open');
   opener.addEventListener('click', () => {
+    const snap = caretSnapshot();
+    state.focusOpen = true;
     document.getElementById('focus-slot').append(document.getElementById('work'));
     dialog.showModal();
+    renderWork(); // Done appears beside the tabs
+    restoreCaret(snap);
     requestAnimationFrame(() => dialog.classList.add('is-open'));
-    dialog.querySelector('textarea')?.focus();
   });
-  const close = () => {
+  closeFocus = () => {
     if (!dialog.open || !dialog.classList.contains('is-open')) return;
     dialog.classList.remove('is-open');
     let done = false;
@@ -659,9 +679,12 @@ function setupFocus() {
       if (done) return;
       done = true;
       dialog.removeEventListener('transitionend', onEnd);
+      const snap = caretSnapshot();
+      state.focusOpen = false;
       dialog.close();
       document.getElementById('work-home').append(document.getElementById('work'));
-      opener.focus();
+      renderWork();
+      restoreCaret(snap);
     };
     // Children's transitions bubble up too, so wait for the dialog's own. The timer covers reduced motion.
     const onEnd = (e) => {
@@ -670,10 +693,9 @@ function setupFocus() {
     dialog.addEventListener('transitionend', onEnd);
     setTimeout(finish, 400);
   };
-  document.getElementById('focus-done').addEventListener('click', close);
   dialog.addEventListener('cancel', (e) => {
     e.preventDefault();
-    close();
+    closeFocus();
   });
 }
 
