@@ -3,7 +3,7 @@ import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { Bible, BibleError, hash, parseEntry, serializeEntry } from './bible.js';
+import { Bible, BibleError, hash } from './bible.js';
 import { Watcher } from './watch.js';
 
 const APP_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -12,6 +12,8 @@ const FONT_DIRS = ['source-sans-3', 'atkinson-hyperlegible'].map((name) =>
   path.join(APP_DIR, 'node_modules', '@fontsource', name, 'files'),
 );
 const ICON = path.join(APP_DIR, 'assets', 'fletcherling-icon.svg');
+// Browser build of the yaml package, mapped to the bare name "yaml" by the page's import map.
+const YAML_DIR = path.join(APP_DIR, 'node_modules', 'yaml', 'browser', 'dist');
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -21,11 +23,6 @@ const TYPES = {
   '.woff2': 'font/woff2',
   '.json': 'application/json; charset=utf-8',
 };
-
-const STORY_TYPES = ['prose', 'screenplay', 'game'];
-const SCOPES = ['standalone', 'series'];
-const SETTINGS_FILE = 'fletcherling.json';
-const PREMISE_FILE = 'premise/premise.md';
 
 export function createServer(projectDir) {
   const bible = new Bible(projectDir);
@@ -52,84 +49,47 @@ export function createServer(projectDir) {
     const url = new URL(req.url, `http://${req.headers.host}`);
     const route = `${req.method} ${url.pathname}`;
 
-    if (route === 'GET /api/project') return send(res, 200, await project());
-    if (route === 'POST /api/setup') return send(res, 200, await setup(await readBody(req)));
-    if (route === 'GET /api/entry') return send(res, 200, await getEntry(url.searchParams.get('path')));
-    if (route === 'PUT /api/entry') return send(res, 200, await putEntry(await readBody(req)));
+    if (route === 'GET /api/project') return send(res, 200, { projectDir, bibleDir: bible.root });
+    if (route === 'GET /api/list') return send(res, 200, { entries: await bible.list(url.searchParams.get('dir') ?? '') });
+    if (route === 'GET /api/file') return send(res, 200, await bible.read(url.searchParams.get('path')));
+    if (route === 'PUT /api/file') return send(res, 200, await writeFile(await readBody(req)));
+    if (route === 'DELETE /api/file') return send(res, 200, await deleteFile(await readBody(req)));
+    if (route === 'POST /api/move') return send(res, 200, await moveFile(await readBody(req)));
     if (route === 'GET /api/events') return events(req, res);
     if (req.method === 'GET') return serveStatic(url.pathname, res);
     return send(res, 404, { error: 'Not found.' });
   }
 
-  async function project() {
-    const exists = await bible.exists();
-    const settings = exists ? await bible.readJson(SETTINGS_FILE) : null;
-    return { projectDir, bibleDir: bible.root, settings };
+  // Every change names the version the caller last saw. A mismatch returns 409 with what's stored now.
+  async function requireVersion(rel, baseVersion) {
+    const current = await bible.read(rel);
+    if (current.version !== (baseVersion ?? null)) throw new BibleError(409, 'The file changed in storage.', { current });
+    return current;
   }
 
-  async function setup(input) {
-    if (await bible.readRaw(SETTINGS_FILE)) throw new BibleError(409, 'This project is already set up.');
-    const title = String(input.title ?? '').trim();
-    if (!STORY_TYPES.includes(input.storyType)) throw new BibleError(400, 'Choose a story type.');
-    if (!SCOPES.includes(input.scope)) throw new BibleError(400, 'Choose standalone or series.');
-    if (!title) throw new BibleError(400, 'Enter a working title.');
-
-    const settings = {
-      version: 1,
-      storyType: input.storyType,
-      title,
-      scope: input.scope,
-      font: 'source-sans-3',
-      claudeMdPointer: null,
-      createdAt: new Date().toISOString(),
-    };
-    await bible.writeJson(SETTINGS_FILE, settings);
-    if (!(await bible.readRaw(PREMISE_FILE))) {
-      const content = serializeEntry(
-        {
-          title: 'Premise',
-          type: 'premise',
-          depth: 'seed',
-          status: 'empty',
-          author: 'writer',
-          updated: new Date().toISOString(),
-          description: '',
-        },
-        '',
-      );
-      watcher.expect(PREMISE_FILE, hash(content));
-      await bible.writeAtomic(PREMISE_FILE, content);
-    }
-    watcher.start();
-    return { settings };
-  }
-
-  async function getEntry(rel) {
-    requireMarkdown(rel);
-    const file = await bible.readRaw(rel);
-    if (!file) return { path: rel, exists: false, hash: null, frontmatter: {}, body: '' };
-    const { frontmatter, body } = parseEntry(file.raw);
-    return { path: rel, exists: true, hash: file.hash, frontmatter, body };
-  }
-
-  // Saves only if the file on disk is still the version the page loaded.
-  async function putEntry(input) {
-    const rel = input.path;
-    requireMarkdown(rel);
-    if (typeof input.body !== 'string') throw new BibleError(400, 'Missing body.');
-    const current = await bible.readRaw(rel);
-    const currentHash = current ? current.hash : null;
-    if (currentHash !== (input.baseHash ?? null)) {
-      const disk = current ? { hash: current.hash, ...parseEntry(current.raw) } : { hash: null, frontmatter: {}, body: '' };
-      throw new BibleError(409, 'The file changed on disk.', { disk });
-    }
-    const frontmatter = current ? parseEntry(current.raw).frontmatter : { title: path.basename(rel, '.md') };
-    frontmatter.updated = new Date().toISOString();
-    if ((frontmatter.status ?? 'empty') === 'empty' && input.body.trim()) frontmatter.status = 'draft';
-    const content = serializeEntry(frontmatter, input.body);
+  async function writeFile({ path: rel, content, baseVersion }) {
+    if (typeof content !== 'string') throw new BibleError(400, 'Missing content.');
+    await requireVersion(rel, baseVersion);
     watcher.expect(rel, hash(content));
-    const newHash = await bible.writeAtomic(rel, content);
-    return { path: rel, hash: newHash, frontmatter };
+    const version = await bible.writeAtomic(rel, content);
+    watcher.start();
+    return { version };
+  }
+
+  async function deleteFile({ path: rel, baseVersion }) {
+    await requireVersion(rel, baseVersion);
+    watcher.expect(rel, null);
+    await bible.remove(rel);
+    return {};
+  }
+
+  async function moveFile({ from, to, baseVersion }) {
+    const current = await requireVersion(from, baseVersion);
+    if (!current.exists) throw new BibleError(404, 'There is no file to move.');
+    watcher.expect(from, null);
+    watcher.expect(to, current.version);
+    await bible.move(from, to);
+    return { version: current.version };
   }
 
   function events(req, res) {
@@ -151,6 +111,10 @@ export function createServer(projectDir) {
     let file;
     if (pathname === '/') file = path.join(PUBLIC_DIR, 'index.html');
     else if (pathname === '/icon.svg') file = ICON;
+    else if (pathname.startsWith('/vendor/yaml/')) {
+      file = path.resolve(YAML_DIR, '.' + pathname.slice('/vendor/yaml'.length));
+      if (!file.startsWith(YAML_DIR + path.sep)) file = null;
+    }
     else if (pathname.startsWith('/fonts/')) {
       const name = path.basename(pathname);
       for (const dir of FONT_DIRS) {
@@ -192,10 +156,6 @@ export function createServer(projectDir) {
       return port;
     },
   };
-}
-
-function requireMarkdown(rel) {
-  if (typeof rel !== 'string' || !rel.endsWith('.md')) throw new BibleError(400, 'Only Markdown entries can be edited here.');
 }
 
 function send(res, status, body) {

@@ -16,9 +16,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 
 ## Audit findings (design-quality-audit.md)
 
-- [ ] Q1: Give entries created by `PUT /api/entry` the full seven-field frontmatter, and parse the current file once.
-- [ ] Q2: Return a clear error for a broken `fletcherling.json`, and make the page show it instead of the setup form.
-- [ ] Q3: Share one helper for the saved-state update in `save()` and the conflict overwrite in `app.js`.
+- [ ] P2: The yaml browser build loads as 72 module files; consider a single-file build for the hosted web edition.
 - [ ] Q5: Restart the watcher if `story-bible/` is deleted and recreated while the app runs.
 - [ ] Q6: Replace the deprecated `clip: rect()` in `.visually-hidden`, or remove the class until it's used.
 - [ ] R1: Put buttons on the 4px baseline (42px now) to match SPEC.md.
@@ -47,3 +45,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [x] Skeleton, approved (commit 8597841).
 - [x] Gate candidates from the design audit: color literals, raw token values, and TODO format implemented; axe deferred to A1; frontmatter completeness deferred to T1.
 - [x] Sentinel-Prompts/ is gitignored by decision; the session hook's weekly version check runs only on this machine.
+- [x] Q1: Give entries created by `PUT /api/entry` the full seven-field frontmatter, and parse the current file once.
+- [x] Q2: Return a clear error for a broken `fletcherling.json`, and make the page show it instead of the setup form.
+- [x] Q3: Share one helper for the saved-state update in `save()` and the conflict overwrite in `app.js`.
+- [x] Shared core, first step: `entry.js`, `store.js`, and the server reduced to a file store.

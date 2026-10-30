@@ -13,33 +13,39 @@ Fletcherling runs in two editions that share one front end and one file format:
 
 ## Current structure
 
-As of the skeleton phase:
+As of the shared-core step:
 
 | Path | Role |
 |---|---|
 | `bin/fletcherling.js` | Launcher. Parses `--port` and `--no-open`, finds a free port from 3000, starts the server, and opens the browser at `127.0.0.1`. |
-| `server/server.js` | HTTP server: static files, fonts from `node_modules/@fontsource`, the JSON API, and server-sent events. |
-| `server/bible.js` | File access inside `story-bible/`: the path guard, atomic writes, content hashing, and frontmatter parsing and serialization. |
+| `server/server.js` | HTTP server: static files, fonts from `node_modules/@fontsource`, the browser build of `yaml` at `/vendor/yaml/`, the file API, and server-sent events. |
+| `server/bible.js` | File storage inside `story-bible/`: the path guard, atomic writes, list, delete, move, and content hashing. It knows nothing about entries. |
 | `server/watch.js` | Recursive `fs.watch` on the bible. It reports a change only when a file's content hash differs from the last one seen or written. |
 | `public/index.html` | Page shell: skip link, header, `main`, and footer with the save-status live region. |
 | `public/js/app.js` | First-run setup and the entry editor: autosave, live updates, and the conflict panel. |
+| `public/js/core/entry.js` | Entry files: frontmatter parsing and serialization, new-entry frontmatter, and the body update rules. It imports the bare name `yaml`, which the page's import map points at `/vendor/yaml/` and Node resolves from `node_modules`, so the same module runs in both. |
+| `public/js/core/store.js` | The storage interface and `LocalServerStore`, its backend for the local edition. |
 | `public/css/tokens.css` | Every color, type size, rhythm, and spacing value, plus the `@font-face` rules. |
 | `public/css/base.css` | Layout and components, built only from tokens. |
 | `sentinel-gate/` | The quality gate: `commit-msg` and `pre-push` hooks and the session-start hook. See `INTEGRATION_CHECKLIST.md`. |
 
 ### API
 
+The server is a file store. Paths are relative to `story-bible/`, and a version is the SHA-256 hash of a file's content.
+
 | Route | Purpose |
 |---|---|
-| `GET /api/project` | Project folder, bible folder, and settings from `story-bible/fletcherling.json` (null before setup). |
-| `POST /api/setup` | Writes `fletcherling.json` and the first premise entry, then starts the watcher. |
-| `GET /api/entry?path=` | Returns an entry's frontmatter, body, and content hash. |
-| `PUT /api/entry` | Saves a body only if the file's current hash matches `baseHash`. Otherwise returns 409 with the version on disk. |
-| `GET /api/events` | Server-sent events, one `change` event per real content change. |
+| `GET /api/project` | The project folder and the bible folder. |
+| `GET /api/list?dir=` | Files and folders in a folder, or an empty list if it doesn't exist. |
+| `GET /api/file?path=` | A file's content and version, or `exists: false`. |
+| `PUT /api/file` | Writes `content` only if the stored version still matches `baseVersion` (`null` means the file must not exist yet). Otherwise returns 409 with the current file. |
+| `DELETE /api/file` | Deletes a file, with the same version check. |
+| `POST /api/move` | Moves a file, with the same version check. Refuses if the destination exists. |
+| `GET /api/events` | Server-sent events, one `change` event (path and version) per real content change. |
 
 ### Saving and conflicts
 
-The page keeps the hash of the version it loaded. It saves about 500 ms after typing stops, and on blur, sending that hash as `baseHash`. The server writes only if the file on disk still has that hash. Writes go to a temp file in the same folder, which is then renamed over the target, so another program never reads a half-written file.
+The page keeps the version and full content of the file it loaded. It saves about 500 ms after typing stops, and on blur. The core builds the new file from the loaded content (keeping its frontmatter, filling any missing fields, and updating `updated` and `status`), and the store writes it with the loaded version as `baseVersion`. The server writes only if the file on disk still has that version. Writes go to a temp file in the same folder, which is then renamed over the target, so another program never reads a half-written file.
 
 When the watcher reports a change to the open file, the page reloads it if nothing is unsaved. If there are unsaved edits, it shows both versions and asks the writer which to keep. The server records the hash of each file it writes, so its own saves never come back as outside changes.
 
@@ -53,11 +59,9 @@ These changes come next, before the Premise section is built out.
 
 ### Shared core
 
-Logic that both editions need moves into browser-side modules under `public/js/core/`:
+Built so far: `entry.js` and `store.js` (see the table above). Still to move into `public/js/core/`:
 
-- section definitions loaded from `sections/<story type>.json`
-- entry templates
-- Markdown and frontmatter parsing and serialization
+- section definitions loaded from `sections/<story type>.json`, replacing the Premise template in `app.js`
 - index and `BIBLE.md` generation
 - link suggestions, and link rewriting when files move
 - the structural audit
@@ -76,7 +80,7 @@ The core talks to storage only through one interface:
 
 | Backend | Edition | Notes |
 |---|---|---|
-| `LocalServerStore` | Local | The Node server, reduced to file I/O, the path guard, atomic writes, and watching. |
+| `LocalServerStore` | Local | Built. The Node server: file I/O, the path guard, atomic writes, and watching. |
 | `FolderStore` | Web | The File System Access API, in Chrome and Edge. |
 | `DriveStore` | Web | Google Drive with the `drive.file` scope. |
 | `ZipStore` | Web | Open and save a zip, for Firefox and Safari. |

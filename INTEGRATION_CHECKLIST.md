@@ -33,7 +33,7 @@ Folded in from `PROJECT_PROFILE.md`'s follow-up list:
 ### 1. Definition and registry (App)
 
 - [ ] **1.1 Section data file.** Add the section to `sections/<type>.json` for every story type it belongs to (prose, screenplay, game). Missing one: **silent**. That story type just lacks the section. [plan]
-- [ ] **1.2 No hardcoded section names in code.** `public/js/app.js` hardcodes `ENTRY_PATH = 'premise/premise.md'` and the "Premise" heading and label. `server/server.js` hardcodes `PREMISE_FILE` and Premise's default frontmatter. Phase 2 must replace these with data from 1.1. Any remaining hardcoded name: **silent**, since a new section copied from Premise would quietly reuse its path. [code]
+- [ ] **1.2 No hardcoded section names in code.** `public/js/app.js` hardcodes `ENTRY_PATH = 'premise/premise.md'`, `ENTRY_TEMPLATE`, and the "Premise" heading and label. (The server no longer knows about entries, as of the shared-core step.) Phase 2 must replace these with data from 1.1. Any remaining hardcoded name: **silent**, since a new section copied from Premise would quietly reuse its path. [code]
 - [ ] **1.3 Series layer.** Per-book sections (premise, plot) also need a `books/<slug>/` variant when `scope` is `series`. Missing: **silent**. A series bible would put book content at the top level. [plan]
 
 ### 2. Persistence and file format (App and Skills)

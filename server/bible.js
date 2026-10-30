@@ -1,8 +1,7 @@
-// Reads and writes files inside one story-bible directory.
+// File storage inside one story-bible directory. Entry logic lives in public/js/core/.
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import YAML from 'yaml';
 
 export const TMP_PREFIX = '.fl-tmp-';
 
@@ -17,15 +16,13 @@ export class Bible {
   }
 
   // Every path the API accepts must resolve inside the bible.
-  resolve(rel) {
-    if (typeof rel !== 'string' || rel === '') throw new BibleError(400, 'Missing path.');
+  resolve(rel, { allowRoot = false } = {}) {
+    if (typeof rel !== 'string' || (rel === '' && !allowRoot)) throw new BibleError(400, 'Missing path.');
     const full = path.resolve(this.root, rel);
+    if (allowRoot && full === this.root) return full;
     if (!full.startsWith(this.root + path.sep)) throw new BibleError(400, 'Path is outside the bible.');
+    if (path.basename(full).startsWith(TMP_PREFIX)) throw new BibleError(400, 'That name is reserved.');
     return full;
-  }
-
-  toRel(full) {
-    return path.relative(this.root, full).split(path.sep).join('/');
   }
 
   async exists() {
@@ -36,13 +33,27 @@ export class Bible {
     }
   }
 
-  // Returns { raw, hash } or null when the file does not exist.
-  async readRaw(rel) {
+  // Returns { exists, content, version }.
+  async read(rel) {
     try {
-      const raw = await fs.readFile(this.resolve(rel), 'utf8');
-      return { raw, hash: hash(raw) };
+      const content = await fs.readFile(this.resolve(rel), 'utf8');
+      return { exists: true, content, version: hash(content) };
     } catch (err) {
-      if (err.code === 'ENOENT') return null;
+      if (err.code === 'ENOENT') return { exists: false, content: null, version: null };
+      if (err.code === 'EISDIR') throw new BibleError(400, 'That path is a folder.');
+      throw err;
+    }
+  }
+
+  async list(dir) {
+    try {
+      const entries = await fs.readdir(this.resolve(dir, { allowRoot: true }), { withFileTypes: true });
+      return entries
+        .filter((e) => !e.name.startsWith(TMP_PREFIX))
+        .map((e) => ({ name: e.name, type: e.isDirectory() ? 'dir' : 'file' }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    } catch (err) {
+      if (err.code === 'ENOENT') return [];
       throw err;
     }
   }
@@ -53,28 +64,37 @@ export class Bible {
     await fs.mkdir(path.dirname(full), { recursive: true });
     const tmp = path.join(path.dirname(full), TMP_PREFIX + crypto.randomBytes(4).toString('hex'));
     await fs.writeFile(tmp, content, 'utf8');
-    // Windows can refuse a rename briefly while another program has the file open.
-    for (let attempt = 0; ; attempt++) {
-      try {
-        await fs.rename(tmp, full);
-        return hash(content);
-      } catch (err) {
-        if (attempt >= 5 || !['EPERM', 'EBUSY', 'EACCES'].includes(err.code)) {
-          await fs.rm(tmp, { force: true });
-          throw err;
-        }
-        await new Promise((r) => setTimeout(r, 50 * (attempt + 1)));
-      }
+    try {
+      await retryOnWindowsLock(() => fs.rename(tmp, full));
+    } catch (err) {
+      await fs.rm(tmp, { force: true });
+      throw err;
     }
+    return hash(content);
   }
 
-  async readJson(rel) {
-    const file = await this.readRaw(rel);
-    return file ? JSON.parse(file.raw) : null;
+  async remove(rel) {
+    await retryOnWindowsLock(() => fs.rm(this.resolve(rel)));
   }
 
-  async writeJson(rel, data) {
-    return this.writeAtomic(rel, JSON.stringify(data, null, 2) + '\n');
+  async move(fromRel, toRel) {
+    const from = this.resolve(fromRel);
+    const to = this.resolve(toRel);
+    if ((await this.read(toRel)).exists) throw new BibleError(409, 'A file already exists there.', { current: await this.read(toRel) });
+    await fs.mkdir(path.dirname(to), { recursive: true });
+    await retryOnWindowsLock(() => fs.rename(from, to));
+  }
+}
+
+// Windows can refuse a rename or delete briefly while another program has the file open.
+async function retryOnWindowsLock(op) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await op();
+    } catch (err) {
+      if (attempt >= 5 || !['EPERM', 'EBUSY', 'EACCES'].includes(err.code)) throw err;
+      await new Promise((r) => setTimeout(r, 50 * (attempt + 1)));
+    }
   }
 }
 
@@ -84,33 +104,4 @@ export class BibleError extends Error {
     this.status = status;
     this.extra = extra;
   }
-}
-
-const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;
-
-// Splits a Markdown file into frontmatter and body. Throws if the YAML is broken.
-export function parseEntry(raw) {
-  const match = raw.match(FRONTMATTER);
-  if (!match) return { frontmatter: {}, body: trimOne(raw.replace(/\r\n/g, '\n')) };
-  let frontmatter;
-  try {
-    frontmatter = YAML.parse(match[1]) ?? {};
-  } catch (err) {
-    throw new BibleError(422, 'The frontmatter in this file can’t be read. Fix it in an editor, then reload.', {
-      detail: err.message,
-    });
-  }
-  const body = raw.slice(match[0].length).replace(/\r\n/g, '\n');
-  return { frontmatter, body: trimOne(body) };
-}
-
-export function serializeEntry(frontmatter, body) {
-  const text = body.replace(/\r\n/g, '\n');
-  return `---\n${YAML.stringify(frontmatter)}---\n\n${text}${text && !text.endsWith('\n') ? '\n' : ''}`;
-}
-
-// Drops the one blank line after the frontmatter and the final newline,
-// so the text area shows only what the writer wrote.
-function trimOne(body) {
-  return body.replace(/^\n/, '').replace(/\n$/, '');
 }

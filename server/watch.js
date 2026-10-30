@@ -15,7 +15,7 @@ export class Watcher {
   }
 
   start() {
-    if (this.fsWatcher) return;
+    if (this.fsWatcher || !fs.existsSync(this.bible.root)) return;
     this.fsWatcher = fs.watch(this.bible.root, { recursive: true }, (_event, filename) => {
       if (!filename) return;
       const rel = filename.split(path.sep).join('/');
@@ -44,6 +44,6 @@ export class Watcher {
     }
     if (this.known.has(rel) && this.known.get(rel) === current) return;
     this.known.set(rel, current);
-    this.onChange({ path: rel, hash: current, deleted: current === null });
+    this.onChange({ path: rel, version: current });
   }
 }

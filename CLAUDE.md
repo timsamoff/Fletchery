@@ -13,6 +13,7 @@ This file and `Sentinel-Notes/` are committed to the public repo by deliberate c
 - Load the tim-writing-style skill before writing UI copy or docs.
 - Stack: Node `http`, plain HTML/CSS/JS, no build step. Launch with `fletcherling` from a story project.
 - Tim keeps stories in `Documents/_Writing/<story>/`, each its own private git repo, and runs `fletcherling` from inside the story folder. App code and story data never mix.
+- Entry logic lives in `public/js/core/` and must run in both the browser and Node: import only the bare name `yaml` and relative paths there, never browser globals at module level. The server is a file store and knows nothing about entries.
 - Write one-off verification scripts to `scratch/` (gitignored), not the OS temp folder. Playwright saves to `.playwright-mcp/` (gitignored).
 
 ## Design rules

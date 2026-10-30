@@ -1,6 +1,11 @@
 // First-run setup and the entry editor, with live sync and conflict handling.
+import { parseEntry, withBody } from './core/entry.js';
+import { LocalServerStore, StoreConflict } from './core/store.js';
 
+const store = new LocalServerStore();
+const SETTINGS_PATH = 'fletcherling.json';
 const ENTRY_PATH = 'premise/premise.md';
+const ENTRY_TEMPLATE = { title: 'Premise', type: 'premise' };
 const SAVE_DELAY_MS = 500;
 
 const view = document.getElementById('view');
@@ -16,24 +21,35 @@ function setStatus(text) {
   statusEl.textContent = text;
 }
 
-async function api(method, url, body) {
-  const res = await fetch(url, {
-    method,
-    headers: body ? { 'Content-Type': 'application/json' } : {},
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  const data = await res.json().catch(() => ({}));
-  return { ok: res.ok, status: res.status, data };
+// A stored file plus its parsed entry. Throws EntryFormatError for broken frontmatter.
+function toEntry(file) {
+  const parsed = file.exists ? parseEntry(file.content) : { frontmatter: {}, body: '' };
+  return { ...file, ...parsed };
+}
+
+function showProblem(heading, message) {
+  view.innerHTML = `<h1>${esc(heading)}</h1><p>${esc(message)}</p>`;
 }
 
 // ---------- Start ----------
 
 async function start() {
   setupGridToggle();
-  const { data } = await api('GET', '/api/project');
-  document.getElementById('project-path').textContent = data.projectDir;
-  if (data.settings) showEditor(data.settings);
-  else showSetup();
+  try {
+    const info = await store.info();
+    document.getElementById('project-path').textContent = info.projectDir;
+    const file = await store.read(SETTINGS_PATH);
+    if (!file.exists) return showSetup();
+    let settings;
+    try {
+      settings = JSON.parse(file.content);
+    } catch {
+      return showProblem('The settings file can’t be read', 'story-bible/fletcherling.json isn’t valid JSON. Fix it in an editor, then reload this page.');
+    }
+    showEditor(settings);
+  } catch (err) {
+    showProblem('Fletcherling couldn’t start', err.message);
+  }
 }
 
 function applySettings(settings) {
@@ -107,13 +123,25 @@ function showSetup() {
       missing[1].focus();
       return;
     }
-    const res = await api('POST', '/api/setup', input);
-    if (!res.ok) {
-      error.textContent = res.data.error ?? 'The bible couldn’t be created.';
+    const settings = {
+      version: 1,
+      storyType: input.storyType,
+      title: input.title,
+      scope: input.scope,
+      font: 'source-sans-3',
+      claudeMdPointer: null,
+      createdAt: new Date().toISOString(),
+    };
+    try {
+      await store.write(SETTINGS_PATH, JSON.stringify(settings, null, 2) + '\n', null);
+      const entry = await store.read(ENTRY_PATH);
+      if (!entry.exists) await store.write(ENTRY_PATH, withBody(null, '', ENTRY_TEMPLATE), null);
+    } catch (err) {
+      error.textContent = err instanceof StoreConflict ? 'This project is already set up. Reload the page.' : err.message;
       return;
     }
     setStatus('Bible created.');
-    showEditor(res.data.settings);
+    showEditor(settings);
     main.focus();
   });
 }
@@ -131,7 +159,8 @@ function choice(name, value, label, hint) {
 // ---------- Editor ----------
 
 const state = {
-  baseHash: null, // hash of the file version the text area is based on
+  baseVersion: null, // stored version the text area is based on
+  baseContent: null, // that version's full file content, frontmatter included
   savedBody: '', // body as last loaded or saved
   frontmatter: {},
   saving: false,
@@ -157,24 +186,51 @@ async function showEditor(settings) {
   textarea.addEventListener('input', onInput);
   textarea.addEventListener('blur', () => save());
 
-  const { ok, data } = await api('GET', `/api/entry?path=${encodeURIComponent(ENTRY_PATH)}`);
-  if (!ok) {
-    setStatus(data.error ?? 'The file couldn’t be read.');
+  try {
+    load(toEntry(await store.read(ENTRY_PATH)));
+  } catch (err) {
+    if (err.detail) console.error(`${ENTRY_PATH}: ${err.detail}`);
+    setStatus(err.message);
     textarea.disabled = true;
     return;
   }
-  load(data);
   listen();
 }
 
 const isDirty = () => textarea.value !== state.savedBody;
 
 function load(entry) {
-  state.baseHash = entry.hash;
+  state.baseVersion = entry.version;
+  state.baseContent = entry.exists ? entry.content : null;
   state.savedBody = entry.body;
   state.frontmatter = entry.frontmatter;
   textarea.value = entry.body;
   renderMeta();
+}
+
+// Writes the body on top of baseVersion. Returns true when saved; shows the conflict panel otherwise.
+async function writeBody(body, baseVersion, baseContent) {
+  const content = withBody(baseContent, body, ENTRY_TEMPLATE);
+  try {
+    const version = await store.write(ENTRY_PATH, content, baseVersion);
+    state.baseVersion = version;
+    state.baseContent = content;
+    state.savedBody = body;
+    state.frontmatter = parseEntry(content).frontmatter;
+    renderMeta();
+    return true;
+  } catch (err) {
+    if (!(err instanceof StoreConflict)) {
+      setStatus(`Couldn’t save. ${err.message}`);
+      return false;
+    }
+    try {
+      showConflict(toEntry(err.current));
+    } catch (parseErr) {
+      setStatus(`Not saved. The file changed on disk and can’t be read. ${parseErr.message}`);
+    }
+    return false;
+  }
 }
 
 function renderMeta() {
@@ -202,32 +258,18 @@ async function save() {
   state.saving = true;
   const body = textarea.value;
   setStatus('Saving…');
-  const res = await api('PUT', '/api/entry', { path: ENTRY_PATH, body, baseHash: state.baseHash });
+  const saved = await writeBody(body, state.baseVersion, state.baseContent);
   state.saving = false;
-
-  if (res.ok) {
-    state.baseHash = res.data.hash;
-    state.savedBody = body;
-    state.frontmatter = res.data.frontmatter;
-    renderMeta();
-    setStatus(isDirty() ? 'Unsaved changes' : `Saved at ${timeNow()}`);
-  } else if (res.status === 409) {
-    showConflict(res.data.disk);
-    return;
-  } else {
-    setStatus(`Couldn’t save. ${res.data.error ?? ''}`.trim());
-    return;
-  }
+  if (!saved) return;
+  setStatus(isDirty() ? 'Unsaved changes' : `Saved at ${timeNow()}`);
 
   if (state.remotePending) return checkRemote();
   if (isDirty()) state.timer = setTimeout(save, SAVE_DELAY_MS);
 }
 
 function listen() {
-  const source = new EventSource('/api/events');
-  source.addEventListener('change', (event) => {
-    const change = JSON.parse(event.data);
-    if (change.path !== ENTRY_PATH || change.hash === state.baseHash) return;
+  store.changes((change) => {
+    if (change.path !== ENTRY_PATH || change.version === state.baseVersion) return;
     if (state.saving) state.remotePending = true;
     else checkRemote();
   });
@@ -237,12 +279,14 @@ function listen() {
 // unsaved. Otherwise ask.
 async function checkRemote() {
   state.remotePending = false;
-  const { ok, data } = await api('GET', `/api/entry?path=${encodeURIComponent(ENTRY_PATH)}`);
-  if (!ok) {
-    setStatus(data.error ?? 'The file changed on disk but couldn’t be read.');
+  let data;
+  try {
+    data = toEntry(await store.read(ENTRY_PATH));
+  } catch (err) {
+    setStatus(`The file changed on disk but couldn’t be read. ${err.message}`);
     return;
   }
-  if (data.hash === state.baseHash) return;
+  if (data.version === state.baseVersion) return;
   if (state.conflict) {
     state.conflict.disk = data;
     renderConflict();
@@ -323,29 +367,19 @@ async function resolveConflict(action) {
   }
   if (action === 'disk' || action === 'copy') {
     closeConflict();
-    load({ ...disk, body: disk.body ?? '' });
+    load(disk);
     setStatus(action === 'copy' ? 'Your version is on the clipboard. Using the disk version.' : 'Using the disk version.');
     return;
   }
   if (action === 'overwrite') {
-    const body = textarea.value;
-    const res = await api('PUT', '/api/entry', { path: ENTRY_PATH, body, baseHash: disk.hash });
-    if (res.status === 409) {
-      state.conflict = { disk: res.data.disk, confirming: false };
-      renderConflict();
-      setStatus('The file changed on disk again. Nothing was overwritten.');
-      document.getElementById('conflict-heading').focus();
-      return;
-    }
-    if (!res.ok) {
-      setStatus(`Couldn’t save. ${res.data.error ?? ''}`.trim());
+    const open = state.conflict;
+    state.conflict = null; // lets writeBody reopen the panel if the file changed again
+    if (!(await writeBody(textarea.value, disk.version, disk.exists ? disk.content : null))) {
+      if (state.conflict) setStatus('The file changed on disk again. Nothing was overwritten.');
+      else state.conflict = open; // a non-conflict failure: the panel stays as it was
       return;
     }
     closeConflict();
-    state.baseHash = res.data.hash;
-    state.savedBody = body;
-    state.frontmatter = res.data.frontmatter;
-    renderMeta();
     setStatus(`Saved your version at ${timeNow()}`);
   }
 }
