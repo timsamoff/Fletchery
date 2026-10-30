@@ -6,7 +6,7 @@ This file and `Sentinel-Notes/` are committed to the public repo by deliberate c
 
 ## Project
 
-- Brief: `first-prompt/FLETCHERLING-PROMPT.md` (untracked; see TODO Doc1). Decisions: `docs/SPEC.md`, which wins where the two differ and serves as the design document.
+- Brief: `first-prompt/FLETCHERLING-PROMPT.md`, deliberately kept out of git (gitignored, never committed). Remote sessions can't see it; `docs/SPEC.md` carries the decisions they need. Decisions: `docs/SPEC.md`, which wins where the two differ and serves as the design document.
 - Approved plan: `C:\Users\Tim\.claude\plans\bubbly-enchanting-trinket.md` (outside the repo; see TODO Doc1).
 - Backlog: `Sentinel-Notes/TODO.md`. Project profile: `PROJECT_PROFILE.md`.
 - Stop after each phase for Tim's review. Test in a real browser before saying anything works.
@@ -28,7 +28,8 @@ This file and `Sentinel-Notes/` are committed to the public repo by deliberate c
 - **TODO items:** one line each, and anything longer gets `Sentinel-Notes/<issue>-design-brief.md`. Move a finished item's line to the Done section at the bottom. Move a finished item's brief to `Sentinel-Notes/archive/`. Updating `TODO.md` is part of finishing the work, not a follow-up.
 - **After finishing a TODO item:** name the item most worth doing next with a reason, then start on it unless Tim redirects. TODO items carry no priority, effort, or dependency data, so the pick is judgment from the item text, and should be stated that way. If two are close, name both with a one-line reason each, then proceed on the stronger.
 - **Backlog mention:** when any distinct task reaches a natural stopping point, check whether `Sentinel-Notes/TODO.md` has open items not touched or acknowledged since the task started, and if so, name the strongest candidate before ending the response. Skip this if the backlog was already surfaced this session and nothing changed.
-- **Commits:** single-line summary by default, a few single-sentence bullets only when genuinely needed, written as Tim's own description of the change. No co-author or other trailers. Commit or push only when Tim asks, except the handoff file below.
+- **Commits:** a single-line subject is the norm. A body of a few one-sentence bullets is allowed only when one coherent change has three or more separate parts, or changes behavior someone reading history later needs to know about. Unrelated changes get split into separate commits, not bulleted. One commit per session by default, more only when the work is large. Messages describe the change in Tim's own voice and never mention the agent, the session, or "the user." No co-author lines, tool attribution, or session links. The only allowed trailer is `Sentinel-Override: <reason>`, and only Tim writes it: if a check blocks my commit, I split it or ask, and never add the override myself. Commit or push only when Tim asks, except the handoff file below.
+- **Adding a bible section:** follow the section touchpoints in `INTEGRATION_CHECKLIST.md`. Adding a section also updates `docs/SPEC.md` (its section lists) and the README feature mapping.
 
 ## Sessions
 

@@ -31,10 +31,11 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] B2: Keep the project path from dominating the footer at phone width.
 - [ ] A1: Add automated axe accessibility checks for the setup and editor pages.
 - [ ] A2: Add `:disabled` and `:active` styles for buttons and fields.
-- [ ] Doc1: Copy the approved plan into the repo, and decide whether to track `first-prompt/`, so remote sessions can see both.
+- [ ] Doc1: Copy the approved plan into the repo so remote sessions can see it (`first-prompt/` stays private by decision).
 
 ## Setup
 
+- [ ] T1: Add automated tests for conflict detection, the path guard, and frontmatter completeness in `server/`.
 - [ ] Consider a narrow permission rule allowing `node scratch/*.js` to cut down on prompts.
 - [ ] Decide whether `Sentinel-Prompts/` should be tracked in git.
 
