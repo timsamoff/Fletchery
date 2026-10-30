@@ -23,6 +23,7 @@
           <span>Fletchery</span>
         </a>
         <p class="project-title" id="project-title"></p>
+        <button type="button" class="header-button" id="settings-open">Settings</button>
       </div>
     </header>
 
@@ -31,6 +32,16 @@
         <p>Loading…</p>
       </div>
     </main>
+
+    <dialog class="settings-drawer" id="settings-dialog" aria-labelledby="settings-title">
+      <div class="settings-inner">
+        <div class="settings-bar">
+          <h2 id="settings-title">Settings</h2>
+          <button type="button" class="button" id="settings-close">Done</button>
+        </div>
+        <div class="settings-body" id="settings-body"></div>
+      </div>
+    </dialog>
 
     <footer class="site-footer">
       <div class="wrap">

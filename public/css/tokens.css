@@ -96,6 +96,7 @@
   --shadow-paper: 0 1px 0 rgb(29 31 35 / 0.08), 0 16px 32px -22px rgb(29 31 35 / 0.4);
   --shadow-sheet: 0 2px 0 rgb(29 31 35 / 0.2), 0 40px 80px -30px rgb(0 0 0 / 0.6);
   --color-backdrop: rgb(29 31 35 / 0.62);
+  --color-backdrop-soft: rgb(29 31 35 / 0.25);
 
   /* Type. The writer's own text is set in the serif; the interface stays in the sans. */
   --font-body: 'Source Sans 3', system-ui, sans-serif;
@@ -140,4 +141,7 @@
 
 :root[data-font='atkinson-hyperlegible'] {
   --font-body: var(--font-hyperlegible);
+}
+:root[data-writing-font='interface'] {
+  --font-writing: var(--font-body);
 }

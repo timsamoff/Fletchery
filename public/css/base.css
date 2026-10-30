@@ -1102,3 +1102,102 @@ textarea:focus-visible {
   opacity: 0.3;
   transition: opacity 600ms ease;
 }
+
+/* Header: the Settings button sits at the right. */
+.header-button {
+  margin-left: auto;
+  font: inherit;
+  color: var(--color-text);
+  background: none;
+  border: var(--border) solid transparent;
+  border-radius: var(--radius);
+  padding: 6px 12px;
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease;
+}
+.header-button:hover {
+  background: var(--color-panel);
+}
+
+/* Settings: a panel that slides in from the right over a light backdrop, so the writing stays in view. */
+.settings-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0;
+  width: min(440px, 100vw);
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  padding: 0;
+  border: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sheet);
+  transform: translateX(100%);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+.settings-drawer.is-open {
+  transform: none;
+}
+.settings-drawer::backdrop {
+  background: var(--color-backdrop-soft);
+  opacity: 0;
+  transition: opacity var(--duration-base) ease;
+}
+.settings-drawer.is-open::backdrop {
+  opacity: 1;
+}
+.settings-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.settings-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-rule);
+}
+.settings-bar h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 600;
+}
+.settings-body {
+  flex: 1;
+  overflow: auto;
+  padding: var(--space-4) var(--space-5);
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-rule) transparent;
+}
+.settings-body fieldset {
+  margin-bottom: var(--space-5);
+}
+.settings-question {
+  margin: var(--space-3) 0 var(--space-1);
+  font-size: var(--text-small);
+  font-weight: 600;
+  color: var(--color-text-quiet);
+}
+.settings-select {
+  margin: var(--space-3) 0 0;
+}
+.settings-select select {
+  display: block;
+  margin-top: var(--space-1);
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: var(--border) solid var(--color-border-quiet);
+  border-radius: var(--radius);
+  padding: var(--space-1) var(--space-2);
+}
+.choice input:disabled + label,
+.settings-select select:disabled {
+  color: var(--color-text-quiet);
+  cursor: not-allowed;
+}

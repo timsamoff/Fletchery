@@ -23,6 +23,7 @@ As of the Premise step:
 | `server/watch.js` | Recursive `fs.watch` on the bible. It reports a change only when a file's content hash differs from the last one seen or written. |
 | `public/index.html` | Page shell: skip link, header, `main`, and footer with the save-status live region. |
 | `public/js/app.js` | First-run setup, the section list, and the section editor: depth control, Interview and Full form modes, status and marking canon, Skip for now, autosave, live updates, and the conflict panel. |
+| `public/js/settings.js` | The writer's settings in `story-bible/fletchery-settings.json` (load, merge, save with a version check, reload on outside edits) and the Settings panel. |
 | `public/js/core/layers.js` | The Seed, Sketch, and Sheet layers inside an entry body. Unknown text is kept. |
 | `sections/<type>.json` | Section definitions for each story type: IDs, titles, and for built sections the why-it-matters line, guiding questions, and fields at each depth. Served at `/sections/`. |
 | `public/js/core/entry.js` | Entry files: frontmatter parsing and serialization, new-entry frontmatter, and the body update rules. It imports the bare name `yaml`, which the page's import map points at `/vendor/yaml/` and Node resolves from `node_modules`, so the same module runs in both. |

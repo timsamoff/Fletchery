@@ -2,6 +2,7 @@
 import { normalizeStatus, parseEntry, updateEntry } from './core/entry.js';
 import { DEPTHS, deepestFilled, parseLayers, serializeLayers } from './core/layers.js';
 import { LocalServerStore, StoreConflict } from './core/store.js';
+import { Settings, SETTINGS_FILE, setupSettingsPanel } from './settings.js';
 
 const store = new LocalServerStore();
 const SETTINGS_PATH = 'fletchery.json';
@@ -40,39 +41,49 @@ function showProblem(heading, message) {
   view.innerHTML = `<h1>${esc(heading)}</h1><p>${esc(message)}</p>`;
 }
 
-function readPref(key, fallback) {
-  try {
-    return localStorage.getItem(key) ?? fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function writePref(key, value) {
-  try {
-    localStorage.setItem(key, value);
-  } catch {}
-}
+// The writer's settings (fletchery-settings.json). "settings" elsewhere in this file is the bible's own
+// fletchery.json.
+const prefs = new Settings(store, {
+  onSaved: () => setStatus('Settings saved.'),
+  onError: (err) => setStatus(`Settings problem: ${err.message}.`),
+});
 
 // ---------- Start ----------
 
 async function start() {
-  setupGridToggle();
   try {
     const info = await store.info();
     document.getElementById('project-path').textContent = info.projectDir;
     const file = await readSettingsFile();
-    if (!file.exists) return showSetup();
-    let settings;
-    try {
-      settings = JSON.parse(file.content);
-    } catch {
-      return showProblem('The settings file can’t be read', 'story-bible/fletchery.json isn’t valid JSON. Fix it in an editor, then reload this page.');
+    let settings = null;
+    if (file.exists) {
+      try {
+        settings = JSON.parse(file.content);
+      } catch {
+        return showProblem('The settings file can’t be read', 'story-bible/fletchery.json isn’t valid JSON. Fix it in an editor, then reload this page.');
+      }
     }
+    await prefs.load(settings?.font);
+    prefs.onChange(applyPrefs);
+    setupGridToggle();
+    setupSettingsPanel(prefs);
+    if (!settings) return showSetup();
     showEditor(settings, file.version);
   } catch (err) {
     showProblem('Fletchery couldn’t start', err.message);
   }
+}
+
+// Applies the writer's settings to the page. Runs on load and after every change.
+function applyPrefs(v) {
+  const root = document.documentElement;
+  root.dataset.font = v.interfaceFont;
+  root.dataset.writingFont = v.writingFont;
+  if (v.fade.scope === 'full') root.dataset.fadeScope = 'full';
+  else delete root.dataset.fadeScope;
+  if (!v.fade.on) fadeChrome(false);
+  root.classList.toggle('show-grid', v.layout.grid);
+  document.getElementById('grid-toggle').setAttribute('aria-pressed', String(v.layout.grid));
 }
 
 // Bibles made before the rename have fletcherling.json. Move it to fletchery.json, unchanged, on first open.
@@ -88,20 +99,12 @@ async function readSettingsFile() {
 }
 
 function applySettings(settings) {
-  document.documentElement.dataset.font = settings.font ?? 'source-sans-3';
   document.getElementById('project-title').textContent = settings.title;
   document.title = `${settings.title} · Fletchery`;
 }
 
 function setupGridToggle() {
-  const button = document.getElementById('grid-toggle');
-  const set = (on) => {
-    document.documentElement.classList.toggle('show-grid', on);
-    button.setAttribute('aria-pressed', String(on));
-    writePref('fl-grid', on ? '1' : '0');
-  };
-  set(readPref('fl-grid', '0') === '1');
-  button.addEventListener('click', () => set(button.getAttribute('aria-pressed') !== 'true'));
+  document.getElementById('grid-toggle').addEventListener('click', () => prefs.update({ layout: { grid: !prefs.values.layout.grid } }));
 }
 
 async function loadSectionSet(storyType) {
@@ -163,7 +166,6 @@ function showSetup() {
       storyType: input.storyType,
       title: input.title,
       scope: input.scope,
-      font: 'source-sans-3',
       claudeMdPointer: null,
       sections: {},
       createdAt: new Date().toISOString(),
@@ -200,7 +202,7 @@ const state = {
   section: null, // the built section being edited
   layers: null, // { seed, sketch, sheet: { id: text }, ... }
   depth: 'seed', // the depth being worked on (a page choice; frontmatter depth follows the text)
-  mode: readPref('fl-mode', 'interview'), // 'interview' or 'full'
+  mode: 'interview', // 'interview' or 'full'; the last one used is kept in the writer's settings
   step: 0, // current question or Sheet part in Interview mode
   navCollapsed: false, // wide screens only: the section list folded to a strip of status shapes
   contextOpen: false, // shallower depths shown above the question
@@ -290,7 +292,8 @@ async function showEditor(settings, settingsVersion) {
   WIDE.addEventListener('change', (e) => {
     if (e.matches) document.getElementById('nav-details').open = true;
   });
-  setNavOpen(readPref('fl-nav', 'open') === 'open');
+  state.mode = prefs.values.layout.questionMode;
+  setNavOpen(!prefs.values.layout.sectionsFolded, false);
   document.getElementById('nav-toggle').addEventListener('click', () => setNavOpen(state.navCollapsed));
   document.getElementById('next-depth').addEventListener('click', () => setDepth(DEPTHS[DEPTHS.indexOf(state.depth) + 1], true));
   setupFocus();
@@ -355,9 +358,9 @@ function renderNav() {
 }
 
 // Wide screens only; below 960px the list is a disclosure menu and this has no visible effect.
-function setNavOpen(open) {
+function setNavOpen(open, save = true) {
   state.navCollapsed = !open;
-  writePref('fl-nav', open ? 'open' : 'collapsed');
+  if (save) prefs.update({ layout: { sectionsFolded: !open } });
   document.getElementById('workspace').classList.toggle('nav-collapsed', !open);
   const toggle = document.getElementById('nav-toggle');
   toggle.setAttribute('aria-expanded', String(open));
@@ -623,7 +626,7 @@ function setMode(mode) {
   const before = document.querySelector('#work .question-panel')?.offsetHeight;
   state.mode = mode;
   state.step = 0;
-  writePref('fl-mode', mode);
+  prefs.update({ layout: { questionMode: mode } });
   renderWork();
   const panel = document.querySelector('#work .question-panel');
   if (before) {
@@ -678,7 +681,7 @@ function setupFocus() {
 // paragraph. A multi-line paste gets a blank line between paragraphs.
 function onPaste(event) {
   const text = event.clipboardData?.getData('text/plain');
-  if (!text || !text.includes('\n')) return;
+  if (prefs.values.paste === 'lines' || !text || !text.includes('\n')) return;
   event.preventDefault();
   const paragraphs = text
     .replace(/\r\n?/g, '\n')
@@ -696,12 +699,12 @@ function onPaste(event) {
 
 // While the writer types, the section list fades back (base.css says what fades). A pause, a pointer movement,
 // or leaving the field brings it back at full contrast.
-const FADE_PAUSE_MS = 2000;
 let fadeTimer = null;
 function fadeChrome(on) {
+  const { fade } = prefs.values;
   clearTimeout(fadeTimer);
-  document.documentElement.classList.toggle('is-writing', on);
-  if (on) fadeTimer = setTimeout(() => fadeChrome(false), FADE_PAUSE_MS);
+  document.documentElement.classList.toggle('is-writing', on && fade.on);
+  if (on && fade.on) fadeTimer = setTimeout(() => fadeChrome(false), fade.pauseSeconds * 1000);
 }
 document.addEventListener('pointermove', (e) => {
   if (Math.abs(e.movementX) + Math.abs(e.movementY) > 4 && document.documentElement.classList.contains('is-writing')) {
@@ -809,6 +812,7 @@ async function skipSection() {
 
 function listen() {
   store.changes((change) => {
+    if (change.path === SETTINGS_FILE) return prefs.reload(change.version);
     if (change.path !== entryPath() || change.version === state.baseVersion) return;
     if (state.saving) state.remotePending = true;
     else checkRemote();
