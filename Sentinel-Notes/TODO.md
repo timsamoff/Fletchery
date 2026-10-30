@@ -6,7 +6,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 
 - [ ] Premise end to end: depth screens, paste fix, one-box Sheet built; Sheet questions and copy to do; see [premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md).
 - [ ] Visual redesign before more feature work: steps 1-3 built, frame matched to the mockup, header and list pinned; see [visual-redesign-design-brief.md](visual-redesign-design-brief.md).
-- [ ] Settings page, all saved on disk: font, author info, paste breaks, and fade on/off, scope, and timing; see [settings-page-design-brief.md](settings-page-design-brief.md).
+- [ ] Settings page, saved in fletchery-settings.json: AI choice, font, author info, paste breaks, and fade options; see [settings-page-design-brief.md](settings-page-design-brief.md).
 - [ ] Fletchery web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
 - [ ] Characters with images, the media library, relationships, and generated indexes.
 - [ ] Notes and media (Inbox, quick capture, maps), then the remaining sections from data for all three story types.
@@ -14,7 +14,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Layout views (document, board, canvas, outline), animated drag and drop, canon status board, Fletchery name; see [layout-views-design-brief.md](layout-views-design-brief.md).
 - [ ] Accessibility and responsiveness pass, tested with the keyboard and at 320px and ultra-wide.
 - [ ] README: install, launch, directory layout, handing a bible to Claude Code, and the edition comparison from the web edition brief.
-- [ ] Later, only with approval: a `claude -p` "Run now" option for Ask Claude.
+- [ ] Later, only with approval: a `claude -p` "Run now" option for Ask AI.
 
 ## Audit findings (design-quality-audit.md)
 

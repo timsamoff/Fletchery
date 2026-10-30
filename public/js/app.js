@@ -270,12 +270,12 @@ async function showEditor(settings, settingsVersion) {
         <div class="button-row section-actions">
           <button type="button" class="button button-quiet" id="canon"></button>
           <button type="button" class="button button-plain" id="skip">Skip for now</button>
-          <button type="button" class="button button-quiet" id="ask-claude" disabled aria-describedby="ask-claude-note">Ask Claude</button>
+          <button type="button" class="button button-quiet" id="ask-ai" disabled aria-describedby="ask-ai-note">Ask AI</button>
           <p class="local-status" id="local-status" aria-hidden="true"></p>
           <button type="button" class="button" id="next-depth"></button>
         </div>
         </div>
-        <p class="hint" id="ask-claude-note">Ask Claude arrives with the Claude Code bridge.</p>
+        <p class="hint" id="ask-ai-note">Ask AI turns on once you choose an AI in Settings, in a later version.</p>
         <dl class="entry-meta" id="entry-meta"></dl>
         <p class="hint file-note" id="file-note"></p>
       </div>

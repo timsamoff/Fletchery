@@ -90,7 +90,7 @@ The core talks to storage only through one interface:
 
 | Route | Edition | How it works |
 |---|---|---|
-| Claude Code | Local | "Ask Claude" writes a request file to `story-bible/.fletchery/requests/`. The `fletchery-process` skill handles it in a Claude Code session and writes the results back. |
+| Claude Code | Local | "Ask AI" (shown as "Ask Claude" once Claude Code is chosen in Settings) writes a request file to `story-bible/.fletchery/requests/`. The `fletchery-process` skill handles it in a Claude Code session and writes the results back. |
 | Provider adapter | Web | Anthropic or OpenRouter, called from the browser with the writer's own key or sign-in. Every response is validated before anything is written. |
 
 Both routes follow the same writing rules. Changes to existing text become proposal files in `story-bible/.fletchery/proposals/`, which the writer accepts or rejects. New entries are marked `author: ai-draft` until the writer marks them as canon.
