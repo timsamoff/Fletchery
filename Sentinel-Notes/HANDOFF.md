@@ -1,31 +1,34 @@
 # Handoff
 
-Written 2026-10-30. The visual redesign is underway: step 1 of 3 is built and waiting on Tim's review.
+Written 2026-10-30. The visual redesign is underway: steps 1 and 2 of 3 are built, and step 2 is waiting on Tim's review.
 
 ## 1. Current task and status
 
-- **Visual redesign** ([visual-redesign-design-brief.md](visual-redesign-design-brief.md)). Decisions are recorded there, including the mockup link. Step 1 (foundation) is committed in `89e1f63`. Steps 2 and 3 aren't started.
-- **Premise review items** ([premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md), "Tim's review"). These get built during steps 2 and 3. The Sheet model and the mode names are still open.
+- **Visual redesign** ([visual-redesign-design-brief.md](visual-redesign-design-brief.md), "Build"). Step 1 (foundation) is pushed. Step 2 (section page) is committed and tested in a browser at 1440px and 375px. Step 3 (details) isn't started.
+- **Premise review items** ([premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md), "Tim's review"). One screen per depth and the Sheet question card are built with step 2. The paste fix comes with step 3. The Sheet model and the mode names are still open.
 
-## 2. Files touched in step 1
+## 2. Files touched in step 2
 
-- `package.json`, `package-lock.json`: added `@fontsource/literata`.
-- `server/server.js`: serves the Literata font files.
-- `public/css/tokens.css`: Literata font faces, plus tokens for the deep cream panel, rule, paper shadow, controls, writing font and size, and motion.
-- `public/css/base.css`: serif h1, quieter header with the project title in serif italic, charcoal buttons with cream labels, serif text areas at 20px, restyled section list and status label.
-- `docs/SPEC.md`, `PROJECT_PROFILE.md`: list the Literata dependency.
+- `public/js/app.js`: new section page markup, depth steps, folded context, one question card for every depth, the section list toggle and status strip (`fl-nav` preference), the Focus dialog (moves `#work` in and back), and the "Go to" next-depth button.
+- `public/css/base.css`: the workspace grid with an animated width, the status strip, the new section page, the question card, writing fields that fill the page, the Focus dialog's Rise animation, `[hidden]` forcing `display: none`, and `.wrap` widened to 1600px.
+- `public/css/tokens.css`: `--shadow-sheet` and `--color-backdrop`.
 
 ## 3. Next step
 
-After Tim's OK on step 1, build step 2 in `public/js/app.js` and `base.css`. Use one layout for every depth, with the question card on top looking identical at Seed, Sketch, and Sheet (mode buttons plus Back and Next). The writing surface fills the rest. The section list shows and hides with an animated width (see mockup board 2), and Focus opens with Rise, using the same question card.
+After Tim's OK on step 2, build step 3:
+- Fletching links: two small orange chevrons after the link text, which shift right on hover.
+- Chrome that fades while the writer types (Fade, which Tim leans toward), returning at full contrast on pause or pointer movement.
+- The Google Docs paste fix: turn single line breaks into paragraph breaks on paste.
 
 ## 4. Open questions for Tim
 
-- His review of step 1.
-- Fade or Tuck for controls while typing (he leans Fade).
-- Text area boundaries: paper on cream is too faint to count as a field edge (WCAG 1.4.11), so the text area keeps a mid-charcoal border for now.
+- His review of step 2.
+- Fade or Tuck (he leans Fade).
+- Text area boundaries: the boxes keep a mid-charcoal border, because paper on cream is too faint to count as a field edge (WCAG 1.4.11).
 
 ## 5. Tried and failed
 
 - Editing a brief without touching its TODO line trips the gate's `todo-sync` check, including on `--amend`.
-- Adding a dependency trips the `spec-gate` check until `docs/SPEC.md` is updated in the same commit.
+- Adding a dependency trips `spec-gate` until `docs/SPEC.md` is updated in the same commit.
+- In the nav grid, a 264px-wide child sized the only column, so the collapsed toggle and strip centered off-screen. The fix is `grid-template-columns: minmax(0, 1fr)`.
+- Hiding rules placed in a media query before the base rules lose to them. Raise specificity, as `.section-nav .nav-toggle` does.
