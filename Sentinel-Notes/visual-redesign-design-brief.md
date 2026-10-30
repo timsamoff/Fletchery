@@ -28,7 +28,7 @@ Mockups: https://claude.ai/artifact/XuVSsW4zdE8JQQvqwQAemM (private).
 - **Links:** the fletching mark (two small orange chevrons after the link text, shifting right on hover). An arrow underline was compared and not chosen.
 - **Writer's text size:** the same at every depth (20px Literata on the 28px line). A zoom option for the writer's text is worth adding with the formatting editor.
 - **Motion:** err on the side of animation (CLAUDE.md design rule). The section list animates its width as it opens and closes, crossfading between the full list and the strip.
-- **Focus animation:** four compared on the canvas: Fade, Rise, Lift (the writing surface grows to fill the screen), and Dim the room (it grows while the page fades to cream). Not chosen yet.
+- **Focus animation:** Rise. The sheet rises about 48px as it fades in over a dark backdrop, and sinks back on close. Fade, Lift, and Dim the room were compared.
 
 ## Open
 
