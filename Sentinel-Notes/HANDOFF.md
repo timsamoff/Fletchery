@@ -6,8 +6,9 @@ Written 2026-10-30. All three steps of the visual redesign are built. Step 3 is 
 
 - **Visual redesign** ([visual-redesign-design-brief.md](visual-redesign-design-brief.md), "Build"). Steps 1 and 2, plus the folder tabs, are pushed and approved. Step 3 is committed and tested in a browser:
   - fletching links,
-  - everything but the field fading while typing,
-  - the Google Docs paste fix.
+  - the section list fading while typing (cut back from the full interface on 2026-10-30 because the full fade was disruptive; the full scope stays behind `data-fade-scope="full"`),
+  - the Google Docs paste fix, which Tim confirmed.
+- **Settings page** ([settings-page-design-brief.md](settings-page-design-brief.md)): briefed, not built. It covers paste breaks, plus fade on/off, scope, and timing.
 
 ## 2. Files touched in step 3
 
@@ -17,13 +18,12 @@ Written 2026-10-30. All three steps of the visual redesign are built. Step 3 is 
 ## 3. Next step
 
 Wait for Tim's review of step 3. After that, the strongest open items:
-- **The Settings page** (TODO): font choice and author info. It would also be the natural home for a fade on/off switch and its timing.
+- **The Settings page**: first settle where each setting lives (the brief's Open section), then build it.
 - **The Premise brief's open decisions:** the Sheet model and the names for the two question layouts.
 
 ## 4. Open questions for Tim
 
-- Is a 2-second pause before the page returns from the fade right?
-- Text area boundaries: the boxes keep a mid-charcoal border, because paper on cream is too faint to count as a field edge (WCAG 1.4.11).
+- Text area boundaries: Tim will comment once the layout is more final.
 - The tablet tier from the brief isn't designed yet. The app still has 720px and 960px points only.
 
 ## 5. Tried and failed
