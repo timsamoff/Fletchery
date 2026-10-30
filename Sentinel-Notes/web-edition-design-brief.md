@@ -88,3 +88,24 @@ The first-run screen and the settings page list these losses plainly before the 
 - **Claude Code with the web edition:** in "this computer" mode, the folder is an ordinary story folder, so Claude Code can work in it, and the request queue could still apply. Offer that as a third AI option ("Claude Code on this computer"), or keep the web edition to none or an API key?
 - **Build order:** build the shared core and storage interface now, with the web edition itself after the local edition's phases? Or ship the web edition earlier?
 - **Drive and Claude Code:** the Drive for desktop sync client would put a Drive bible on disk where Claude Code could reach it. Mention this in docs, or leave it out?
+
+## Edition comparison (source for user-facing copy)
+
+Decided 2026-10-30: both editions stay. README, first-run screens, settings, and any landing page draw on this so writers can choose knowingly.
+
+| | Local edition | Web edition |
+|---|---|---|
+| Install | Node and one `npm` command; launch with `fletcherling` in a story folder | None; open a web page |
+| Browsers | Any | Folder storage in Chrome and Edge; Google Drive anywhere; zip open and save in Firefox and Safari |
+| Live sync with outside edits | Yes, through the file watcher | In Chrome and Edge, through `FileSystemObserver` (experimental) or a re-check on focus; Drive re-checks on focus and on an interval |
+| AI | Claude Code, through the request queue, on the writer's Claude plan | None, or Anthropic or OpenRouter, billed per use to the writer's own provider account |
+| What the AI can see | The whole project folder, including manuscript chapters and style skills | The bible, sent with each request (the whole bible fits in one request on current models) |
+| AI work style | Open-ended: reads many files, follows leads, rewrites several entries | Structured actions: interview, expand, check, suggest; one request each |
+| Network | None | Only Google (if Drive) and the connected AI provider |
+| Claude Code for drafting prose | Yes | Yes, in folder mode, since the bible is an ordinary folder on disk |
+
+Takeaways to state in copy:
+
+- **Local:** the full Claude Code experience, on the writer's existing plan, with nothing leaving the computer. Needs Node and a terminal.
+- **Web:** no install, works from anywhere, AI optional and paid per use, with the whole bible in view on every request. Live local editing needs Chrome or Edge.
+- **Both:** the same files, so a bible moves freely between editions and into a Claude Code drafting session.

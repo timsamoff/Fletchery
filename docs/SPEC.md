@@ -63,6 +63,7 @@ Fletcherling also runs as a static web app, with no install and no server. Worki
 - **Shared core.** Entry templates, index and `BIBLE.md` generation, link handling, and the audit live in browser-side modules behind one storage interface. The local server becomes one storage backend among several.
 - **Network.** The web edition contacts Google only when Drive storage is chosen, and an AI provider only when one is connected. Fonts stay self-hosted, and nothing else leaves the browser.
 - **Out of scope:** GitHub storage.
+- **Both editions stay (decided 2026-10-30).** The web edition doesn't replace the local edition. Every user-facing description of Fletcherling (README, first-run screens, settings, any landing page) explains what each edition and each choice gives and costs, so writers can pick knowingly. The comparison to draw from is in the web edition brief, under "Edition comparison". It's written plainly, per the style rules, as information rather than promotion.
 
 ## Defaults adopted for ambiguities in the prompt
 
