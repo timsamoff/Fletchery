@@ -26,7 +26,6 @@ Written 2026-10-29 at session end. All work is committed and pushed through `3ae
 - **Navigation:** should Premise get the section list now, or wait until Phase 4?
 - **Question edits:** Tim is sending edits to the Premise question set. Use the draft as placeholders until they arrive.
 - **Session hook test:** Tim to confirm it by putting text in this file and asking something unrelated in a new session.
-- **`Sentinel-Prompts/`:** still untracked. Track it or not (it's on TODO).
 
 ## 5. Tried and failed
 
