@@ -14,6 +14,7 @@ html {
   font-size: var(--text-body);
   line-height: var(--line);
   -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 84px; /* keeps focused fields clear of the sticky header */
 }
 
 body {
@@ -133,6 +134,9 @@ code {
 
 /* Header: 84px, three lines. */
 .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
   background: var(--color-bg);
   border-bottom: var(--border) solid var(--color-rule);
 }
@@ -386,16 +390,42 @@ textarea:focus-visible {
   .workspace.nav-collapsed {
     grid-template-columns: 72px minmax(0, 1fr);
   }
+  /* The list is pinned under the sticky header down to the window's bottom, scrolling on its own if it runs
+     long. Its grid column stays as a spacer, and the footer text starts past it. */
+  .editor-view {
+    --nav-width: 264px;
+  }
+  .editor-view:has(.nav-collapsed) {
+    --nav-width: 72px;
+  }
+  .editor-view .site-footer .wrap {
+    padding-left: calc(var(--nav-width) + var(--space-5));
+    transition: padding-left var(--duration-base) var(--ease-out);
+  }
+  .section-page {
+    grid-column: 2;
+  }
+  .workspace .section-nav {
+    margin-bottom: 0;
+  }
   .section-nav {
+    position: fixed;
+    top: 84px;
+    bottom: 0;
+    left: 0;
+    z-index: 4;
+    width: var(--nav-width);
+    transition: width var(--duration-base) var(--ease-out);
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-rule) transparent;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto 1fr;
     grid-template-areas: 'head' 'list';
     align-content: start;
-    overflow: hidden;
+    overflow: hidden auto;
     background: var(--color-panel);
-    padding-block: var(--space-4);
-    margin-bottom: 0;
+    padding-block: var(--space-3);
   }
   .section-nav summary {
     display: none;
