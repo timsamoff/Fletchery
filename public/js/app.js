@@ -441,27 +441,43 @@ function renderWork() {
   const interview = state.mode === 'interview';
   const questions = isSheet ? def.fields.map((f) => f.question) : def.questions;
   const step = Math.min(state.step, questions.length - 1);
-  const guide = def.guide.charAt(0).toLowerCase() + def.guide.slice(1);
-  const count = interview ? `Question ${step + 1} of ${questions.length}` : `${questions.length} questions`;
-  const modeButton = (mode, label) =>
-    `<button type="button" class="mode-button" data-mode="${mode}" aria-pressed="${state.mode === mode}">${label}</button>`;
+  // The two layouts are folder tabs over the question panel; the open tab joins the panel.
+  const tab = (mode, label) => {
+    const open = state.mode === mode;
+    return `<button type="button" role="tab" class="question-tab" id="tab-${mode}" data-mode="${mode}" aria-selected="${open}" aria-controls="question-panel" tabindex="${open ? 0 : -1}">${label}</button>`;
+  };
+  const arrow = (delta, label, disabled, path) =>
+    `<button type="button" class="question-arrow" data-step="${delta}" aria-label="${label}"${disabled ? ' disabled' : ''}>
+       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${path}"></path></svg>
+     </button>`;
+  const steps = `
+    <div class="question-steps" role="group" aria-label="Questions">
+      ${arrow(-1, 'Previous question', step === 0, 'M15 6l-6 6 6 6')}
+      ${questions
+        .map(
+          (q, i) =>
+            `<button type="button" class="question-number" data-question="${i}" aria-label="Question ${i + 1} of ${questions.length}"${i === step ? ' aria-current="step"' : ''}>${i + 1}</button>`,
+        )
+        .join('')}
+      ${arrow(1, 'Next question', step >= questions.length - 1, 'M9 6l6 6-6 6')}
+    </div>`;
   const card = `
-    <section class="question-card" aria-label="Questions">
-      <div class="question-meta">
-        <p class="question-count">${count} · ${esc(guide)}</p>
-        <div class="mode-toggle" role="group" aria-label="Question layout">
-          ${modeButton('interview', 'Interview me')}${modeButton('full', 'Full form')}
-        </div>
+    <div class="question-card">
+      <div class="question-tabs" role="tablist" aria-label="Question layout">
+        ${tab('interview', 'Interview me')}${tab('full', 'Full form')}
       </div>
-      ${
-        interview
-          ? `<div class="question-row">
-               <p class="question" id="question-text" aria-live="polite">${esc(questions[step])}</p>
-               ${stepButtons(step, questions.length)}
-             </div>`
-          : `<ol class="question-list" id="question-text">${questions.map((q) => `<li>${esc(q)}</li>`).join('')}</ol>`
-      }
-    </section>`;
+      <section class="question-panel${interview ? ' first-tab-open' : ''}" id="question-panel" role="tabpanel" aria-labelledby="tab-${state.mode}">
+        <div class="question-nav">
+          ${interview ? steps : ''}
+          <p class="question-guide">${interview ? '' : `${questions.length} questions. `}${esc(def.guide)}</p>
+        </div>
+        ${
+          interview
+            ? `<p class="question" id="question-text" aria-live="polite">${esc(questions[step])}</p>`
+            : `<ol class="question-list" id="question-text">${questions.map((q) => `<li>${esc(q)}</li>`).join('')}</ol>`
+        }
+      </section>
+    </div>`;
   // One field fills the page; the Sheet's full form stacks its parts at a fixed height.
   const fields = isSheet ? (interview ? [def.fields[step]] : def.fields) : [def.fields[0]];
   const fill = fields.length === 1;
@@ -476,7 +492,16 @@ function renderWork() {
         </div>`,
       )
       .join('');
-  work.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
+  work.querySelectorAll('[data-mode]').forEach((b) => {
+    b.addEventListener('click', () => setMode(b.dataset.mode));
+    // Tab pattern: the arrow keys, Home, and End move between the two tabs.
+    b.addEventListener('keydown', (e) => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+      e.preventDefault();
+      const other = b.dataset.mode === 'interview' ? 'full' : 'interview';
+      setMode(e.key === 'Home' ? 'interview' : e.key === 'End' ? 'full' : other);
+    });
+  });
   work.querySelectorAll('textarea[data-field]').forEach((t) => {
     t.value = fieldValue(t.dataset.field);
     t.addEventListener('input', () => onInput(t));
@@ -484,20 +509,20 @@ function renderWork() {
   });
   work.querySelectorAll('[data-step]').forEach((b) =>
     b.addEventListener('click', () => {
-      state.step += Number(b.dataset.step);
+      state.step = step + Number(b.dataset.step);
       renderWork();
-      // Keep focus on the same button, or on the other one when this end of the list disables it.
+      // Keep focus on the same arrow, or on the other one when this end of the list disables it.
       const same = work.querySelector(`[data-step="${b.dataset.step}"]:not([disabled])`);
       (same ?? work.querySelector('[data-step]:not([disabled])'))?.focus();
     }),
   );
-}
-
-function stepButtons(step, count) {
-  return `<div class="button-row step-buttons">
-    <button type="button" class="button button-quiet" data-step="-1"${step === 0 ? ' disabled' : ''}>Back</button>
-    <button type="button" class="button button-quiet" data-step="1"${step >= count - 1 ? ' disabled' : ''}>Next</button>
-  </div>`;
+  work.querySelectorAll('[data-question]').forEach((b) =>
+    b.addEventListener('click', () => {
+      state.step = Number(b.dataset.question);
+      renderWork();
+      work.querySelector(`[data-question="${b.dataset.question}"]`).focus();
+    }),
+  );
 }
 
 function fieldValue(id) {

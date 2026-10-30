@@ -74,6 +74,7 @@
   --color-cream: #f1ece2;
   --color-cream-light: #f8f5ef;
   --color-cream-deep: #eae3d5;
+  --color-cream-shade: #dfd6c4;
 
   /* Roles */
   --color-text: var(--color-charcoal);
@@ -87,6 +88,7 @@
   --color-focus: var(--color-orange);
   --color-grid: rgb(224 96 30 / 0.18);
   --color-panel: var(--color-cream-deep);
+  --color-tab-back: var(--color-cream-shade);
   --color-on-dark: var(--color-cream-light);
   --color-control: var(--color-charcoal);
   --color-control-hover: var(--color-spine);
