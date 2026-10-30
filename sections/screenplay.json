@@ -1,0 +1,58 @@
+{
+  "storyType": "screenplay",
+  "sections": [
+    {
+      "id": "premise",
+      "title": "Logline and premise",
+      "built": true,
+      "file": "premise/premise.md",
+      "descriptionFrom": "seed",
+      "why": "The logline is the shortest true statement of your script, and every other entry in the bible has to agree with it.",
+      "depths": {
+        "seed": {
+          "label": "Seed",
+          "guide": "A logline, under 35 words: protagonist, goal, obstacle, and stakes.",
+          "questions": [
+            "Who is the protagonist? Describe them without using a name.",
+            "What do they want, concretely?",
+            "What stands in the way?",
+            "What happens if they fail?",
+            "Put those together in one sentence of fewer than 35 words."
+          ],
+          "fields": [{ "id": "seed", "label": "Logline" }]
+        },
+        "sketch": {
+          "label": "Sketch",
+          "guide": "One paragraph of about five sentences: the setup, three disasters, and the ending.",
+          "questions": [
+            "Setup: who, where, and what’s normal before things go wrong?",
+            "First disaster: what ends the first act and commits them?",
+            "Second disaster: how does their attempt to fix things make it worse?",
+            "Third disaster: what failure forces the final act?",
+            "Ending: how does it resolve, and what does it cost?"
+          ],
+          "fields": [{ "id": "sketch", "label": "Premise in one paragraph" }]
+        },
+        "sheet": {
+          "label": "Sheet",
+          "guide": "About a page, in four paragraphs. Each of the first three ends in a disaster.",
+          "fields": [
+            { "id": "act1", "label": "Act 1, through the first disaster", "question": "Who, where, and what’s normal, up to the first disaster that commits them?" },
+            { "id": "act2a", "label": "Act 2, through the second disaster", "question": "How does their first attempt to fix things lead to the second disaster?" },
+            { "id": "act2b", "label": "Act 2, through the third disaster", "question": "What do they try next, and what failure forces the final act?" },
+            { "id": "act3", "label": "Act 3 and the ending", "question": "How does it resolve, and what does it cost them?" }
+          ]
+        }
+      }
+    },
+    { "id": "characters", "title": "Characters" },
+    { "id": "relationships", "title": "Relationships" },
+    { "id": "world", "title": "World and settings" },
+    { "id": "timeline", "title": "Timeline and events" },
+    { "id": "structure", "title": "Structure" },
+    { "id": "themes", "title": "Themes, motifs, and symbols" },
+    { "id": "voice", "title": "Voice and format" },
+    { "id": "series", "title": "Series continuity", "onlyFor": "series" }
+  ],
+  "areas": [{ "id": "notes", "title": "Notes and media" }]
+}

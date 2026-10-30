@@ -52,6 +52,34 @@ Fletcherling writes no ignore files. Everything in `story-bible/`, including `.f
 - **Security.** The server binds to `127.0.0.1`, checks the `Host` header, and refuses writes from any other `Origin`.
 - **Rhythm.** Base unit 8px, body 18px on a 28px line height, a 4px baseline grid, and a "Show grid" overlay for checking it.
 
+## Section lists
+
+Each story type's sections live in `sections/<type>.json`, by ID and title. IDs are stable because they name folders and files. Every story type also has the Notes and media area (`notes`).
+
+| ID | Prose fiction | Screenplay | Game narrative |
+|---|---|---|---|
+| `premise` | Premise | Logline and premise | Premise |
+| `characters` | Characters | Characters | Characters |
+| `relationships` | Relationships | Relationships | Relationships |
+| `world` | World and settings | World and settings | World and settings |
+| `factions` | | | Factions |
+| `timeline` | Timeline and events | Timeline and events | Timeline and events |
+| `plot` | Plot and structure | | Plot and structure |
+| `structure` | | Structure | |
+| `quests` | | | Quests |
+| `choices` | | | Choices and branching |
+| `mechanics` | | | Narrative and mechanics |
+| `items` | | | Items and glossary |
+| `themes` | Themes, motifs, and symbols | Themes, motifs, and symbols | Themes, motifs, and symbols |
+| `voice` | Voice and style | Voice and format | Voice and dialogue conventions |
+| `series` | Series continuity (series only) | Series continuity (series only) | Series continuity (series only) |
+
+What each section covers is in the approved plan and `first-prompt/FLETCHERLING-PROMPT.md`. It's recorded in each section's data as the section is built.
+
+### Entry depths (built 2026-10-30)
+
+An entry's body holds up to three layers under `## Seed`, `## Sketch`, and `## Sheet` headings, and Sheet fields are `###` subsections named by their labels. Only layers with text are written. A body with no layer headings is read as the Seed, and text the app doesn't recognize is kept. Frontmatter `depth` is the deepest layer with text. Status is empty or draft from the text, and settled only by the writer. Editing a settled entry's text returns it to draft.
+
 ## Web edition (decided 2026-10-30)
 
 Fletcherling also runs as a static web app, with no install and no server. Working detail and open questions are in `Sentinel-Notes/web-edition-design-brief.md`.

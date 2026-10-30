@@ -43,12 +43,32 @@ export function newFrontmatter({ title, type }, now = new Date()) {
   };
 }
 
-// The file content after the writer changes the body. Starts from the template when the file doesn't exist.
-export function withBody(raw, body, template, now = new Date()) {
-  const frontmatter = raw === null ? newFrontmatter(template, now) : { ...newFrontmatter(template, now), ...parseEntry(raw).frontmatter };
+// The file content after a change. Starts from the template when the file doesn't exist.
+// change: { body?, depth?, description?, settle?: true | false }. Returns { content, frontmatter, reverted }.
+// Status rules: empty and draft follow the text; settled is the writer's decision, and editing
+// the text of a settled entry drops it back to draft (reverted: true).
+export function updateEntry(raw, change, template, now = new Date()) {
+  const existing = raw === null ? { frontmatter: {}, body: '' } : parseEntry(raw);
+  const frontmatter = { ...newFrontmatter(template, now), ...existing.frontmatter };
+  const body = change.body ?? existing.body;
+  const bodyChanged = change.body !== undefined && change.body !== existing.body;
+  let reverted = false;
+
+  if (change.depth) frontmatter.depth = change.depth;
+  if (change.description !== undefined) frontmatter.description = change.description;
+  if (change.settle === true) {
+    frontmatter.status = 'settled';
+    if (frontmatter.author === 'ai-draft') frontmatter.author = 'ai-reviewed';
+  } else if (!body.trim()) {
+    frontmatter.status = 'empty';
+  } else if (change.settle === false || frontmatter.status === 'empty') {
+    frontmatter.status = 'draft';
+  } else if (frontmatter.status === 'settled' && bodyChanged) {
+    frontmatter.status = 'draft';
+    reverted = true;
+  }
   frontmatter.updated = now.toISOString();
-  if ((frontmatter.status ?? 'empty') === 'empty' && body.trim()) frontmatter.status = 'draft';
-  return serializeEntry(frontmatter, body);
+  return { content: serializeEntry(frontmatter, body), frontmatter, reverted };
 }
 
 // Drops the one blank line after the frontmatter and the final newline,

@@ -9,10 +9,19 @@ Paused 2026-10-29 to run Sentinel. Build phase 2 of the approved plan.
 - A body with no known headings (for example, EOL's existing "TBA") is read as the Seed.
 - The Premise `description` frontmatter field mirrors the Seed sentence, so indexes can use it.
 
+## Built (2026-10-30)
+
+- Section list from `sections/<type>.json` (beside the page from 960px, a Sections menu below that), with Premise linked and the rest marked Not built yet.
+- Depth control. Shallower layers show above as read-only context, each with an Edit link that jumps to that depth.
+- Interview me (one question, or one Sheet part, at a time) and Full form, remembered per browser.
+- Status as a shape plus a word. Mark settled and Back to draft. Editing a settled entry returns it to draft and says so.
+- Skip for now, recorded in `fletcherling.json` and cleared by writing.
+- Ask Claude, disabled with a note until the bridge exists.
+- Audit items R1 (44px buttons on the grid), R4 (save status by the editor), and A2 (disabled and pressed styles).
+
 ## Open
 
-- Section navigation now (a side list of all sections from `sections/prose.json`, with only Premise linked) or wait until Phase 4. Not answered yet.
-- Tim is sending edits to the question set. Build the mechanics with the draft below as placeholders.
+- Tim is sending edits to the question set. The drafts below are in `sections/*.json` as placeholders.
 
 ## Draft copy (placeholder)
 

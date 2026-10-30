@@ -12,6 +12,7 @@ const FONT_DIRS = ['source-sans-3', 'atkinson-hyperlegible'].map((name) =>
   path.join(APP_DIR, 'node_modules', '@fontsource', name, 'files'),
 );
 const ICON = path.join(APP_DIR, 'assets', 'fletcherling-icon.svg');
+const SECTIONS_DIR = path.join(APP_DIR, 'sections');
 // Browser build of the yaml package, mapped to the bare name "yaml" by the page's import map.
 const YAML_DIR = path.join(APP_DIR, 'node_modules', 'yaml', 'browser', 'dist');
 
@@ -111,6 +112,7 @@ export function createServer(projectDir) {
     let file;
     if (pathname === '/') file = path.join(PUBLIC_DIR, 'index.html');
     else if (pathname === '/icon.svg') file = ICON;
+    else if (/^\/sections\/[a-z]+\.json$/.test(pathname)) file = path.join(SECTIONS_DIR, path.basename(pathname));
     else if (pathname.startsWith('/vendor/yaml/')) {
       file = path.resolve(YAML_DIR, '.' + pathname.slice('/vendor/yaml'.length));
       if (!file.startsWith(YAML_DIR + path.sep)) file = null;

@@ -1,12 +1,17 @@
-// First-run setup and the entry editor, with live sync and conflict handling.
-import { parseEntry, withBody } from './core/entry.js';
+// First-run setup, section navigation, and the section editor, with live sync and conflict handling.
+import { parseEntry, updateEntry } from './core/entry.js';
+import { DEPTHS, deepestFilled, parseLayers, serializeLayers } from './core/layers.js';
 import { LocalServerStore, StoreConflict } from './core/store.js';
 
 const store = new LocalServerStore();
 const SETTINGS_PATH = 'fletcherling.json';
-const ENTRY_PATH = 'premise/premise.md';
-const ENTRY_TEMPLATE = { title: 'Premise', type: 'premise' };
 const SAVE_DELAY_MS = 500;
+const WIDE = window.matchMedia('(min-width: 960px)');
+const STATUS = {
+  empty: { shape: '○', word: 'Empty' },
+  draft: { shape: '◐', word: 'Draft' },
+  settled: { shape: '●', word: 'Settled' },
+};
 
 const view = document.getElementById('view');
 const statusEl = document.getElementById('save-status');
@@ -17,8 +22,11 @@ const esc = (s) =>
 
 const timeNow = () => new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
+// The footer live region is what screen readers hear; the copy by the editor is for sighted writers on tall pages.
 function setStatus(text) {
   statusEl.textContent = text;
+  const local = document.getElementById('local-status');
+  if (local) local.textContent = text;
 }
 
 // A stored file plus its parsed entry. Throws EntryFormatError for broken frontmatter.
@@ -29,6 +37,20 @@ function toEntry(file) {
 
 function showProblem(heading, message) {
   view.innerHTML = `<h1>${esc(heading)}</h1><p>${esc(message)}</p>`;
+}
+
+function readPref(key, fallback) {
+  try {
+    return localStorage.getItem(key) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writePref(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {}
 }
 
 // ---------- Start ----------
@@ -46,7 +68,7 @@ async function start() {
     } catch {
       return showProblem('The settings file can’t be read', 'story-bible/fletcherling.json isn’t valid JSON. Fix it in an editor, then reload this page.');
     }
-    showEditor(settings);
+    showEditor(settings, file.version);
   } catch (err) {
     showProblem('Fletcherling couldn’t start', err.message);
   }
@@ -63,16 +85,16 @@ function setupGridToggle() {
   const set = (on) => {
     document.documentElement.classList.toggle('show-grid', on);
     button.setAttribute('aria-pressed', String(on));
-    try {
-      localStorage.setItem('fl-grid', on ? '1' : '0');
-    } catch {}
+    writePref('fl-grid', on ? '1' : '0');
   };
-  let saved = false;
-  try {
-    saved = localStorage.getItem('fl-grid') === '1';
-  } catch {}
-  set(saved);
+  set(readPref('fl-grid', '0') === '1');
   button.addEventListener('click', () => set(button.getAttribute('aria-pressed') !== 'true'));
+}
+
+async function loadSectionSet(storyType) {
+  const res = await fetch(`/sections/${encodeURIComponent(storyType)}.json`);
+  if (!res.ok) throw new Error(`The section list for “${storyType}” is missing.`);
+  return res.json();
 }
 
 // ---------- First run ----------
@@ -130,18 +152,18 @@ function showSetup() {
       scope: input.scope,
       font: 'source-sans-3',
       claudeMdPointer: null,
+      sections: {},
       createdAt: new Date().toISOString(),
     };
+    let settingsVersion;
     try {
-      await store.write(SETTINGS_PATH, JSON.stringify(settings, null, 2) + '\n', null);
-      const entry = await store.read(ENTRY_PATH);
-      if (!entry.exists) await store.write(ENTRY_PATH, withBody(null, '', ENTRY_TEMPLATE), null);
+      settingsVersion = await store.write(SETTINGS_PATH, JSON.stringify(settings, null, 2) + '\n', null);
     } catch (err) {
       error.textContent = err instanceof StoreConflict ? 'This project is already set up. Reload the page.' : err.message;
       return;
     }
     setStatus('Bible created.');
-    showEditor(settings);
+    showEditor(settings, settingsVersion);
     main.focus();
   });
 }
@@ -156,12 +178,20 @@ function choice(name, value, label, hint) {
     </div>`;
 }
 
-// ---------- Editor ----------
+// ---------- Section editor ----------
 
 const state = {
-  baseVersion: null, // stored version the text area is based on
+  settings: null,
+  settingsVersion: null,
+  sectionSet: null,
+  section: null, // the built section being edited
+  layers: null, // { seed, sketch, sheet: { id: text }, ... }
+  depth: 'seed', // the depth being worked on (a page choice; frontmatter depth follows the text)
+  mode: readPref('fl-mode', 'interview'), // 'interview' or 'full'
+  step: 0, // current question or Sheet part in Interview mode
+  baseVersion: null, // stored version the editor is based on
   baseContent: null, // that version's full file content, frontmatter included
-  savedBody: '', // body as last loaded or saved
+  savedBody: '', // body as last loaded or saved, normalized
   frontmatter: {},
   saving: false,
   timer: null,
@@ -169,82 +199,261 @@ const state = {
   conflict: null, // { disk, confirming }
 };
 
-let textarea;
+const sheetFields = () => state.section.depths.sheet.fields;
+const composedBody = () => serializeLayers(state.layers, sheetFields());
+const isDirty = () => composedBody() !== state.savedBody;
+const entryPath = () => state.section.file;
+const template = () => ({ title: state.section.title, type: state.section.id });
+const statusOf = () => STATUS[state.frontmatter.status] ?? STATUS.empty;
+const skipped = () => Boolean(state.settings.sections?.[state.section.id]?.skipped);
 
-async function showEditor(settings) {
+async function showEditor(settings, settingsVersion) {
   applySettings(settings);
+  state.settings = settings;
+  state.settingsVersion = settingsVersion;
+  try {
+    state.sectionSet = await loadSectionSet(settings.storyType);
+  } catch (err) {
+    return showProblem('The sections couldn’t be loaded', err.message);
+  }
+  state.section = state.sectionSet.sections.find((s) => s.built);
+
   view.innerHTML = `
-    <h1>Premise</h1>
-    <p>Saved to <code>story-bible/${ENTRY_PATH}</code> as you type. Changes made to that file in another editor appear here.</p>
-    <div id="conflict-slot"></div>
-    <div class="field">
-      <label for="entry-body">Premise text</label>
-      <textarea id="entry-body" rows="8" spellcheck="true"></textarea>
-    </div>
-    <dl class="entry-meta" id="entry-meta"></dl>`;
-  textarea = document.getElementById('entry-body');
-  textarea.addEventListener('input', onInput);
-  textarea.addEventListener('blur', () => save());
+    <div class="workspace">
+      <nav class="section-nav" aria-label="Sections">
+        <details id="nav-details"${WIDE.matches ? ' open' : ''}>
+          <summary>Sections</summary>
+          <div id="nav-lists"></div>
+        </details>
+      </nav>
+      <div class="section-page">
+        <div class="section-head">
+          <h1 id="section-title"></h1>
+          <p class="status-badge" id="status-badge"></p>
+        </div>
+        <p class="why" id="section-why"></p>
+        <div id="conflict-slot"></div>
+        <fieldset class="depth-control">
+          <legend>Depth</legend>
+          <div class="choices-inline" id="depth-choices"></div>
+        </fieldset>
+        <p class="hint guide" id="depth-guide"></p>
+        <div class="mode-toggle" role="group" aria-label="Question layout">
+          <button type="button" class="button button-quiet" data-mode="interview">Interview me</button>
+          <button type="button" class="button button-quiet" data-mode="full">Full form</button>
+        </div>
+        <div id="context"></div>
+        <div id="work"></div>
+        <p class="local-status" id="local-status" aria-hidden="true"></p>
+        <div class="button-row section-actions">
+          <button type="button" class="button" id="settle"></button>
+          <button type="button" class="button button-quiet" id="skip">Skip for now</button>
+          <button type="button" class="button button-quiet" id="ask-claude" disabled aria-describedby="ask-claude-note">Ask Claude</button>
+        </div>
+        <p class="hint" id="ask-claude-note">Ask Claude arrives with the Claude Code bridge.</p>
+        <dl class="entry-meta" id="entry-meta"></dl>
+        <p class="hint file-note" id="file-note"></p>
+      </div>
+    </div>`;
+
+  document.getElementById('section-title').textContent = state.section.title;
+  document.getElementById('section-why').textContent = state.section.why;
+  document.getElementById('file-note').innerHTML =
+    `Saved to <code>story-bible/${esc(entryPath())}</code> as you type. Changes made to that file in another editor appear here.`;
+  WIDE.addEventListener('change', (e) => {
+    if (e.matches) document.getElementById('nav-details').open = true;
+  });
+  document.getElementById('depth-choices').innerHTML = DEPTHS.map(
+    (d) => `
+      <div class="choice">
+        <input type="radio" id="depth-${d}" name="depth" value="${d}" />
+        <label for="depth-${d}">${esc(state.section.depths[d].label)}</label>
+      </div>`,
+  ).join('');
+  document.querySelectorAll('[name=depth]').forEach((r) => r.addEventListener('change', () => setDepth(r.value, false)));
+  document.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
+  document.getElementById('settle').addEventListener('click', toggleSettled);
+  document.getElementById('skip').addEventListener('click', skipSection);
 
   try {
-    load(toEntry(await store.read(ENTRY_PATH)));
+    load(toEntry(await store.read(entryPath())), { firstLoad: true });
   } catch (err) {
-    if (err.detail) console.error(`${ENTRY_PATH}: ${err.detail}`);
+    if (err.detail) console.error(`${entryPath()}: ${err.detail}`);
     setStatus(err.message);
-    textarea.disabled = true;
+    document.querySelectorAll('.section-page textarea, .section-page button, .section-page input').forEach((el) => (el.disabled = true));
     return;
   }
   listen();
 }
 
-const isDirty = () => textarea.value !== state.savedBody;
-
-function load(entry) {
+function load(entry, { firstLoad = false } = {}) {
   state.baseVersion = entry.version;
   state.baseContent = entry.exists ? entry.content : null;
-  state.savedBody = entry.body;
   state.frontmatter = entry.frontmatter;
-  textarea.value = entry.body;
-  renderMeta();
+  state.layers = parseLayers(entry.body, sheetFields());
+  state.savedBody = composedBody();
+  if (firstLoad) state.depth = deepestFilled(state.layers);
+  renderAll();
 }
 
-// Writes the body on top of baseVersion. Returns true when saved; shows the conflict panel otherwise.
-async function writeBody(body, baseVersion, baseContent) {
-  const content = withBody(baseContent, body, ENTRY_TEMPLATE);
-  try {
-    const version = await store.write(ENTRY_PATH, content, baseVersion);
-    state.baseVersion = version;
-    state.baseContent = content;
-    state.savedBody = body;
-    state.frontmatter = parseEntry(content).frontmatter;
-    renderMeta();
-    return true;
-  } catch (err) {
-    if (!(err instanceof StoreConflict)) {
-      setStatus(`Couldn’t save. ${err.message}`);
-      return false;
-    }
-    try {
-      showConflict(toEntry(err.current));
-    } catch (parseErr) {
-      setStatus(`Not saved. The file changed on disk and can’t be read. ${parseErr.message}`);
-    }
-    return false;
-  }
+function renderAll() {
+  renderNav();
+  renderStatus();
+  renderDepth();
+  renderWork();
 }
 
-function renderMeta() {
+function renderNav() {
+  const scope = state.settings.scope;
+  const item = (s) => {
+    if (s.id === state.section.id) {
+      const st = statusOf();
+      const note = skipped() ? 'Skipped' : st.word;
+      return `<li><a href="#" aria-current="page"><span class="nav-title">${esc(s.title)}</span>
+        <span class="nav-state"><span aria-hidden="true">${skipped() ? '–' : st.shape}</span> ${note}</span></a></li>`;
+    }
+    return `<li><span class="nav-item-off"><span class="nav-title">${esc(s.title)}</span>
+      <span class="nav-state">Not built yet</span></span></li>`;
+  };
+  const sections = state.sectionSet.sections.filter((s) => !s.onlyFor || s.onlyFor === scope);
+  document.getElementById('nav-lists').innerHTML = `
+    <ol class="nav-list">${sections.map(item).join('')}</ol>
+    <ul class="nav-list nav-areas">${(state.sectionSet.areas ?? []).map(item).join('')}</ul>`;
+}
+
+function renderStatus() {
+  const st = statusOf();
+  document.getElementById('status-badge').innerHTML = `<span aria-hidden="true">${st.shape}</span> ${st.word}`;
+  const settle = document.getElementById('settle');
+  const settled = state.frontmatter.status === 'settled';
+  settle.textContent = settled ? 'Back to draft' : 'Mark settled';
+  settle.disabled = !settled && !composedBody().trim();
   const fm = state.frontmatter;
   const updated = fm.updated ? new Date(fm.updated).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'never';
-  const item = (label, value) => `<div><dt>${label}</dt><dd>${esc(value ?? 'not set')}</dd></div>`;
+  const row = (label, value) => `<div><dt>${label}</dt><dd>${esc(value ?? 'not set')}</dd></div>`;
+  const depthLabel = state.section.depths[fm.depth]?.label ?? fm.depth;
   document.getElementById('entry-meta').innerHTML =
-    item('Depth', fm.depth) + item('Status', fm.status) + item('Author', fm.author) + item('Updated', updated);
+    row('Depth', depthLabel) + row('Status', st.word) + row('Author', fm.author) + row('Updated', updated);
 }
 
-function onInput() {
+function renderDepth() {
+  document.getElementById(`depth-${state.depth}`).checked = true;
+  document.getElementById('depth-guide').textContent = state.section.depths[state.depth].guide;
+  document.querySelectorAll('[data-mode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)));
+
+  // Shallower layers stay in view as read-only context, each with a way back to edit it.
+  const shallower = DEPTHS.slice(0, DEPTHS.indexOf(state.depth));
+  document.getElementById('context').innerHTML = shallower
+    .map((d) => {
+      const label = state.section.depths[d].label;
+      const text = d === 'sheet' ? '' : state.layers[d];
+      return `
+        <section class="context-layer" aria-labelledby="context-${d}">
+          <h2 id="context-${d}">${esc(label)}</h2>
+          <p>${text ? esc(text) : `<span class="hint">No ${label.toLowerCase()} yet.</span>`}</p>
+          <button type="button" class="link-button" data-goto="${d}">Edit ${label.toLowerCase()}</button>
+        </section>`;
+    })
+    .join('');
+  document.querySelectorAll('[data-goto]').forEach((b) => b.addEventListener('click', () => setDepth(b.dataset.goto, true)));
+}
+
+// The questions and answer fields for the current depth and mode.
+function renderWork() {
+  const def = state.section.depths[state.depth];
+  const work = document.getElementById('work');
+  if (state.depth === 'sheet') {
+    const fields = def.fields;
+    const shown = state.mode === 'interview' ? [fields[Math.min(state.step, fields.length - 1)]] : fields;
+    work.innerHTML =
+      (state.mode === 'interview' ? stepper(state.step, fields.length, 'Part') : '') +
+      shown
+        .map(
+          (f) => `
+          <div class="field">
+            <label for="field-${f.id}">${esc(f.label)}</label>
+            <span class="hint" id="hint-${f.id}">${esc(f.question)}</span>
+            <textarea id="field-${f.id}" data-field="${f.id}" rows="6" spellcheck="true" aria-describedby="hint-${f.id}"></textarea>
+          </div>`,
+        )
+        .join('');
+  } else {
+    const field = def.fields[0];
+    const questions = def.questions;
+    const prompt =
+      state.mode === 'interview'
+        ? `<div class="question-card">
+             <p class="question-count">Question ${state.step + 1} of ${questions.length}</p>
+             <p class="question" id="question-text" aria-live="polite">${esc(questions[state.step])}</p>
+             ${stepButtons(state.step, questions.length)}
+           </div>`
+        : `<ol class="question-list" id="question-text">${questions.map((q) => `<li>${esc(q)}</li>`).join('')}</ol>`;
+    work.innerHTML = `${prompt}
+      <div class="field">
+        <label for="field-${field.id}">${esc(field.label)}</label>
+        <textarea id="field-${field.id}" data-field="${field.id}"${state.depth === 'seed' ? ' class="short" rows="2"' : ' rows="8"'} spellcheck="true" aria-describedby="question-text"></textarea>
+      </div>`;
+  }
+  work.querySelectorAll('textarea[data-field]').forEach((t) => {
+    t.value = fieldValue(t.dataset.field);
+    t.addEventListener('input', () => onInput(t));
+    t.addEventListener('blur', () => save());
+  });
+  work.querySelectorAll('[data-step]').forEach((b) =>
+    b.addEventListener('click', () => {
+      state.step += Number(b.dataset.step);
+      renderWork();
+      // Keep focus on the same button, or on the other one when this end of the list disables it.
+      const same = work.querySelector(`[data-step="${b.dataset.step}"]:not([disabled])`);
+      (same ?? work.querySelector('[data-step]:not([disabled])'))?.focus();
+    }),
+  );
+}
+
+function stepper(step, count, noun) {
+  return `<div class="question-card stepper">
+    <p class="question-count" aria-live="polite">${noun} ${step + 1} of ${count}</p>
+    ${stepButtons(step, count)}
+  </div>`;
+}
+
+function stepButtons(step, count) {
+  return `<div class="button-row step-buttons">
+    <button type="button" class="button button-quiet" data-step="-1"${step === 0 ? ' disabled' : ''}>Back</button>
+    <button type="button" class="button button-quiet" data-step="1"${step >= count - 1 ? ' disabled' : ''}>Next</button>
+  </div>`;
+}
+
+function fieldValue(id) {
+  return id === 'seed' || id === 'sketch' ? state.layers[id] : (state.layers.sheet[id] ?? '');
+}
+
+function setFieldValue(id, value) {
+  if (id === 'seed' || id === 'sketch') state.layers[id] = value;
+  else state.layers.sheet[id] = value;
+}
+
+function setDepth(depth, focusField) {
+  state.depth = depth;
+  state.step = 0;
+  renderDepth();
+  renderWork();
+  if (focusField) document.querySelector('#work textarea')?.focus();
+}
+
+function setMode(mode) {
+  state.mode = mode;
+  state.step = 0;
+  writePref('fl-mode', mode);
+  renderDepth();
+  renderWork();
+}
+
+function onInput(textarea) {
+  setFieldValue(textarea.dataset.field, textarea.value);
   if (state.conflict) {
     // Saving waits until the conflict is resolved. Keep "Your version" current.
-    document.getElementById('conflict-mine').value = textarea.value;
+    document.getElementById('conflict-mine').value = composedBody();
     return;
   }
   if (statusEl.textContent !== 'Unsaved changes') setStatus('Unsaved changes');
@@ -252,24 +461,95 @@ function onInput() {
   state.timer = setTimeout(save, SAVE_DELAY_MS);
 }
 
+// Writes the entry on top of baseVersion. Returns the update result, or null after a conflict or error.
+async function writeEntry(change, baseVersion = state.baseVersion, baseContent = state.baseContent) {
+  const body = composedBody();
+  const description = state.section.descriptionFrom ? (state.layers[state.section.descriptionFrom] ?? '').split('\n')[0].trim() : undefined;
+  const result = updateEntry(baseContent, { body, depth: deepestFilled(state.layers), description, ...change }, template());
+  try {
+    const version = await store.write(entryPath(), result.content, baseVersion);
+    state.baseVersion = version;
+    state.baseContent = result.content;
+    state.savedBody = body;
+    state.frontmatter = result.frontmatter;
+    renderStatus();
+    renderNav();
+    if (skipped() && body.trim()) await setSkipped(false);
+    return result;
+  } catch (err) {
+    if (!(err instanceof StoreConflict)) {
+      setStatus(`Couldn’t save. ${err.message}`);
+      return null;
+    }
+    try {
+      showConflict(toEntry(err.current));
+    } catch (parseErr) {
+      setStatus(`Not saved. The file changed on disk and can’t be read. ${parseErr.message}`);
+    }
+    return null;
+  }
+}
+
 async function save() {
   clearTimeout(state.timer);
   if (state.saving || state.conflict || !isDirty()) return;
   state.saving = true;
-  const body = textarea.value;
   setStatus('Saving…');
-  const saved = await writeBody(body, state.baseVersion, state.baseContent);
+  const result = await writeEntry({});
   state.saving = false;
-  if (!saved) return;
-  setStatus(isDirty() ? 'Unsaved changes' : `Saved at ${timeNow()}`);
-
+  if (!result) return;
+  if (isDirty()) setStatus('Unsaved changes');
+  else setStatus(result.reverted ? `Saved at ${timeNow()}. Back to draft because you edited it.` : `Saved at ${timeNow()}`);
   if (state.remotePending) return checkRemote();
   if (isDirty()) state.timer = setTimeout(save, SAVE_DELAY_MS);
 }
 
+async function toggleSettled() {
+  if (state.conflict || state.saving) return;
+  clearTimeout(state.timer);
+  const settling = state.frontmatter.status !== 'settled';
+  state.saving = true;
+  const result = await writeEntry({ settle: settling });
+  state.saving = false;
+  if (!result) return;
+  setStatus(settling ? `${state.section.title} settled.` : `${state.section.title} is back to draft.`);
+  document.getElementById('settle').focus();
+}
+
+// Skips live in fletcherling.json. A conflicting write rereads the file and tries once more.
+async function setSkipped(value) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const next = { ...state.settings, sections: { ...(state.settings.sections ?? {}) } };
+    next.sections[state.section.id] = { ...(next.sections[state.section.id] ?? {}), skipped: value };
+    if (!value) delete next.sections[state.section.id].skipped;
+    if (!Object.keys(next.sections[state.section.id]).length) delete next.sections[state.section.id];
+    try {
+      state.settingsVersion = await store.write(SETTINGS_PATH, JSON.stringify(next, null, 2) + '\n', state.settingsVersion);
+      state.settings = next;
+      renderNav();
+      return true;
+    } catch (err) {
+      if (!(err instanceof StoreConflict) || !err.current.exists) {
+        setStatus(`Couldn’t update the settings. ${err.message}`);
+        return false;
+      }
+      state.settings = JSON.parse(err.current.content);
+      state.settingsVersion = err.current.version;
+    }
+  }
+  setStatus('Couldn’t update the settings because they keep changing on disk.');
+  return false;
+}
+
+async function skipSection() {
+  if (await setSkipped(true)) {
+    setStatus(`${state.section.title} skipped for now. It shows as skipped in the section list until you write in it.`);
+  }
+}
+
 function listen() {
   store.changes((change) => {
-    if (change.path !== ENTRY_PATH || change.version === state.baseVersion) return;
+    if (change.path !== entryPath() || change.version === state.baseVersion) return;
     if (state.saving) state.remotePending = true;
     else checkRemote();
   });
@@ -281,7 +561,7 @@ async function checkRemote() {
   state.remotePending = false;
   let data;
   try {
-    data = toEntry(await store.read(ENTRY_PATH));
+    data = toEntry(await store.read(entryPath()));
   } catch (err) {
     setStatus(`The file changed on disk but couldn’t be read. ${err.message}`);
     return;
@@ -296,10 +576,15 @@ async function checkRemote() {
     showConflict(data);
     return;
   }
-  const { selectionStart, selectionEnd } = textarea;
-  const hadFocus = document.activeElement === textarea;
+  const active = document.activeElement;
+  const field = active?.dataset?.field;
+  const selection = field ? [active.selectionStart, active.selectionEnd] : null;
   load(data);
-  if (hadFocus) textarea.setSelectionRange(selectionStart, selectionEnd);
+  if (field) {
+    const again = document.getElementById(`field-${field}`);
+    again?.focus();
+    again?.setSelectionRange(...selection);
+  }
   setStatus(data.exists ? `Updated from disk at ${timeNow()}` : 'The file was deleted on disk. Typing here creates it again.');
 }
 
@@ -345,7 +630,7 @@ function renderConflict() {
       }
     </section>`;
   document.getElementById('conflict-disk').value = disk.body;
-  document.getElementById('conflict-mine').value = textarea.value;
+  document.getElementById('conflict-mine').value = composedBody();
   slot.querySelectorAll('[data-action]').forEach((b) => b.addEventListener('click', () => resolveConflict(b.dataset.action)));
 }
 
@@ -359,22 +644,22 @@ async function resolveConflict(action) {
   }
   if (action === 'copy') {
     try {
-      await navigator.clipboard.writeText(textarea.value);
+      await navigator.clipboard.writeText(composedBody());
     } catch {
       setStatus('Couldn’t copy your version, so the disk version wasn’t loaded.');
       return;
     }
   }
   if (action === 'disk' || action === 'copy') {
+    load(disk); // before closeConflict, which focuses the freshly rendered field
     closeConflict();
-    load(disk);
     setStatus(action === 'copy' ? 'Your version is on the clipboard. Using the disk version.' : 'Using the disk version.');
     return;
   }
   if (action === 'overwrite') {
     const open = state.conflict;
-    state.conflict = null; // lets writeBody reopen the panel if the file changed again
-    if (!(await writeBody(textarea.value, disk.version, disk.exists ? disk.content : null))) {
+    state.conflict = null; // lets writeEntry reopen the panel if the file changed again
+    if (!(await writeEntry({}, disk.version, disk.exists ? disk.content : null))) {
       if (state.conflict) setStatus('The file changed on disk again. Nothing was overwritten.');
       else state.conflict = open; // a non-conflict failure: the panel stays as it was
       return;
@@ -387,7 +672,7 @@ async function resolveConflict(action) {
 function closeConflict() {
   state.conflict = null;
   document.getElementById('conflict-slot').innerHTML = '';
-  textarea.focus();
+  document.querySelector('#work textarea')?.focus();
 }
 
 start();

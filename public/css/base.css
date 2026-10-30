@@ -221,6 +221,9 @@ textarea {
   resize: vertical;
   min-height: calc(var(--line) * 6 + 28px);
 }
+textarea.short {
+  min-height: calc(var(--line) * 3); /* two lines of text plus padding and border */
+}
 input[type='text']:focus-visible,
 textarea:focus-visible {
   outline-offset: 0;
@@ -251,13 +254,13 @@ textarea:focus-visible {
   gap: 0 var(--space-5);
 }
 
-/* Buttons: 42px tall. Orange buttons carry spine-charcoal labels (4.61:1). */
+/* Buttons: 44px tall, and a row of them takes two lines. Orange buttons carry spine-charcoal labels (4.61:1). */
 .button {
   display: inline-block;
   font: inherit;
   font-weight: 600;
   line-height: var(--line);
-  padding: 5px var(--space-4);
+  padding: 6px var(--space-4);
   border: var(--border) solid var(--color-accent);
   border-radius: var(--radius);
   background: var(--color-accent);
@@ -279,11 +282,39 @@ textarea:focus-visible {
   border-color: var(--color-accent);
   box-shadow: inset 0 -4px 0 var(--color-accent);
 }
+.button:active:not(:disabled) {
+  box-shadow: inset 0 var(--space-1) 0 var(--color-spine);
+}
+.button-quiet:active:not(:disabled) {
+  box-shadow: inset 0 var(--space-1) 0 var(--color-border-quiet);
+}
+.button:disabled {
+  background: transparent;
+  border-style: dashed;
+  border-color: var(--color-border-quiet);
+  color: var(--color-text-quiet);
+  cursor: not-allowed;
+}
 .button-row {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2) var(--space-3);
-  margin-bottom: var(--line);
+  align-items: center;
+  gap: 12px var(--space-3); /* wrapped rows stay on whole lines */
+  margin-bottom: 12px;
+}
+.link-button {
+  display: block; /* inline, it sits on the text baseline and adds a pixel below */
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: var(--text-small);
+  color: var(--color-text);
+  text-decoration: underline;
+  text-decoration-color: var(--color-accent);
+  text-decoration-thickness: var(--border);
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 
 .form-error {
@@ -293,6 +324,153 @@ textarea:focus-visible {
 }
 .form-error:empty {
   display: none;
+}
+
+/* Section workspace: the section list beside the page from 960px, above it on narrower screens. */
+@media (min-width: 960px) {
+  .workspace {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 0 var(--space-6);
+    align-items: start;
+  }
+  .section-nav {
+    position: sticky;
+    top: var(--line);
+  }
+  .section-nav summary {
+    display: none;
+  }
+}
+.section-nav {
+  margin-bottom: var(--line);
+}
+.section-nav summary {
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+}
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--line);
+  max-width: none;
+}
+.nav-areas {
+  border-top: var(--border) solid var(--color-border-quiet);
+  padding-top: calc(var(--line) - var(--border)); /* with the border, one line */
+}
+.nav-list a,
+.nav-item-off {
+  display: block;
+  padding-left: var(--space-3);
+  border-left: var(--space-1) solid transparent;
+  text-decoration: none;
+  color: var(--color-text);
+}
+.nav-list a[aria-current='page'] {
+  border-left-color: var(--color-accent);
+  font-weight: 700;
+}
+.nav-item-off {
+  color: var(--color-text-quiet);
+}
+.nav-title,
+.nav-state {
+  display: block;
+}
+.nav-state {
+  font-size: var(--text-small);
+  font-weight: 400;
+  color: var(--color-text-quiet);
+}
+
+/* Section page */
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.section-head h1 {
+  margin-bottom: 0;
+}
+.status-badge {
+  margin: 0;
+  padding: 0 var(--space-2);
+  line-height: calc(var(--line) - 2 * var(--border)); /* with the border, one line */
+  border: var(--border) solid var(--color-border);
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+.guide {
+  margin-bottom: var(--line);
+  max-width: var(--measure);
+}
+.mode-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px var(--space-2);
+  margin-bottom: 12px;
+}
+.depth-control legend {
+  margin-bottom: 0;
+}
+.depth-control .choice {
+  padding-block: 0;
+}
+.question-card {
+  max-width: var(--measure);
+  background: var(--color-surface);
+  border: var(--border) solid var(--color-border-quiet);
+  border-left: var(--space-2) solid var(--color-accent);
+  border-radius: var(--radius);
+  padding: 12px var(--space-4) 0; /* with the border, whole lines */
+  margin-bottom: var(--line);
+}
+.question-count {
+  margin: 0;
+  font-size: var(--text-small);
+  color: var(--color-text-quiet);
+}
+.question {
+  margin-bottom: 12px; /* the card comes to five whole lines */
+  font-size: var(--text-h3);
+  line-height: var(--leading-h3);
+  font-weight: 600;
+}
+.step-buttons {
+  margin-bottom: 12px;
+}
+.stepper .question-count {
+  margin-bottom: 12px; /* a card with no question text still takes whole lines */
+}
+.question-list {
+  padding-left: var(--space-4);
+}
+.context-layer {
+  max-width: var(--measure);
+  border-left: var(--space-1) solid var(--color-border-quiet);
+  padding-left: var(--space-3);
+  margin-bottom: var(--line);
+}
+.context-layer h2 {
+  font-size: var(--text-h3);
+  line-height: var(--leading-h3);
+  margin: 0;
+}
+.context-layer p {
+  margin: 0;
+}
+.local-status {
+  min-height: var(--line);
+  margin-bottom: 0;
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+.file-note {
+  margin-top: var(--line);
 }
 
 /* Entry editor */

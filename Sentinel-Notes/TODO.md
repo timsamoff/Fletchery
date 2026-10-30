@@ -4,7 +4,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 
 ## Build phases
 
-- [ ] Premise end to end: see [premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md).
+- [ ] Premise end to end: built, waiting on Tim’s review and question edits; see [premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md).
 - [ ] Web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
 - [ ] Characters with images, the media library, relationships, and generated indexes.
 - [ ] Notes and media (Inbox, quick capture, maps), then the remaining sections from data for all three story types.
@@ -19,10 +19,8 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] P2: The yaml browser build loads as 72 module files; consider a single-file build for the hosted web edition.
 - [ ] Q5: Restart the watcher if `story-bible/` is deleted and recreated while the app runs.
 - [ ] Q6: Replace the deprecated `clip: rect()` in `.visually-hidden`, or remove the class until it's used.
-- [ ] R1: Put buttons on the 4px baseline (42px now) to match SPEC.md.
 - [ ] R2: Decide whether forms must take whole 28px lines, and fix the setup form if so.
 - [ ] R3: Align the conflict panel's width with the text area below it.
-- [ ] R4: Make save status visible near the editor on tall pages.
 - [ ] S1: Clear the 13 baselined raw-token-value items in `base.css`, and tokenize the 82px header and footer height (S2).
 - [ ] S3: Use role tokens instead of palette tokens for `.choice input` and `.button:hover`.
 - [ ] S4: Add a `--font-mono` token for the monospace stack.
@@ -30,7 +28,6 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] C1: Clear the 1 baselined color-literal item (overlay color), and derive `--color-grid` from `--color-orange` (C2).
 - [ ] B2: Keep the project path from dominating the footer at phone width.
 - [ ] A1: Add automated axe accessibility checks for the setup and editor pages.
-- [ ] A2: Add `:disabled` and `:active` styles for buttons and fields.
 - [ ] Doc1: Copy the approved plan into the repo so remote sessions can see it (`first-prompt/` stays private by decision).
 
 ## Setup
@@ -49,3 +46,6 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [x] Q2: Return a clear error for a broken `fletcherling.json`, and make the page show it instead of the setup form.
 - [x] Q3: Share one helper for the saved-state update in `save()` and the conflict overwrite in `app.js`.
 - [x] Shared core, first step: `entry.js`, `store.js`, and the server reduced to a file store.
+- [x] R1: Put buttons on the 4px baseline (42px now) to match SPEC.md.
+- [x] R4: Make save status visible near the editor on tall pages.
+- [x] A2: Add `:disabled` and `:active` styles for buttons and fields.

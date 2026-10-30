@@ -1,3 +1,74 @@
 [
-  { "feature": "Story Bible", "phrase": "Story Bible" }
+  {
+    "feature": "Story Bible",
+    "phrase": "Story Bible"
+  },
+  {
+    "feature": "premise section",
+    "phrase": "Premise"
+  },
+  {
+    "feature": "characters section",
+    "phrase": "Characters"
+  },
+  {
+    "feature": "relationships section",
+    "phrase": "Relationships"
+  },
+  {
+    "feature": "world section",
+    "phrase": "World and settings"
+  },
+  {
+    "feature": "timeline section",
+    "phrase": "Timeline and events"
+  },
+  {
+    "feature": "plot section",
+    "phrase": "Plot and structure"
+  },
+  {
+    "feature": "themes section",
+    "phrase": "Themes, motifs, and symbols"
+  },
+  {
+    "feature": "voice section",
+    "phrase": "Voice and style"
+  },
+  {
+    "feature": "series section",
+    "phrase": "Series continuity"
+  },
+  {
+    "feature": "structure section (screenplay)",
+    "phrase": "Structure"
+  },
+  {
+    "feature": "factions section (game)",
+    "phrase": "Factions"
+  },
+  {
+    "feature": "quests section (game)",
+    "phrase": "Quests"
+  },
+  {
+    "feature": "choices section (game)",
+    "phrase": "Choices and branching"
+  },
+  {
+    "feature": "mechanics section (game)",
+    "phrase": "Narrative and mechanics"
+  },
+  {
+    "feature": "items section (game)",
+    "phrase": "Items and glossary"
+  },
+  {
+    "feature": "notes and media area",
+    "phrase": "Notes and media"
+  },
+  {
+    "feature": "depth levels",
+    "phrase": "Seed"
+  }
 ]

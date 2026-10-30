@@ -13,16 +13,18 @@ Fletcherling runs in two editions that share one front end and one file format:
 
 ## Current structure
 
-As of the shared-core step:
+As of the Premise step:
 
 | Path | Role |
 |---|---|
 | `bin/fletcherling.js` | Launcher. Parses `--port` and `--no-open`, finds a free port from 3000, starts the server, and opens the browser at `127.0.0.1`. |
-| `server/server.js` | HTTP server: static files, fonts from `node_modules/@fontsource`, the browser build of `yaml` at `/vendor/yaml/`, the file API, and server-sent events. |
+| `server/server.js` | HTTP server: static files, section definitions, fonts from `node_modules/@fontsource`, the browser build of `yaml` at `/vendor/yaml/`, the file API, and server-sent events. |
 | `server/bible.js` | File storage inside `story-bible/`: the path guard, atomic writes, list, delete, move, and content hashing. It knows nothing about entries. |
 | `server/watch.js` | Recursive `fs.watch` on the bible. It reports a change only when a file's content hash differs from the last one seen or written. |
 | `public/index.html` | Page shell: skip link, header, `main`, and footer with the save-status live region. |
-| `public/js/app.js` | First-run setup and the entry editor: autosave, live updates, and the conflict panel. |
+| `public/js/app.js` | First-run setup, the section list, and the section editor: depth control, Interview and Full form modes, status and settling, Skip for now, autosave, live updates, and the conflict panel. |
+| `public/js/core/layers.js` | The Seed, Sketch, and Sheet layers inside an entry body. Unknown text is kept. |
+| `sections/<type>.json` | Section definitions for each story type: IDs, titles, and for built sections the why-it-matters line, guiding questions, and fields at each depth. Served at `/sections/`. |
 | `public/js/core/entry.js` | Entry files: frontmatter parsing and serialization, new-entry frontmatter, and the body update rules. It imports the bare name `yaml`, which the page's import map points at `/vendor/yaml/` and Node resolves from `node_modules`, so the same module runs in both. |
 | `public/js/core/store.js` | The storage interface and `LocalServerStore`, its backend for the local edition. |
 | `public/css/tokens.css` | Every color, type size, rhythm, and spacing value, plus the `@font-face` rules. |
@@ -59,9 +61,8 @@ These changes come next, before the Premise section is built out.
 
 ### Shared core
 
-Built so far: `entry.js` and `store.js` (see the table above). Still to move into `public/js/core/`:
+Built so far: `entry.js`, `layers.js`, and `store.js`, with section definitions in `sections/` (see the table above). Still to move into `public/js/core/`:
 
-- section definitions loaded from `sections/<story type>.json`, replacing the Premise template in `app.js`
 - index and `BIBLE.md` generation
 - link suggestions, and link rewriting when files move
 - the structural audit
