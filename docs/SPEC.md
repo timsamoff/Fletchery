@@ -5,13 +5,13 @@ This file records the decisions agreed in Phase 0. The build prompt in `first-pr
 ## Environment
 
 - Windows 11. Node 25.2 and npm 11.6 are installed. Claude Code 2.1.314 is on the path.
-- The Fletchery repo lives at `C:\Users\Tim\Documents\Fletcherling` (folder not yet renamed).
+- The Fletchery repo lives at `C:\Users\Tim\Documents\Fletchery`.
 
 ## Decided
 
 ### Name
 
-The app is Fletchery, renamed from Fletcherling on 2026-10-30. Bibles made before then have `story-bible/fletcherling.json`, which the app renames to `fletchery.json` the first time it opens them. The GitHub repo was renamed to `timsamoff/Fletchery` the same day. The local folder keeps the old name until Tim renames it.
+The app is Fletchery, renamed from Fletcherling on 2026-10-30. Bibles made before then have `story-bible/fletcherling.json`, which the app renames to `fletchery.json` the first time it opens them. The GitHub repo and the local folder were renamed to Fletchery the same day.
 
 ### Stack
 

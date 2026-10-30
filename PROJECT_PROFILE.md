@@ -2,7 +2,7 @@
 
 Produced by Sentinel `00-project-discovery.md`, version 1.6.1, on 2026-10-29.
 
-The app was renamed from Fletcherling to Fletchery on 2026-10-30. The fields below use the new name. The GitHub repo was renamed the same day. The local folder still has the old name.
+The app was renamed from Fletcherling to Fletchery on 2026-10-30. The fields below use the new name. The GitHub repo and the local folder were renamed the same day.
 
 ## Run type
 
