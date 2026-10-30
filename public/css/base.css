@@ -670,9 +670,6 @@ textarea:focus-visible {
   margin-bottom: var(--space-1);
   border-color: transparent;
 }
-.why {
-  color: var(--color-text-quiet);
-}
 .context-wrap {
   margin-bottom: var(--space-3);
 }
@@ -1030,7 +1027,6 @@ textarea:focus-visible {
 .site-footer,
 .section-nav,
 .section-head,
-.why,
 .context-wrap,
 .question-card,
 .section-actions,
@@ -1040,7 +1036,7 @@ textarea:focus-visible {
   transition: opacity var(--duration-fast) ease;
 }
 .is-writing .section-nav,
-.is-writing[data-fade-scope='full'] :is(.site-header, .site-footer, .section-head, .why, .context-wrap, .question-card, .section-actions, .section-page > .hint, .entry-meta, .focus-bar) {
+.is-writing[data-fade-scope='full'] :is(.site-header, .site-footer, .section-head, .context-wrap, .question-card, .section-actions, .section-page > .hint, .entry-meta, .focus-bar) {
   opacity: 0.3;
   transition: opacity 600ms ease;
 }

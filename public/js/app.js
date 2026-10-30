@@ -261,7 +261,6 @@ async function showEditor(settings, settingsVersion) {
             Focus
           </button>
         </div>
-        <p class="why" id="section-why"></p>
         <div id="conflict-slot"></div>
         <div class="context-wrap" id="context-wrap">
           <button type="button" class="link-button" id="context-toggle" aria-controls="context" aria-expanded="false"></button>
@@ -290,7 +289,6 @@ async function showEditor(settings, settingsVersion) {
     </dialog>`;
 
   document.getElementById('section-title').textContent = state.section.title;
-  document.getElementById('section-why').textContent = state.section.why;
   document.getElementById('file-note').innerHTML =
     `Saved to <code>story-bible/${esc(entryPath())}</code> as you type. Changes made to that file in another editor appear here.`;
   WIDE.addEventListener('change', (e) => {
