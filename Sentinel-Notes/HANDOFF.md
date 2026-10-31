@@ -1,58 +1,40 @@
 # Handoff
 
-Written 2026-10-30, at 95% of the five-hour usage limit. Everything is committed; five commits after `6473cb2` are not pushed and wait on Tim's OK.
+Written 2026-10-30. Characters step 1 is built; steps 2 to 5 remain.
 
 ## 1. Current task and status
 
-Polishing the redesign and the Settings panel on Tim's notes. Everything asked so far is built, browser-tested, and committed:
-- **Settings panel:**
-  - a Credit section (Author, Co-authors), shown under each entry as "Written by";
-  - an AI section shown as a dimmed preview;
-  - 1px focus outlines everywhere;
-  - a gear on the header button and the panel heading.
-- **Writing box:** can be dragged taller on the page. It can't be resized in Focus.
-- **Focus sheet:**
-  - no header, inset 32px from the window on every side;
-  - only the writing box scrolls;
-  - the cursor carries in and out;
-  - Done is full size, absolutely positioned 16px from the sheet's top and 16px above the question panel.
-- **Decisions recorded:**
-  - API keys go in `fletchery-api.json` in the per-user config folder (SPEC 11).
-  - Don't assume a story folder is a git repo (CLAUDE.md).
-  - Text zoom waits for the formatting editor.
+**Characters, step 1 of 5** ([characters-design-brief.md](characters-design-brief.md)) is built, browser-tested, and committed in `8c3f717` (not pushed). It's waiting on Tim's review. It covers:
+- the Characters page with cards and silhouettes;
+- Add a character;
+- an editor for each character, with the approved fields and questions and the Archetype chips;
+- Rename, through a new folder-move API;
+- the placeholder portrait;
+- the folding Characters list in the sidebar;
+- page addresses (`#/premise`, `#/characters`, `#/characters/<slug>`);
+- Go to Characters from the Premise Sheet.
 
-Unpushed: `3f8fbfc`, `509aff7`, `afa6c6a`, `0e3696d`, `982b838`, `d4e4ed1`, `3dbdc98`, and `41006f7`.
+`assets/fletchery-icon.svg` has an uncommitted change that isn't from this work. Ask Tim before committing it.
 
-## 2. Files touched this stretch
+## 2. Files touched for step 1
 
-- `public/js/app.js`:
-  - the Focus rework (`caretSnapshot`, `restoreCaret`, `closeFocus`, and Done drawn in the tab row when `state.focusOpen`);
-  - `writtenBy()` for the entry details.
-- `public/js/settings.js`: the Credit and AI sections, and `escAttr`.
-- `public/index.html`: the gear icons.
-- `public/css/base.css`: the Focus sheet, `.focus-done`, the resizable fill box, `.button-soft` hover, and the settings field styles.
-- `public/css/tokens.css`: `--focus-ring` set to 1px.
-- `docs/SPEC.md`, `CLAUDE.md`, `Sentinel-Notes/settings-page-design-brief.md`, `TODO.md`: the decisions above.
+- `sections/*.json`: the Characters definition (17 fields; screenplay and game add their own).
+- `public/js/app.js`: `route()`, `openEntry()`, `renderListPage()`, `loadCharacters()`, the name dialog, `renameCharacter()`, `cycleSilhouette()`, `renderHead()`, the folder-style `renderNav()`, `openFocus()` split from `setupFocus()`, and the archetype chips.
+- `public/js/core/entry.js`: `updateEntry` accepts `set` (title, silhouette).
+- `public/js/core/store.js` and `server/bible.js`, `server/server.js`: `moveFolder`, `POST /api/move-folder`.
+- `public/js/settings.js`: `layout.charactersOpen`.
+- `public/css/base.css`: cards, portrait, name dialog, sidebar folder, chips.
+- Docs: SPEC (Characters), DESIGN, README, CLAUDE.md, the brief, and TODO.
 
 ## 3. Next step
 
-The Focus overlap bug is fixed in `41006f7` and tested at widths from 375px to 1440px.
-- **Clear space:** the Focus tab row keeps Done's width (96px plus a gap) clear, so the link never runs under it.
-- **Container queries:** below 560px on the page, and below 720px of card width in Focus, the link moves to its own line on the panel's color, inset like the panel's contents, and runs the panel's full width.
-- **No unstyled wrap:** at no tested width does the link wrap without that styling.
-
-Then `200a9f4`:
-- On phones, Focus trims only its side padding, so Done stays 16px from the sheet's top at every width.
-- The wrapped link's gap to the numbers is evened out (padding-top `--space-2` on the panel).
-- The writing box's 80ch cap is gone, so the text runs the full width with equal margins (Tim's call).
-
-Next: ask Tim to OK pushing the local commits, `3f8fbfc` through `200a9f4` plus the handoff commits. Then ask what's next. The open questions below are the candidates.
+Get Tim's review of step 1 and OK to push. Then step 2, images: an image zone on each character, with `.meta.md` sidecars (caption, alt text, what to notice). It needs a server route for binary uploads.
 
 ## 4. Open questions for Tim
 
 - Whether a dragged writing-box height should be kept in Settings.
 - The AI section going live, which needs the server-side key file.
-- The Premise question set, and the formatting editor (a light toolbar or full formatting).
+- The formatting editor (a light toolbar or full formatting). Text zoom and margin notes wait on it.
 
 ## 5. Tried and failed
 
