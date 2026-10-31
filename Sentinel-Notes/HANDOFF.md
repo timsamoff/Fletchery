@@ -4,7 +4,7 @@ Written 2026-10-30. Characters step 1 is built; steps 2 to 5 remain.
 
 ## 1. Current task and status
 
-**Characters, step 1 of 5** ([characters-design-brief.md](characters-design-brief.md)) is built, browser-tested, and committed in `8c3f717` (not pushed). It's waiting on Tim's review. It covers:
+**Characters, step 1 of 5** ([characters-design-brief.md](characters-design-brief.md)) is built, browser-tested, and committed, with later revisions (form Sheet, pencil rename, hand-drawn card dragging, animated folder). Four commits since `4beaff3` are unpushed. It's waiting on Tim's review. It covers:
 - the Characters page with cards and silhouettes;
 - Add a character;
 - an editor for each character, with the approved fields and questions and the Archetype chips;
@@ -13,8 +13,6 @@ Written 2026-10-30. Characters step 1 is built; steps 2 to 5 remain.
 - the folding Characters list in the sidebar;
 - page addresses (`#/premise`, `#/characters`, `#/characters/<slug>`);
 - Go to Characters from the Premise Sheet.
-
-`assets/fletchery-icon.svg` has an uncommitted change that isn't from this work. Ask Tim before committing it.
 
 ## 2. Files touched for step 1
 
