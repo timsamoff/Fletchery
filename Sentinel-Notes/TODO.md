@@ -15,7 +15,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Accessibility and responsiveness pass, tested with the keyboard and at 320px and ultra-wide.
 - [ ] README: install, launch, directory layout, handing a bible to Claude Code, and the edition comparison from the web edition brief.
 - [ ] Later, only with approval: a `claude -p` "Run now" option for Ask AI.
-- [ ] Discuss later: the guided interview as the defining feature (threads, Socratic AI, writer sets canon); see [fletchery-prompt-marked.md](fletchery-prompt-marked.md).
+- [ ] Discuss later: the guided interview as the defining feature (threads, Socratic AI, writer sets canon); see [guided-interview-design-brief.md](guided-interview-design-brief.md).
 - [ ] Discuss later: in AI mode, import a folder or premade files (local or Google Drive) for the AI to draft into the bible; see [import-content-design-brief.md](import-content-design-brief.md).
 
 ## Audit findings (design-quality-audit.md)
