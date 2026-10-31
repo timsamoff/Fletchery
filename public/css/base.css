@@ -1341,6 +1341,10 @@ textarea::placeholder {
   background: var(--color-panel);
   color: var(--color-text);
 }
+/* Literata's letters sit low in their line box, so the pencil drops to meet the name's visual middle. */
+.title-group .rename-button {
+  transform: translateY(var(--space-1));
+}
 
 /* A Sheet laid out as a form: each field's label and description sit above its box, with a rule between fields. */
 .paper .form-field {
@@ -1591,4 +1595,13 @@ textarea::placeholder {
 }
 .nav-folder-toggle:hover {
   background: var(--color-bg);
+}
+/* A card being dragged stays in place as a faint outline while the others make room. */
+.character-card {
+  cursor: grab;
+}
+.card-grid li.is-dragging .character-card {
+  opacity: 0.4;
+  box-shadow: none;
+  outline: 1px dashed var(--color-border-quiet);
 }

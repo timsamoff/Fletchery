@@ -415,7 +415,10 @@ async function loadCharacters() {
       }
     }),
   );
-  state.characters = read.filter(Boolean).sort((a, b) => a.title.localeCompare(b.title));
+  // The writer's order, kept in fletchery.json, comes first; characters not in it follow alphabetically.
+  const order = state.settings.order?.characters ?? [];
+  const rank = (c) => (order.includes(c.slug) ? order.indexOf(c.slug) : order.length);
+  state.characters = read.filter(Boolean).sort((a, b) => rank(a) - rank(b) || a.title.localeCompare(b.title));
 }
 
 // Statuses for single-entry sections, so the sidebar can show them from any page.
@@ -451,8 +454,8 @@ function renderListPage() {
   const cards = state.characters
     .map(
       (c) => `
-      <li>
-        <a class="character-card" href="#/${section.id}/${encodeURIComponent(c.slug)}">
+      <li data-slug="${esc(c.slug)}">
+        <a class="character-card" href="#/${section.id}/${encodeURIComponent(c.slug)}" draggable="true" aria-describedby="reorder-help">
           <span class="card-portrait">${silhouetteSvg(c.silhouette)}</span>
           <span class="card-body">
             <span class="card-name">${esc(c.title)}</span>
@@ -469,15 +472,101 @@ function renderListPage() {
         <h1>${esc(section.title)}</h1>
         <button type="button" class="button add-button" id="add-entry">Add a character</button>
       </div>
-      ${cards ? `<ul class="card-grid">${cards}</ul>` : '<p class="empty-note">No characters yet. Add the first one, and start with a single sentence.</p>'}
+      ${
+        cards
+          ? `<ul class="card-grid" id="card-grid">${cards}</ul>
+             <p class="visually-hidden" id="reorder-help">Drag to reorder, or press Alt with an arrow key.</p>`
+          : '<p class="empty-note">No characters yet. Add the first one, and start with a single sentence.</p>'
+      }
       <div class="button-row section-actions">
         <button type="button" class="button button-soft" id="skip">Skip for now</button>
       </div>
     </div>`;
+  setupCardReorder();
   document.getElementById('add-entry').addEventListener('click', () => openNameDialog('add'));
   document.getElementById('skip').addEventListener('click', skipSection);
   renderNav();
   main.focus({ preventScroll: true });
+}
+
+// ---------- Reordering the cards ----------
+// Drag a card, or press Alt with an arrow key on it. The other cards slide aside, and the order is saved to
+// fletchery.json so the sidebar and every later visit follow it.
+
+// Moves elements with a FLIP animation: note where each item was, make the change, then glide each one from its
+// old spot to its new one.
+function flip(list, change) {
+  const items = [...list.children];
+  const before = new Map(items.map((el) => [el, el.getBoundingClientRect()]));
+  change();
+  for (const el of items) {
+    const a = before.get(el);
+    const b = el.getBoundingClientRect();
+    const dx = a.left - b.left;
+    const dy = a.top - b.top;
+    if (dx || dy) animate(el, [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 200 });
+  }
+}
+
+const cardOrder = (grid) => [...grid.children].map((li) => li.dataset.slug);
+
+function setupCardReorder() {
+  const grid = document.getElementById('card-grid');
+  if (!grid) return;
+  let dragged = null;
+  let startOrder = null;
+
+  grid.addEventListener('dragstart', (e) => {
+    dragged = e.target.closest('li');
+    if (!dragged) return;
+    startOrder = cardOrder(grid);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', dragged.dataset.slug);
+    requestAnimationFrame(() => dragged?.classList.add('is-dragging'));
+  });
+  grid.addEventListener('dragover', (e) => {
+    if (!dragged) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const over = e.target.closest('li');
+    if (!over || over === dragged) return;
+    // Before or after the card underneath, by which half of it the pointer is over.
+    const r = over.getBoundingClientRect();
+    const after = e.clientX > r.left + r.width / 2;
+    const target = after ? over.nextElementSibling : over;
+    if (target === dragged || target === dragged.nextElementSibling) return;
+    flip(grid, () => grid.insertBefore(dragged, target));
+  });
+  grid.addEventListener('drop', (e) => e.preventDefault());
+  grid.addEventListener('dragend', () => {
+    dragged?.classList.remove('is-dragging');
+    dragged = null;
+    const order = cardOrder(grid);
+    if (order.join() !== startOrder?.join()) saveCharacterOrder(order);
+  });
+
+  grid.addEventListener('keydown', (e) => {
+    if (!e.altKey || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+    const li = e.target.closest('li');
+    if (!li) return;
+    e.preventDefault();
+    const back = e.key === 'ArrowLeft' || e.key === 'ArrowUp';
+    const target = back ? li.previousElementSibling : li.nextElementSibling?.nextElementSibling ?? null;
+    if (back && !li.previousElementSibling) return;
+    if (!back && !li.nextElementSibling) return;
+    flip(grid, () => grid.insertBefore(li, target));
+    li.querySelector('a').focus();
+    const order = cardOrder(grid);
+    const name = state.characters.find((c) => c.slug === li.dataset.slug)?.title ?? '';
+    saveCharacterOrder(order, `Moved ${name} to position ${order.indexOf(li.dataset.slug) + 1} of ${order.length}.`);
+  });
+}
+
+async function saveCharacterOrder(order, message = 'Saved the new order.') {
+  state.characters.sort((a, b) => order.indexOf(a.slug) - order.indexOf(b.slug));
+  renderNav();
+  const saved = await updateBibleRecord((settings) => ({ ...settings, order: { ...(settings.order ?? {}), characters: order } }));
+  if (saved) setStatus(message);
 }
 
 const slugify = (name) =>
@@ -550,6 +639,11 @@ async function renameCharacter(name) {
     await store.moveFolder(`${section.folder}/${old}`, `${section.folder}/${slug}`);
     await store.move(`${section.folder}/${slug}/${old}.md`, entryFile(section, slug), state.baseVersion);
     state.entry = { path: entryFile(section, slug), slug };
+    // Keep the renamed character's place in the card order.
+    const order = state.settings.order?.characters ?? [];
+    if (order.includes(old)) {
+      await updateBibleRecord((settings) => ({ ...settings, order: { ...settings.order, characters: order.map((s) => (s === old ? slug : s)) } }));
+    }
   }
   await writeEntry({ set: { title: name } });
   await loadCharacters();
@@ -1182,13 +1276,21 @@ async function toggleCanon() {
   document.getElementById('canon').focus();
 }
 
-// Skips live in fletchery.json. A conflicting write rereads the file and tries once more.
-async function setSkipped(value) {
-  for (let attempt = 0; attempt < 2; attempt++) {
-    const next = { ...state.settings, sections: { ...(state.settings.sections ?? {}) } };
+// Skips live in fletchery.json.
+function setSkipped(value) {
+  return updateBibleRecord((settings) => {
+    const next = { ...settings, sections: { ...(settings.sections ?? {}) } };
     next.sections[state.section.id] = { ...(next.sections[state.section.id] ?? {}), skipped: value };
     if (!value) delete next.sections[state.section.id].skipped;
     if (!Object.keys(next.sections[state.section.id]).length) delete next.sections[state.section.id];
+    return next;
+  });
+}
+
+// Writes a change to fletchery.json, the bible's own record. A conflicting write rereads the file and tries once more.
+async function updateBibleRecord(change) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const next = change(state.settings);
     try {
       state.settingsVersion = await store.write(SETTINGS_PATH, JSON.stringify(next, null, 2) + '\n', state.settingsVersion);
       state.settings = next;

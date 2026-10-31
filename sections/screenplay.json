@@ -145,12 +145,6 @@
               "question": "What do they sound like? How fast, how loud, and which words do they reach for?"
             },
             {
-              "id": "traits",
-              "label": "Personality traits",
-              "question": "Which words describe them? Strengths and flaws both.",
-              "kind": "short"
-            },
-            {
               "id": "personality",
               "label": "Personality",
               "question": "What are they like to be around, and where do they contradict themselves?"
