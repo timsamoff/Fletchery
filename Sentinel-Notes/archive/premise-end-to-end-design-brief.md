@@ -63,3 +63,11 @@ Sheet (about a page, four paragraphs, each of the first three ending in a disast
 ## Also in this phase
 
 Depth control, status (empty, draft, canon, each with a text label and a shape), Skip for now, and the Ask Claude menu, shown disabled until the bridge phase. Fold in audit items A2 (disabled styles) and R4 (save status visibility).
+
+## Closed (2026-10-30)
+
+- **Questions** (Tim approved): Seed unchanged. Sketch and Sheet are built around change and its consequences instead of the Snowflake Method's disasters, drawing on the Story Spine and kishōtenketsu, so they fit stories without a central conflict. The Sheet has five questions, one per Sketch sentence, with the guide "About a page. Give each sentence of your Sketch its own paragraph."
+- **Tab names:** "One at a time" and "All questions."
+- **Explaining depths:** placeholder text in each empty box says the depth is optional and never replaces what's above it.
+- **Sheet:** one box, built earlier.
+- **Formatting:** moved to its own backlog item, since it applies to every section.

@@ -9,6 +9,12 @@ const SETTINGS_PATH = 'fletchery.json';
 const LEGACY_SETTINGS_PATH = 'fletcherling.json'; // the app's name before 2026-10-30
 const SAVE_DELAY_MS = 500;
 const WIDE = window.matchMedia('(min-width: 960px)');
+// Shown in an empty box: no depth has to be filled, and going deeper never replaces what's above it.
+const PLACEHOLDERS = {
+  seed: 'One sentence is enough. You can go deeper later.',
+  sketch: 'Optional. Your Seed stays as it is; this builds on it.',
+  sheet: 'Optional. Your Seed and Sketch stay as they are; this builds on them.',
+};
 const STATUS = {
   empty: { shape: '○', word: 'Empty' },
   draft: { shape: '◐', word: 'Draft' },
@@ -512,7 +518,7 @@ function renderWork() {
     <div class="question-card">
       <div class="question-tabs-row">
         <div class="question-tabs" role="tablist" aria-label="Question layout">
-          ${tab('interview', 'Interview me')}${tab('full', 'Full form')}
+          ${tab('interview', 'One at a time')}${tab('full', 'All questions')}
         </div>
         ${contextLink()}
         ${state.focusOpen ? '<button type="button" class="button focus-done" id="focus-done">Done</button>' : ''}
@@ -541,7 +547,7 @@ function renderWork() {
           (f) => `
           <div class="field writing-field${fill ? ' fill' : ''}">
             <label for="field-${f.id}"${fill ? ' class="visually-hidden"' : ''}>${esc(f.label)}</label>
-            <textarea id="field-${f.id}" data-field="${f.id}" spellcheck="true" aria-describedby="question-text"${fill ? '' : ' rows="6"'}></textarea>
+            <textarea id="field-${f.id}" data-field="${f.id}" spellcheck="true" aria-describedby="question-text"${fill ? ` placeholder="${PLACEHOLDERS[state.depth]}"` : ' rows="6"'}></textarea>
           </div>`,
         )
         .join('')}

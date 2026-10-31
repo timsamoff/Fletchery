@@ -1275,3 +1275,8 @@ textarea:focus-visible {
 .settings-text input {
   margin-top: var(--space-1);
 }
+/* Placeholder text in an empty box reads quietly but keeps contrast (mid charcoal, 8.98:1). */
+textarea::placeholder {
+  color: var(--color-text-quiet);
+  opacity: 1;
+}

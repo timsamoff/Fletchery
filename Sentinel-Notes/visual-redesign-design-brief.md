@@ -1,6 +1,6 @@
 # Visual redesign: design brief
 
-Proposed 2026-10-30, after Tim reviewed the built Premise page and found it still looks like a prototype. This covers visual design, layout, and feel only. Behavior changes agreed in the same review are in [premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md).
+Proposed 2026-10-30, after Tim reviewed the built Premise page and found it still looks like a prototype. This covers visual design, layout, and feel only. Behavior changes agreed in the same review are in [premise-end-to-end-design-brief.md](archive/premise-end-to-end-design-brief.md).
 
 Tim wrote a redesign prompt (pasted in session and deliberately not kept in the repo). Its goal: a quiet, literary writer's workshop where a writer wants to stay, not a SaaS dashboard or an AI tool. The decisions below amend it.
 

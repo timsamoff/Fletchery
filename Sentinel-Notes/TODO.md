@@ -4,8 +4,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 
 ## Build phases
 
-- [ ] Premise end to end: depth screens, paste fix, one-box Sheet built; Sheet questions and copy to do; see [premise-end-to-end-design-brief.md](premise-end-to-end-design-brief.md).
-- [ ] Visual redesign before more feature work: steps 1-3 built, motion added, Focus sheet reworked; see [visual-redesign-design-brief.md](visual-redesign-design-brief.md).
+- [ ] Visual redesign before more feature work: steps 1-3 built, motion added, Focus sheet reworked, links updated; see [visual-redesign-design-brief.md](visual-redesign-design-brief.md).
 - [ ] Settings page: credit (shown as Written by), fonts, paste, fade built; AI preview; key location set; see [settings-page-design-brief.md](settings-page-design-brief.md).
 - [ ] Fletchery web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
 - [ ] Characters with images, the media library, relationships, and generated indexes.
@@ -18,6 +17,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Google (Gemini) API as an AI choice beside Claude Code, Anthropic, and OpenRouter; key in fletchery-api.json.
 - [ ] PDF export of the story bible (browser print styles first; a library only if those fall short).
 - [ ] .docx export of the story bible with docx.js (a new dependency, so it goes in SPEC.md when added).
+- [ ] Formatting editor: a light Markdown toolbar or full formatting, never dropping text; text zoom and margin notes wait on it.
 - [ ] Margin notes: select a phrase, add a note, the phrase highlights; waits on the formatting editor; see [margin-notes-design-brief.md](margin-notes-design-brief.md).
 - [ ] Discuss later: the guided interview as the defining feature (threads, Socratic AI, writer sets canon); see [guided-interview-design-brief.md](guided-interview-design-brief.md).
 - [ ] Discuss later: in AI mode, import a folder or premade files (local or Google Drive) for the AI to draft into the bible; see [import-content-design-brief.md](import-content-design-brief.md).
@@ -47,6 +47,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 
 ## Done
 
+- [x] Premise end to end: depth screens, one-box Sheet, questions about change, tab names, placeholders; see [archive/premise-end-to-end-design-brief.md](archive/premise-end-to-end-design-brief.md).
 - [x] Phase 0: interview, SPEC.md, plan approval.
 - [x] Skeleton, approved (commit 8597841).
 - [x] Gate candidates from the design audit: color literals, raw token values, and TODO format implemented; axe deferred to A1; frontmatter completeness deferred to T1.

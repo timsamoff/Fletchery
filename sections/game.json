@@ -22,24 +22,25 @@
         },
         "sketch": {
           "label": "Sketch",
-          "guide": "One paragraph of about five sentences: the setup, three disasters, and the ending.",
+          "guide": "One paragraph of about five sentences: the setup, what changes, what follows, the turn, and the ending.",
           "questions": [
-            "Setup: who, where, and what’s normal before things go wrong?",
-            "First disaster: what ends the opening and commits the player?",
-            "Second disaster: how does the attempt to fix things make it worse?",
-            "Third disaster: what failure forces the final act?",
-            "Ending: how does it resolve, and what does it cost?"
+            "Setup: who, where, and what’s normal before anything changes?",
+            "What changes, and why can’t they go back to the way things were?",
+            "What happens because of that? What do they try, and what does it lead to?",
+            "What turn, choice, or discovery pushes them toward the end?",
+            "How does it end, and what’s different for them afterward?"
           ],
           "fields": [{ "id": "sketch", "label": "Premise in one paragraph" }]
         },
         "sheet": {
           "label": "Sheet",
-          "guide": "About a page, in four paragraphs. Each of the first three ends in a disaster.",
+          "guide": "About a page. Give each sentence of your Sketch its own paragraph.",
           "questions": [
-            "Who, where, and what’s normal, up to the first disaster that commits them?",
-            "How does the first attempt to fix things lead to the second disaster?",
-            "What does the player try next, and what failure forces the final act?",
-            "How does it resolve, and what does it cost?"
+            "Who are they, where are they, and what does an ordinary day look like?",
+            "What changes their world, and what does it ask of them?",
+            "What follows from that, one thing leading to the next?",
+            "What turn changes how they see their situation, and what do they do about it?",
+            "How does it end, what does it cost, and what stays changed?"
           ],
           "fields": [{ "id": "sheet", "label": "Premise in about a page" }]
         }
