@@ -10,7 +10,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Fletchery web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
 - [ ] Characters with images, the media library, relationships, and generated indexes.
 - [ ] Notes and media (Inbox, quick capture, maps), then the remaining sections from data for all three story types.
-- [ ] Bridge: request queue, proposals, `BIBLE.md`, the four skills, and the install script.
+- [ ] Bridge: request queue, proposals, `BIBLE.md`, skills, install script. Proposals in files or UI only: pick the better UX (guided-interview brief).
 - [ ] Layout views (document, board, canvas, outline), animated drag and drop, canon status board, Fletchery name; see [layout-views-design-brief.md](layout-views-design-brief.md).
 - [ ] Accessibility and responsiveness pass, tested with the keyboard and at 320px and ultra-wide.
 - [ ] README: install, launch, directory layout, handing a bible to Claude Code, and the edition comparison from the web edition brief.
