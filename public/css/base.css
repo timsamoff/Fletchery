@@ -1829,6 +1829,24 @@ textarea::placeholder {
 .image-dialog textarea {
   min-height: 0;
 }
+/* Done sits at the top right, as in Focus; the details start below it. */
+.image-dialog {
+  position: relative;
+}
+.image-done {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-5);
+  min-width: calc(var(--space-7) + var(--space-5)); /* the same width as Focus's Done */
+}
+.image-dialog-fields {
+  padding-top: var(--space-6);
+}
+/* The three actions stack, each as wide as the widest. */
+.image-actions {
+  display: inline-grid;
+  gap: var(--space-2);
+}
 .crop-dialog {
   width: min(440px, 100vw - 2 * var(--space-3));
 }
@@ -1900,4 +1918,24 @@ textarea::placeholder {
   .silhouette-grid:has([data-kind='photo']) {
     grid-template-columns: repeat(6, var(--space-6));
   }
+}
+@media (max-width: 719px) {
+  .image-done {
+    right: var(--space-3);
+  }
+}
+/* Both of Remove's labels share one spot, so the button is always as wide as the longer one. */
+.label-swap {
+  display: inline-grid;
+}
+.label-swap > span {
+  grid-area: 1 / 1;
+  transition: opacity var(--duration-fast) ease;
+}
+.label-swap > span:last-child,
+[data-armed] .label-swap > span:first-child {
+  opacity: 0;
+}
+[data-armed] .label-swap > span:last-child {
+  opacity: 1;
 }

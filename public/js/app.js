@@ -302,12 +302,15 @@ async function showEditor(settings, settingsVersion) {
           <label for="image-notice">What to notice</label>
           <textarea id="image-notice" rows="3"></textarea>
         </div>
-        <div class="button-row">
-          <button type="button" class="button" id="image-done">Done</button>
+        <div class="image-actions">
+          <button type="button" class="button button-quiet" id="image-duplicate">Duplicate</button>
           <button type="button" class="button button-quiet" id="image-use-portrait">Use as portrait</button>
-          <button type="button" class="button button-quiet" id="image-remove">Remove</button>
+          <button type="button" class="button button-quiet" id="image-remove" aria-label="Remove">
+            <span class="label-swap"><span>Remove</span><span>Remove it from the folder?</span></span>
+          </button>
         </div>
       </div>
+      <button type="button" class="button image-done" id="image-done">Done</button>
     </dialog>
     <dialog class="crop-dialog" id="crop-dialog" aria-labelledby="crop-title">
       <h2 id="crop-title">Choose the part to use</h2>
@@ -574,7 +577,12 @@ function renderListPage() {
         <button type="button" class="button button-soft" id="skip">Skip for now</button>
       </div>
     </div>`;
-  setupCardReorder();
+  setupCardReorder(document.getElementById('card-grid'), {
+    attr: 'slug',
+    current: () => state.characters.map((c) => c.slug),
+    save: saveCharacterOrder,
+    label: (slug) => state.characters.find((c) => c.slug === slug)?.title ?? '',
+  });
   document.getElementById('add-entry').addEventListener('click', () => openNameDialog('add'));
   document.getElementById('skip').addEventListener('click', skipSection);
   renderNav();
@@ -582,8 +590,8 @@ function renderListPage() {
 }
 
 // ---------- Reordering the cards ----------
-// Drag a card, or press Alt with an arrow key on it. The other cards slide aside, and the order is saved to
-// fletchery.json so the sidebar and every later visit follow it.
+// Drag a card, or press Alt with an arrow key on it. The other cards slide aside, and the order is saved:
+// characters in fletchery.json, a character's images in its own frontmatter.
 
 // Moves elements with a FLIP animation: note where each item was, make the change, then glide each one from its
 // old spot to its new one.
@@ -600,7 +608,7 @@ function flip(list, change, exclude = null, easing = undefined) {
   });
 }
 
-const cardOrder = (grid) => [...grid.children].map((li) => li.dataset.slug);
+const cardOrder = (grid, attr) => [...grid.children].map((li) => li.dataset[attr]).filter(Boolean);
 
 // Dragging is drawn by hand rather than with the browser's drag and drop, which always shows a faint ghost copy.
 // The real card lifts, follows the pointer with a little lag, tilts with the drag's direction and speed, and
@@ -610,14 +618,21 @@ const LIFT = 1.03;
 const DRAG_START_PX = 6;
 const TOUCH_HOLD_MS = 250; // on touch screens, press and hold to pick a card up, so a swipe still scrolls
 
-function setupCardReorder() {
-  const grid = document.getElementById('card-grid');
+// options: attr names the data attribute holding each card's key; current() gives the saved order;
+// save(order, message) stores a new one; label(key) names a card for the screen reader message.
+const reorderListeners = {}; // one set of window listeners per kind of card, replaced each time the cards are redrawn
+
+function setupCardReorder(grid, { attr, current, save, label }) {
+  reorderListeners[attr]?.abort();
   if (!grid) return;
+  const listeners = new AbortController();
+  reorderListeners[attr] = listeners;
+  const { signal } = listeners;
   let press = null; // { li, x, y, pointerId, timer, touch }
   let drag = null; // the card being dragged and its motion
   let suppressClick = false;
 
-  const cards = () => [...grid.children].filter((el) => el.matches('li[data-slug]') && el !== drag?.li);
+  const cards = () => [...grid.children].filter((el) => el !== drag?.li); // the cards, and the slot while dragging
 
   grid.addEventListener('pointerdown', (e) => {
     const card = e.target.closest('.character-card');
@@ -637,21 +652,21 @@ function setupCardReorder() {
     }
     beginDrag(e.clientX, e.clientY);
     moveDrag(e);
-  });
+  }, { signal });
   window.addEventListener('pointerup', () => {
     if (press?.timer) clearTimeout(press.timer);
     press = null;
     if (drag && !drag.ending) endDrag(false);
-  });
+  }, { signal });
   window.addEventListener('pointercancel', () => {
     press = null;
     if (drag && !drag.ending) endDrag(true);
-  });
+  }, { signal });
   // While a touch drag is under way, the page mustn't scroll.
   grid.addEventListener('touchmove', (e) => drag && e.preventDefault(), { passive: false });
   window.addEventListener('keydown', (e) => {
     if (drag && !drag.ending && e.key === 'Escape') endDrag(true);
-  });
+  }, { signal });
   // A drag ends with a click on the card; it shouldn't open the character.
   grid.addEventListener(
     'click',
@@ -735,8 +750,8 @@ function setupCardReorder() {
       slot.remove();
       drag = null;
       setTimeout(() => (suppressClick = false), 0);
-      const order = cardOrder(grid);
-      if (!cancelled && order.join() !== state.characters.map((c) => c.slug).join()) saveCharacterOrder(order);
+      const order = cardOrder(grid, attr);
+      if (!cancelled && order.join() !== current().join()) save(order);
     };
     if (drag.reduced) return settle();
     const anim = li.animate([{ transform: from }, { transform: `translate(${to.left}px, ${to.top}px) rotate(0deg) scale(1)` }], {
@@ -761,10 +776,10 @@ function setupCardReorder() {
     if (!back && !li.nextElementSibling) return;
     const target = back ? li.previousElementSibling : li.nextElementSibling.nextElementSibling;
     flip(grid, () => grid.insertBefore(li, target), null, SPRING);
-    li.querySelector('a').focus();
-    const order = cardOrder(grid);
-    const name = state.characters.find((c) => c.slug === li.dataset.slug)?.title ?? '';
-    saveCharacterOrder(order, `Moved ${name} to position ${order.indexOf(li.dataset.slug) + 1} of ${order.length}.`);
+    li.querySelector('a, button').focus();
+    const order = cardOrder(grid, attr);
+    const key = li.dataset[attr];
+    save(order, `Moved ${label(key)} to position ${order.indexOf(key) + 1} of ${order.length}.`);
   });
 }
 
@@ -974,7 +989,12 @@ async function renderImages() {
   const home = document.getElementById('images-home');
   if (!home || state.view !== 'images') return;
   const dir = entryFolder();
-  const files = (await store.list(dir)).filter((e) => e.type === 'file' && isImage(e.name) && e.name !== PORTRAIT_FILE);
+  // The writer's order, kept as `images` in the frontmatter, comes first; anything not in it follows by name.
+  const order = state.frontmatter.images ?? [];
+  const rank = (name) => (order.includes(name) ? order.indexOf(name) : order.length);
+  const files = (await store.list(dir))
+    .filter((e) => e.type === 'file' && isImage(e.name) && e.name !== PORTRAIT_FILE)
+    .sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name));
   state.images = await Promise.all(
     files.map(async ({ name }) => {
       const path = `${dir}/${name}`;
@@ -992,7 +1012,7 @@ async function renderImages() {
     ? `<ul class="image-grid">${state.images
         .map(
           (img) => `
-        <li><button type="button" class="character-card image-card" data-path="${esc(img.path)}" aria-label="${esc(img.caption || img.name)}. Open it larger.">
+        <li data-name="${esc(img.name)}"><button type="button" class="character-card image-card" data-path="${esc(img.path)}" aria-label="${esc(img.caption || img.name)}. Open it larger." aria-describedby="image-reorder-help">
           <img src="${store.mediaUrl(img.path)}" alt="${esc(img.alt)}" loading="lazy" />
           <span class="card-body">
             <span class="card-name">${esc(img.caption || img.name)}</span>
@@ -1009,8 +1029,15 @@ async function renderImages() {
     </button>
     <input type="file" id="image-input" accept="${IMAGE_ACCEPT}" multiple hidden />
     <p class="form-error" id="images-error" role="alert"></p>
-    ${grid}`;
+    ${grid}
+    <p class="visually-hidden" id="image-reorder-help">Drag to reorder, or press Alt with an arrow key.</p>`;
   home.querySelectorAll('.image-grid li').forEach((li, i) => riseIn(li, { delay: i * 30, fill: 'backwards' }));
+  setupCardReorder(home.querySelector('.image-grid'), {
+    attr: 'name',
+    current: () => state.images.map((i) => i.name),
+    save: saveImageOrder,
+    label: (name) => state.images.find((i) => i.name === name)?.caption || name,
+  });
   if (!home.dataset.ready) setupImagesHome(home);
 }
 
@@ -1040,6 +1067,11 @@ function setupImagesHome(home) {
     home.classList.remove('is-dropping');
     uploadImages(e.dataTransfer.files);
   });
+}
+
+async function saveImageOrder(order, message = 'Saved the new order.') {
+  state.images.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
+  if (await writeEntry({ set: { images: order } })) setStatus(message);
 }
 
 let imagesTimer = null;
@@ -1102,6 +1134,7 @@ function setupImageDialog() {
     await renderImages();
     document.querySelector(`.image-card[data-path="${CSS.escape(path ?? '')}"]`)?.focus();
   });
+  document.getElementById('image-duplicate').addEventListener('click', duplicateImage);
   document.getElementById('image-use-portrait').addEventListener('click', async () => {
     const { path } = state.imageOpen;
     dialog.close();
@@ -1112,7 +1145,7 @@ function setupImageDialog() {
   remove.addEventListener('click', async () => {
     if (!remove.dataset.armed) {
       remove.dataset.armed = '1';
-      remove.textContent = 'Remove it from the folder?';
+      remove.setAttribute('aria-label', 'Remove it from the folder?');
       return;
     }
     const { path } = state.imageOpen;
@@ -1129,6 +1162,27 @@ function setupImageDialog() {
   });
 }
 
+// A copy of the open image and its sidecar, placed right after it. The server gives the copy a free name.
+async function duplicateImage() {
+  const { path } = state.imageOpen;
+  const dialog = document.getElementById('image-dialog');
+  try {
+    await saveImageDetails();
+    const blob = await (await fetch(store.mediaUrl(path))).blob();
+    const copy = await store.upload(entryFolder(), path.split('/').pop(), blob);
+    const side = await store.read(sidecarPath(path));
+    if (side.exists) await store.write(sidecarPath(copy), side.content, null);
+    const names = state.images.map((i) => i.name);
+    const name = path.split('/').pop();
+    names.splice(names.indexOf(name) + 1, 0, copy.split('/').pop());
+    await writeEntry({ set: { images: names } });
+    setStatus('Duplicated the image.');
+  } catch (err) {
+    return setStatus(`Couldn’t duplicate the image. ${err.message}`);
+  }
+  dialog.close();
+}
+
 async function openImage(path) {
   const img = state.images.find((i) => i.path === path);
   const side = await store.read(sidecarPath(path));
@@ -1139,7 +1193,7 @@ async function openImage(path) {
   preview.alt = img.alt;
   const remove = document.getElementById('image-remove');
   delete remove.dataset.armed;
-  remove.textContent = 'Remove';
+  remove.setAttribute('aria-label', 'Remove');
   document.getElementById('image-dialog').showModal();
 }
 
