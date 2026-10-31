@@ -41,7 +41,12 @@ The Focus overlap bug is fixed in `41006f7` and tested at widths from 375px to 1
 - **Container queries:** below 560px on the page, and below 720px of card width in Focus, the link moves to its own line on the panel's color, inset like the panel's contents, and runs the panel's full width.
 - **No unstyled wrap:** at no tested width does the link wrap without that styling.
 
-Next: ask Tim to OK pushing the eight local commits, `3f8fbfc` through `41006f7` plus this handoff. Then ask what's next. The open questions below are the candidates.
+Then `200a9f4`:
+- On phones, Focus trims only its side padding, so Done stays 16px from the sheet's top at every width.
+- The wrapped link's gap to the numbers is evened out (padding-top `--space-2` on the panel).
+- The writing box's 80ch cap is gone, so the text runs the full width with equal margins (Tim's call).
+
+Next: ask Tim to OK pushing the local commits, `3f8fbfc` through `200a9f4` plus the handoff commits. Then ask what's next. The open questions below are the candidates.
 
 ## 4. Open questions for Tim
 
