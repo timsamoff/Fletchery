@@ -293,7 +293,11 @@ async function showEditor(settings, settingsVersion) {
   state.mode = prefs.values.layout.questionMode;
   setNavOpen(!prefs.values.layout.sectionsFolded, false);
   document.getElementById('nav-toggle').addEventListener('click', () => setNavOpen(state.navCollapsed));
-  document.getElementById('next-depth').addEventListener('click', () => setDepth(DEPTHS[DEPTHS.indexOf(state.depth) + 1], true));
+  // Only depths can be reached this way for now; moving to the next section arrives with the second built section.
+  document.getElementById('next-depth').addEventListener('click', () => {
+    const next = DEPTHS[DEPTHS.indexOf(state.depth) + 1];
+    if (next) setDepth(next, true);
+  });
   setupFocus();
   document.getElementById('canon').addEventListener('click', toggleCanon);
   document.getElementById('skip').addEventListener('click', skipSection);
@@ -463,10 +467,15 @@ function renderDepth() {
   });
   placeDepthIndicator();
 
+  // The forward button goes to the next depth, and from the Sheet to the next section, disabled until it's built.
   const next = DEPTHS[DEPTHS.indexOf(state.depth) + 1];
   const nextButton = document.getElementById('next-depth');
-  nextButton.hidden = !next;
-  if (next) nextButton.textContent = `Go to ${state.section.depths[next].label}`;
+  const sections = state.sectionSet.sections.filter((s) => !s.onlyFor || s.onlyFor === state.settings.scope);
+  const nextSection = next ? null : sections[sections.findIndex((s) => s.id === state.section.id) + 1];
+  nextButton.hidden = !next && !nextSection;
+  nextButton.textContent = next ? `Go to ${state.section.depths[next].label}` : `Go to ${nextSection?.title ?? ''}`;
+  nextButton.disabled = !next && !nextSection?.built;
+  nextButton.title = nextButton.disabled ? `${nextSection.title} isn’t built yet.` : '';
   document.getElementById('focus-dialog').setAttribute('aria-label', `Focus: ${state.section.title}, ${state.section.depths[state.depth].label}`);
 }
 

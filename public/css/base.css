@@ -915,7 +915,7 @@ textarea:focus-visible {
 }
 .question {
   margin: 12px 0 0;
-  max-width: var(--measure);
+  max-width: none; /* questions span the panel */
   font-size: var(--text-body); /* the same size as the depth steps */
   line-height: var(--line);
   font-weight: 600;
@@ -923,7 +923,7 @@ textarea:focus-visible {
 .question-list {
   margin: 12px 0 0;
   padding-left: var(--space-4);
-  max-width: var(--measure);
+  max-width: none;
   font-size: var(--text-body);
   line-height: var(--line);
   font-weight: 600;

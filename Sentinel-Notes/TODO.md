@@ -18,6 +18,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Google (Gemini) API as an AI choice beside Claude Code, Anthropic, and OpenRouter; key in fletchery-api.json.
 - [ ] PDF export of the story bible (browser print styles first; a library only if those fall short).
 - [ ] .docx export of the story bible with docx.js (a new dependency, so it goes in SPEC.md when added).
+- [ ] Margin notes: select a phrase, add a note, the phrase highlights; waits on the formatting editor; see [margin-notes-design-brief.md](margin-notes-design-brief.md).
 - [ ] Discuss later: the guided interview as the defining feature (threads, Socratic AI, writer sets canon); see [guided-interview-design-brief.md](guided-interview-design-brief.md).
 - [ ] Discuss later: in AI mode, import a folder or premade files (local or Google Drive) for the AI to draft into the bible; see [import-content-design-brief.md](import-content-design-brief.md).
 
