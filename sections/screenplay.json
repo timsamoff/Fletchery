@@ -59,10 +59,7 @@
           "label": "Seed",
           "guide": "One sentence: who they are and the shape of their story.",
           "questions": [
-            "Who is this person, in a few words? Not their name: what they are.",
-            "What do they want most?",
-            "What gets in their way?",
-            "Put it together in one sentence."
+            "Who is this person, and what’s the shape of their story? Say it in one sentence."
           ],
           "fields": [
             {
@@ -75,11 +72,7 @@
           "label": "Sketch",
           "guide": "One paragraph: their story from start to finish, as they live it.",
           "questions": [
-            "Where do they start, and what’s ordinary for them?",
-            "What changes for them, and how do they respond?",
-            "What do they try, and what does it cost them?",
-            "What turns things for them?",
-            "Where do they end up, and how are they different?"
+            "Tell their story in a paragraph: where they start, what changes, and where they end up."
           ],
           "fields": [
             {
@@ -211,7 +204,8 @@
               "label": "Appearances",
               "question": "Where do they appear in the story?"
             }
-          ]
+          ],
+          "form": true
         }
       }
     },

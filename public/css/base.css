@@ -1275,9 +1275,9 @@ textarea:focus-visible {
 .settings-text input {
   margin-top: var(--space-1);
 }
-/* Placeholder text in an empty box reads quietly but keeps contrast (mid charcoal, 8.98:1). */
+/* Placeholder text in an empty box: dimmer than real text, kept at about 4.8:1 so it stays readable. */
 textarea::placeholder {
-  color: var(--color-text-quiet);
+  color: var(--color-text-hint);
   opacity: 1;
 }
 
@@ -1312,9 +1312,67 @@ textarea::placeholder {
 .portrait-button:hover {
   transform: scale(1.06);
 }
+/* The character's name with a pencil beside it for renaming. */
+.title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+.title-group h1 {
+  margin-bottom: 0;
+}
 .rename-button {
-  margin-bottom: var(--space-1);
-  border-color: transparent;
+  display: grid;
+  place-items: center;
+  width: var(--space-5);
+  height: var(--space-5);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--color-text-quiet);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+.rename-button:hover {
+  background: var(--color-panel);
+  color: var(--color-text);
+}
+
+/* A Sheet laid out as a form: each field's label and description sit above its box, with a rule between fields. */
+.paper .form-field {
+  border-top: 1px solid var(--color-rule);
+}
+.paper .form-field:first-of-type {
+  border-top: 0;
+}
+.paper .form-field > label,
+.field-description {
+  display: block;
+  padding-inline: var(--space-7);
+}
+.paper .form-field > label {
+  padding-top: var(--space-4);
+}
+.field-description {
+  font-size: var(--text-small);
+  color: var(--color-text-quiet);
+}
+.paper .form-field textarea {
+  min-height: 0; /* its rows set the height: two for short facts, four for the rest */
+  padding-block: var(--space-2) var(--space-4);
+}
+.paper .form-field .archetype-chips {
+  padding-top: var(--space-2);
+}
+@media (max-width: 719px) {
+  .paper .form-field > label,
+  .field-description {
+    padding-inline: var(--space-3);
+  }
 }
 .silhouette {
   display: block;

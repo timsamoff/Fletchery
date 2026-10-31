@@ -79,6 +79,7 @@
   /* Roles */
   --color-text: var(--color-charcoal);
   --color-text-quiet: var(--color-charcoal-mid);
+  --color-text-hint: rgb(59 63 70 / 0.75); /* placeholder text: dimmer than real text, still about 4.8:1 on the paper */
   --color-bg: var(--color-cream);
   --color-surface: var(--color-cream-light);
   --color-border: var(--color-charcoal);

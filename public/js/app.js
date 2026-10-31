@@ -339,8 +339,16 @@ async function openEntry(path, slug) {
       ${section.many ? `<a class="crumb" href="#/${section.id}">${esc(section.title)}</a>` : ''}
       <div class="section-head">
         ${section.many ? `<button type="button" class="portrait-button" id="portrait"></button>` : ''}
-        <h1 id="section-title"></h1>
-        ${section.many ? `<button type="button" class="button button-quiet rename-button" id="rename">Rename</button>` : ''}
+        <div class="title-group">
+          <h1 id="section-title"></h1>
+          ${
+            section.many
+              ? `<button type="button" class="rename-button" id="rename" aria-label="Rename" title="Rename">
+                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
+                 </button>`
+              : ''
+          }
+        </div>
         <div class="depth-steps" id="depth-steps" role="group" aria-label="Depth"></div>
         <p class="status-badge" id="status-badge"></p>
         <button type="button" class="button button-quiet focus-open" id="focus-open">
@@ -810,7 +818,24 @@ function renderWork() {
         .join('')}
       ${arrow(1, 'Next question', step >= questions.length - 1, 'M9 6l6 6-6 6')}
     </div>`;
-  const card = `
+  // A depth with one prompt, or a Sheet laid out as a form, needs no tabs or numbers: just the guide and the prompt.
+  const form = isSheet && def.form;
+  const simple = form || questions.length === 1;
+  const done = state.focusOpen ? '<button type="button" class="button focus-done" id="focus-done">Done</button>' : '';
+  const simpleCard = () => {
+    const row = contextLink() + done;
+    return `
+    <div class="question-card">
+      ${row ? `<div class="question-tabs-row">${row}</div>` : ''}
+      <section class="question-panel" id="question-panel" aria-label="Prompt">
+        <p class="question-guide">${esc(def.guide)}</p>
+        ${form ? '' : `<p class="question" id="question-text">${esc(questions[0])}</p>`}
+      </section>
+    </div>`;
+  };
+  const card = simple
+    ? simpleCard()
+    : `
     <div class="question-card">
       <div class="question-tabs-row">
         <div class="question-tabs" role="tablist" aria-label="Question layout">
@@ -832,17 +857,20 @@ function renderWork() {
       </section>
     </div>`;
   // One field fills the page; the Sheet's full form stacks its parts at a fixed height.
-  const fields = isSheet ? (interview ? [def.fields[step]] : def.fields) : [def.fields[0]];
+  const fields = form ? def.fields : isSheet ? (interview ? [def.fields[step]] : def.fields) : [def.fields[0]];
   const single = fields.length === 1;
   // A short field (Age, Type) stays two lines tall instead of filling the page; Archetype adds a picker.
+  // In a form, each field shows its label and a short description in place of a question.
   const fieldHtml = (f) => {
     const fill = single && !f.kind;
-    const rows = fill ? '' : f.kind ? ' rows="2"' : ' rows="6"';
+    const rows = fill ? '' : f.kind ? ' rows="2"' : form ? ' rows="4"' : ' rows="6"';
+    const described = form ? `desc-${f.id}` : 'question-text';
     return `
-      <div class="field writing-field${fill ? ' fill' : ''}${f.kind ? ` field-${f.kind}` : ''}">
+      <div class="field writing-field${fill ? ' fill' : ''}${f.kind ? ` field-${f.kind}` : ''}${form ? ' form-field' : ''}">
         <label for="field-${f.id}"${single ? ' class="visually-hidden"' : ''}>${esc(f.label)}</label>
+        ${form ? `<span class="field-description" id="desc-${f.id}">${esc(f.question)}</span>` : ''}
         ${f.kind === 'archetype' ? archetypeChips(f) : ''}
-        <textarea id="field-${f.id}" data-field="${f.id}" spellcheck="true" aria-describedby="question-text"${single ? ` placeholder="${PLACEHOLDERS[state.depth]}"` : ''}${rows}></textarea>
+        <textarea id="field-${f.id}" data-field="${f.id}" spellcheck="true" aria-describedby="${described}"${single ? ` placeholder="${PLACEHOLDERS[state.depth]}"` : ''}${rows}></textarea>
       </div>`;
   };
   // The paper hangs from the question panel with no gap, the earlier depths clipped across its top.
