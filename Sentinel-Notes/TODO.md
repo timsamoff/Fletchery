@@ -7,7 +7,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Visual redesign before more feature work: steps 1-3 built, motion added, Focus sheet reworked, links updated; see [visual-redesign-design-brief.md](visual-redesign-design-brief.md).
 - [ ] Settings page: credit (shown as Written by), fonts, paste, fade built; AI preview; key location set; see [settings-page-design-brief.md](settings-page-design-brief.md).
 - [ ] Fletchery web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
-- [ ] Characters with images, the media library, relationships, and generated indexes.
+- [ ] Characters with images, the media library, relationships, and indexes: plan proposed, in 5 steps; see [characters-design-brief.md](characters-design-brief.md).
 - [ ] Notes and media (Inbox, quick capture, maps), then the remaining sections from data for all three story types.
 - [ ] Bridge: request queue, proposals, `BIBLE.md`, skills, install script. Proposals in files or UI only: pick the better UX (guided-interview brief).
 - [ ] Layout views (document, board, canvas, outline), animated drag and drop, canon status board, Fletchery name; see [layout-views-design-brief.md](layout-views-design-brief.md).
