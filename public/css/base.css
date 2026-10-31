@@ -797,6 +797,7 @@ textarea:focus-visible {
   }
   .question-tabs-row:has(.context-link) + .question-panel {
     border-top-right-radius: 0;
+    padding-top: var(--space-2); /* matches the space above the link */
   }
 }
 @container (max-width: 720px) {
@@ -810,6 +811,7 @@ textarea:focus-visible {
   }
   .focus-slot .question-tabs-row:has(.context-link) + .question-panel {
     border-top-right-radius: 0;
+    padding-top: var(--space-2); /* matches the space above the link */
   }
 }
 .question-tabs {
@@ -947,7 +949,7 @@ textarea:focus-visible {
   margin-bottom: var(--space-1);
 }
 .writing-field textarea {
-  padding-inline: var(--space-7) max(var(--space-7), calc(100% - 80ch - var(--space-7)));
+  padding-inline: var(--space-7); /* the text runs the box's full width (Tim's call; an 80ch cap was tried) */
 }
 @media (max-width: 719px) {
   .writing-field textarea {
@@ -1040,9 +1042,13 @@ textarea:focus-visible {
   right: var(--space-5);
   min-width: 96px; /* the space the tab row keeps clear for it */
 }
+/* On phones only the side padding shrinks, so the tab row, and Done centered beside it, keep their height. */
 @media (max-width: 719px) {
   .focus-slot {
-    padding: var(--space-3);
+    padding-inline: var(--space-3);
+  }
+  .focus-done {
+    right: var(--space-3);
   }
 }
 
