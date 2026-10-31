@@ -7,8 +7,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Visual redesign before more feature work: steps 1-3 built, motion added, Focus sheet reworked, links updated; see [visual-redesign-design-brief.md](visual-redesign-design-brief.md).
 - [ ] Settings page: credit (shown as Written by), fonts, paste, fade built; AI preview with Gemini; key location set; see [settings-page-design-brief.md](settings-page-design-brief.md).
 - [ ] Fletchery web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
-- [ ] Portrait: make the silhouette look clickable, and crop part of an image as the portrait (options given 2026-10-31).
-- [ ] Characters with images, the media library, relationships, and indexes: step 1 built and revised (Sheet as form, fluid dragging); see [characters-design-brief.md](characters-design-brief.md).
+- [ ] Characters with images, the media library, relationships, and indexes: step 1 built and revised; step 2 portrait and images decided; see [characters-design-brief.md](characters-design-brief.md).
 - [ ] World and settings need images too: reuse the Characters image zone and sidecars once step 2 is built.
 - [ ] Make it clearer where the story-bible folder actually lives on disk.
 - [ ] Hook up a Google Drive connector for storage (web edition and import both lean on it).
@@ -19,6 +18,8 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Notes and media (Inbox, quick capture, maps), then the remaining sections from data for all three story types.
 - [ ] Bridge: request queue, proposals, `BIBLE.md`, skills, install script. Proposals in files or UI only: pick the better UX (guided-interview brief).
 - [ ] Layout views (document, board, canvas, outline), animated drag and drop, canon status board, Fletchery name; see [layout-views-design-brief.md](layout-views-design-brief.md).
+- [ ] Narrow screens: the sidebar sits above the content; make it a hamburger menu, with Settings, Help, and About as slide-out panes in it.
+- [ ] Discuss: a hamburger in the upper right at every width, holding only the top-level items, even when the sidebar shows.
 - [ ] Accessibility and responsiveness pass, tested with the keyboard and at 320px and ultra-wide.
 - [ ] README: install, launch, directory layout, handing a bible to Claude Code, and the edition comparison from the web edition brief.
 - [ ] Later, only with approval: a `claude -p` "Run now" option for Ask AI.
