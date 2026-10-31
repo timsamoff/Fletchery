@@ -26,7 +26,9 @@ Written 2026-10-30. Characters step 1 is built; steps 2 to 5 remain.
 
 ## 3. Next step
 
-First, fix the rename bug Tim found on 2026-10-30: renaming Barb to Deb from the pencil shows "Not found." in the dialog (a 404 from the server). It worked when step 1 was tested. Start by checking whether the running server predates `POST /api/move-folder` (restart `fletchery`), then trace `renameCharacter()` in `public/js/app.js`: the folder move, then the file move, then the `order.characters` update.
+The rename bug is fixed: the server Tim ran on 2026-10-30 predated the folder-move route, and the page now says to restart Fletchery when that happens. Tim will retry the rename.
+
+Portrait choices are waiting on Tim: a pencil badge plus a three-silhouette menu (recommended), and whether a crop saves numbers, a small copy, or both.
 
 After that, get Tim's review of step 1. Then step 2, images: an image zone on each character, with `.meta.md` sidecars (caption, alt text, what to notice). It needs a server route for binary uploads.
 

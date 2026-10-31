@@ -64,6 +64,10 @@ export class LocalServerStore {
     }
     const data = await res.json().catch(() => ({}));
     if (res.status === 409) throw new StoreConflict(data.current);
+    // The server's catch-all answer means it doesn't know this route: it was started before an update.
+    if (res.status === 404 && data.error === 'Not found.') {
+      throw new StoreError('Fletchery was updated while it was running. Restart it and try again.');
+    }
     if (!res.ok) throw new StoreError(data.error ?? `The request failed (${res.status}).`);
     return data;
   }
