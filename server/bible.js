@@ -84,6 +84,17 @@ export class Bible {
     await fs.mkdir(path.dirname(to), { recursive: true });
     await retryOnWindowsLock(() => fs.rename(from, to));
   }
+
+  // Moves a whole folder, such as a renamed character's with its images, refusing if anything already has the name.
+  async moveFolder(fromRel, toRel) {
+    const from = this.resolve(fromRel);
+    const to = this.resolve(toRel);
+    const stat = await fs.stat(from).catch(() => null);
+    if (!stat?.isDirectory()) throw new BibleError(404, 'There is no folder to move.');
+    if (await fs.stat(to).catch(() => null)) throw new BibleError(409, 'Something already has that name.');
+    await fs.mkdir(path.dirname(to), { recursive: true });
+    await retryOnWindowsLock(() => fs.rename(from, to));
+  }
 }
 
 // Windows can refuse a rename or delete briefly while another program has the file open.

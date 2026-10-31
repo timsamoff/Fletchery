@@ -206,7 +206,11 @@ const state = {
   settings: null,
   settingsVersion: null,
   sectionSet: null,
-  section: null, // the built section being edited
+  section: null, // the built section being shown
+  page: null, // 'entry' (the editor) or 'list' (a section's cards, such as Characters)
+  entry: null, // { path, slug } of the entry being edited
+  characters: [], // [{ slug, title, status, description, silhouette }] for the sidebar and the cards
+  statusCache: {}, // section id -> status word, for single-entry sections shown in the sidebar
   layers: null, // { seed, sketch, sheet: { id: text }, ... }
   depth: 'seed', // the depth being worked on (a page choice; frontmatter depth follows the text)
   mode: 'interview', // 'interview' or 'full'; the last one used is kept in the writer's settings
@@ -228,8 +232,10 @@ const state = {
 const sheetFields = () => (state.section.depths.sheet.questions ? [] : state.section.depths.sheet.fields);
 const composedBody = () => serializeLayers(state.layers, sheetFields());
 const isDirty = () => composedBody() !== state.savedBody;
-const entryPath = () => state.section.file;
-const template = () => ({ title: state.section.title, type: state.section.id });
+const entryPath = () => state.entry.path;
+const template = () => ({ title: state.frontmatter.title ?? state.section.title, type: state.section.id });
+const visibleSections = () => state.sectionSet.sections.filter((s) => !s.onlyFor || s.onlyFor === state.settings.scope);
+const entryFile = (section, slug) => `${section.folder}/${slug}/${slug}.md`;
 const statusOf = () => STATUS[normalizeStatus(state.frontmatter.status)] ?? STATUS.empty;
 const skipped = () => Boolean(state.settings.sections?.[state.section.id]?.skipped);
 
@@ -242,8 +248,8 @@ async function showEditor(settings, settingsVersion) {
   } catch (err) {
     return showProblem('The sections couldn’t be loaded', err.message);
   }
-  state.section = state.sectionSet.sections.find((s) => s.built);
 
+  // The frame (sidebar and Focus sheet) is built once; each page renders into #page from the address.
   document.body.classList.add('editor-view');
   view.innerHTML = `
     <div class="workspace" id="workspace">
@@ -260,63 +266,309 @@ async function showEditor(settings, settingsVersion) {
         </details>
         <ol class="nav-rail" id="nav-rail"></ol>
       </nav>
-      <div class="section-page">
-        <div class="section-main">
-        <div class="section-head">
-          <h1 id="section-title"></h1>
-          <div class="depth-steps" id="depth-steps" role="group" aria-label="Depth"></div>
-          <p class="status-badge" id="status-badge"></p>
-          <button type="button" class="button button-quiet focus-open" id="focus-open">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
-            Focus
-          </button>
-        </div>
-        <div id="conflict-slot"></div>
-        <div id="work-home"><div id="work"></div></div>
-        <div class="button-row section-actions">
-          <button type="button" class="button button-quiet" id="canon"></button>
-          <button type="button" class="button button-soft" id="skip">Skip for now</button>
-          <button type="button" class="button button-quiet" id="ask-ai" disabled aria-describedby="ask-ai-note">Ask AI</button>
-          <p class="local-status" id="local-status" aria-hidden="true"></p>
-          <button type="button" class="button" id="next-depth"></button>
-        </div>
-        </div>
-        <p class="hint" id="ask-ai-note">Ask AI turns on once you choose an AI in Settings, in a later version.</p>
-        <dl class="entry-meta" id="entry-meta"></dl>
-        <p class="hint file-note" id="file-note"></p>
-      </div>
+      <div class="section-page" id="page"></div>
     </div>
     <dialog class="focus-dialog" id="focus-dialog">
       <div class="focus-slot" id="focus-slot"></div>
+    </dialog>
+    <dialog class="name-dialog" id="name-dialog" aria-labelledby="name-dialog-title">
+      <form method="dialog" id="name-form">
+        <h2 id="name-dialog-title"></h2>
+        <div class="field">
+          <label for="name-input">Name</label>
+          <input type="text" id="name-input" autocomplete="off" required />
+        </div>
+        <p class="form-error" id="name-error" role="alert"></p>
+        <div class="button-row">
+          <button type="submit" class="button" id="name-submit"></button>
+          <button type="button" class="button button-quiet" id="name-cancel">Cancel</button>
+        </div>
+      </form>
     </dialog>`;
 
-  document.getElementById('section-title').textContent = state.section.title;
-  document.getElementById('file-note').innerHTML =
-    `Saved to <code>story-bible/${esc(entryPath())}</code> as you type. Changes made to that file in another editor appear here.`;
   WIDE.addEventListener('change', (e) => {
     if (e.matches) document.getElementById('nav-details').open = true;
   });
   state.mode = prefs.values.layout.questionMode;
   setNavOpen(!prefs.values.layout.sectionsFolded, false);
   document.getElementById('nav-toggle').addEventListener('click', () => setNavOpen(state.navCollapsed));
-  // Only depths can be reached this way for now; moving to the next section arrives with the second built section.
-  document.getElementById('next-depth').addEventListener('click', () => {
-    const next = DEPTHS[DEPTHS.indexOf(state.depth) + 1];
-    if (next) setDepth(next, true);
-  });
   setupFocus();
+  setupNameDialog();
+
+  await Promise.all([loadCharacters(), loadSingleStatuses()]);
+  listen();
+  window.addEventListener('hashchange', route);
+  await route();
+}
+
+// ---------- Pages and addresses ----------
+// #/premise, #/characters, #/characters/<slug>. An unknown or unbuilt section opens the first built one.
+
+async function route() {
+  const [sectionId, slug] = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  const first = visibleSections().find((s) => s.built);
+  const section = visibleSections().find((s) => s.id === sectionId && s.built);
+  if (!section) {
+    history.replaceState(null, '', `#/${first.id}`);
+    return route();
+  }
+  if (state.page === 'entry' && state.conflict) return; // the conflict panel stays until it's resolved
+  if (state.page === 'entry' && isDirty()) await save();
+  if (state.focusOpen) closeFocus();
+
+  state.section = section;
+  if (section.many && !slug) return renderListPage();
+  const known = !section.many || state.characters.some((c) => c.slug === slug);
+  if (!known) {
+    history.replaceState(null, '', `#/${section.id}`);
+    return renderListPage();
+  }
+  await openEntry(section.many ? entryFile(section, slug) : section.file, slug ?? null);
+}
+
+async function openEntry(path, slug) {
+  const section = state.section;
+  state.page = 'entry';
+  state.entry = { path, slug };
+  state.step = 0;
+  state.contextOpen = false;
+  state.frontmatter = {};
+  const page = document.getElementById('page');
+  page.innerHTML = `
+    <div class="section-main">
+      ${section.many ? `<a class="crumb" href="#/${section.id}">${esc(section.title)}</a>` : ''}
+      <div class="section-head">
+        ${section.many ? `<button type="button" class="portrait-button" id="portrait"></button>` : ''}
+        <h1 id="section-title"></h1>
+        ${section.many ? `<button type="button" class="button button-quiet rename-button" id="rename">Rename</button>` : ''}
+        <div class="depth-steps" id="depth-steps" role="group" aria-label="Depth"></div>
+        <p class="status-badge" id="status-badge"></p>
+        <button type="button" class="button button-quiet focus-open" id="focus-open">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
+          Focus
+        </button>
+      </div>
+      <div id="conflict-slot"></div>
+      <div id="work-home"><div id="work"></div></div>
+      <div class="button-row section-actions">
+        <button type="button" class="button button-quiet" id="canon"></button>
+        ${section.many ? '' : '<button type="button" class="button button-soft" id="skip">Skip for now</button>'}
+        <button type="button" class="button button-quiet" id="ask-ai" disabled aria-describedby="ask-ai-note">Ask AI</button>
+        <p class="local-status" id="local-status" aria-hidden="true"></p>
+        <button type="button" class="button" id="next-depth"></button>
+      </div>
+    </div>
+    <p class="hint" id="ask-ai-note">Ask AI turns on once you choose an AI in Settings, in a later version.</p>
+    <dl class="entry-meta" id="entry-meta"></dl>
+    <p class="hint file-note">Saved to <code>story-bible/${esc(path)}</code> as you type. Changes made to that file in another editor appear here.</p>`;
+
+  document.getElementById('next-depth').addEventListener('click', goForward);
+  document.getElementById('focus-open').addEventListener('click', openFocus);
   document.getElementById('canon').addEventListener('click', toggleCanon);
-  document.getElementById('skip').addEventListener('click', skipSection);
+  document.getElementById('skip')?.addEventListener('click', skipSection);
+  document.getElementById('rename')?.addEventListener('click', () => openNameDialog('rename'));
+  document.getElementById('portrait')?.addEventListener('click', cycleSilhouette);
 
   try {
-    load(toEntry(await store.read(entryPath())), { firstLoad: true });
+    load(toEntry(await store.read(path)), { firstLoad: true });
   } catch (err) {
-    if (err.detail) console.error(`${entryPath()}: ${err.detail}`);
+    if (err.detail) console.error(`${path}: ${err.detail}`);
     setStatus(err.message);
-    document.querySelectorAll('.section-page textarea, .section-page button, .section-page input').forEach((el) => (el.disabled = true));
-    return;
+    page.querySelectorAll('textarea, button, input').forEach((el) => (el.disabled = true));
   }
-  listen();
+  main.focus({ preventScroll: true });
+  window.scrollTo(0, 0);
+}
+
+// The forward button: the next depth, or from the Sheet the next section.
+function goForward() {
+  const next = DEPTHS[DEPTHS.indexOf(state.depth) + 1];
+  if (next) return setDepth(next, true);
+  const sections = visibleSections();
+  const after = sections[sections.findIndex((s) => s.id === state.section.id) + 1];
+  if (after?.built) location.hash = `#/${after.id}`;
+}
+
+// ---------- Characters ----------
+
+async function loadCharacters() {
+  const section = state.sectionSet.sections.find((s) => s.id === 'characters' && s.built);
+  if (!section) return;
+  const folders = (await store.list(section.folder)).filter((e) => e.type === 'dir');
+  const read = await Promise.all(
+    folders.map(async ({ name: slug }) => {
+      const file = await store.read(entryFile(section, slug));
+      if (!file.exists) return null;
+      try {
+        const { frontmatter } = parseEntry(file.content);
+        return { slug, title: frontmatter.title || slug, status: normalizeStatus(frontmatter.status), description: frontmatter.description ?? '', silhouette: frontmatter.silhouette ?? 'neutral' };
+      } catch {
+        return { slug, title: slug, status: 'empty', description: '', silhouette: 'neutral' };
+      }
+    }),
+  );
+  state.characters = read.filter(Boolean).sort((a, b) => a.title.localeCompare(b.title));
+}
+
+// Statuses for single-entry sections, so the sidebar can show them from any page.
+async function loadSingleStatuses() {
+  for (const s of visibleSections().filter((s) => s.built && !s.many)) {
+    try {
+      const file = await store.read(s.file);
+      state.statusCache[s.id] = file.exists ? normalizeStatus(parseEntry(file.content).frontmatter.status) : 'empty';
+    } catch {
+      state.statusCache[s.id] = 'empty';
+    }
+  }
+}
+
+const SILHOUETTES = ['neutral', 'female', 'male'];
+const SILHOUETTE_LABELS = { neutral: 'neutral', female: 'female', male: 'male' };
+
+// Head-and-shoulders placeholders for characters with no photo yet.
+function silhouetteSvg(kind) {
+  const hair = {
+    neutral: '<path d="M38 34c0-9 7-15 14-15s14 6 14 15c0 3-1 5-2 7-2-6-6-9-12-9s-10 3-12 9c-1-2-2-4-2-7z"/>',
+    female: '<path d="M33 46c-2-16 6-27 19-27s21 11 19 27c-1 6-3 11-6 14l-2-14c-2-7-6-10-11-10s-9 3-11 10l-2 14c-3-3-5-8-6-14z"/>',
+    male: '<path d="M38 32c0-8 6-13 14-13s14 5 14 13c0 2 0 4-1 5-2-4-6-6-13-6s-11 2-13 6c-1-1-1-3-1-5z"/>',
+  }[kind];
+  const shoulders = kind === 'male' ? 'M20 100c0-20 14-32 32-32s32 12 32 32z' : 'M24 100c0-19 12-30 28-30s28 11 28 30z';
+  return `<svg viewBox="0 0 104 100" aria-hidden="true" class="silhouette"><circle cx="52" cy="40" r="15"/>${hair}<path d="${shoulders}"/></svg>`;
+}
+
+function renderListPage() {
+  const section = state.section;
+  state.page = 'list';
+  state.entry = null;
+  const cards = state.characters
+    .map(
+      (c) => `
+      <li>
+        <a class="character-card" href="#/${section.id}/${encodeURIComponent(c.slug)}">
+          <span class="card-portrait">${silhouetteSvg(c.silhouette)}</span>
+          <span class="card-body">
+            <span class="card-name">${esc(c.title)}</span>
+            ${c.description ? `<span class="card-seed">${esc(c.description)}</span>` : ''}
+            <span class="card-status"><span aria-hidden="true">${STATUS[c.status]?.shape ?? '○'}</span> ${STATUS[c.status]?.word ?? 'Empty'}</span>
+          </span>
+        </a>
+      </li>`,
+    )
+    .join('');
+  document.getElementById('page').innerHTML = `
+    <div class="section-main list-page">
+      <div class="section-head">
+        <h1>${esc(section.title)}</h1>
+        <button type="button" class="button add-button" id="add-entry">Add a character</button>
+      </div>
+      ${cards ? `<ul class="card-grid">${cards}</ul>` : '<p class="empty-note">No characters yet. Add the first one, and start with a single sentence.</p>'}
+      <div class="button-row section-actions">
+        <button type="button" class="button button-soft" id="skip">Skip for now</button>
+      </div>
+    </div>`;
+  document.getElementById('add-entry').addEventListener('click', () => openNameDialog('add'));
+  document.getElementById('skip').addEventListener('click', skipSection);
+  renderNav();
+  main.focus({ preventScroll: true });
+}
+
+const slugify = (name) =>
+  name
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'character';
+
+function freeSlug(name, except = null) {
+  const base = slugify(name);
+  const taken = new Set(state.characters.map((c) => c.slug).filter((s) => s !== except));
+  let slug = base;
+  for (let n = 2; taken.has(slug); n++) slug = `${base}-${n}`;
+  return slug;
+}
+
+// One small dialog asks for a name, both to add a character and to rename one.
+function setupNameDialog() {
+  const dialog = document.getElementById('name-dialog');
+  document.getElementById('name-cancel').addEventListener('click', () => dialog.close());
+  document.getElementById('name-form').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const name = document.getElementById('name-input').value.trim();
+    const error = document.getElementById('name-error');
+    if (!name) {
+      error.textContent = 'Enter a name.';
+      return;
+    }
+    try {
+      if (dialog.dataset.mode === 'add') await addCharacter(name);
+      else await renameCharacter(name);
+      dialog.close();
+    } catch (err) {
+      error.textContent = err.message;
+    }
+  });
+}
+
+function openNameDialog(mode) {
+  const dialog = document.getElementById('name-dialog');
+  dialog.dataset.mode = mode;
+  document.getElementById('name-dialog-title').textContent = mode === 'add' ? 'Add a character' : 'Rename this character';
+  document.getElementById('name-submit').textContent = mode === 'add' ? 'Add' : 'Rename';
+  document.getElementById('name-input').value = mode === 'add' ? '' : (state.frontmatter.title ?? '');
+  document.getElementById('name-error').textContent = '';
+  dialog.showModal();
+  document.getElementById('name-input').select();
+}
+
+async function addCharacter(name) {
+  const section = state.section;
+  const slug = freeSlug(name);
+  const { content } = updateEntry(null, { body: '' }, { title: name, type: section.id });
+  await store.write(entryFile(section, slug), content, null);
+  await loadCharacters();
+  setStatus(`Added ${name}.`);
+  location.hash = `#/${section.id}/${encodeURIComponent(slug)}`;
+}
+
+// Renames the character, its folder, and its file together, so the folder stays readable for writers who
+// work in it directly. Rewriting links in other entries arrives with the media library's link rewriting.
+async function renameCharacter(name) {
+  if (isDirty()) await save();
+  const section = state.section;
+  const old = state.entry.slug;
+  const slug = freeSlug(name, old);
+  if (slug !== old) {
+    await store.moveFolder(`${section.folder}/${old}`, `${section.folder}/${slug}`);
+    await store.move(`${section.folder}/${slug}/${old}.md`, entryFile(section, slug), state.baseVersion);
+    state.entry = { path: entryFile(section, slug), slug };
+  }
+  await writeEntry({ set: { title: name } });
+  await loadCharacters();
+  setStatus(`Renamed to ${name}.`);
+  history.replaceState(null, '', `#/${section.id}/${encodeURIComponent(slug)}`);
+  await openEntry(state.entry.path, slug);
+}
+
+// The placeholder portrait cycles neutral, female, male. A photo replaces it in a later step.
+async function cycleSilhouette() {
+  const current = state.frontmatter.silhouette ?? 'neutral';
+  const next = SILHOUETTES[(SILHOUETTES.indexOf(current) + 1) % SILHOUETTES.length];
+  await writeEntry({ set: { silhouette: next } });
+  renderHead();
+  document.getElementById('portrait').focus();
+}
+
+function renderHead() {
+  const many = state.section.many;
+  document.getElementById('section-title').textContent = many ? (state.frontmatter.title ?? state.entry.slug) : state.section.title;
+  const portrait = document.getElementById('portrait');
+  if (portrait) {
+    const kind = state.frontmatter.silhouette ?? 'neutral';
+    portrait.innerHTML = silhouetteSvg(kind);
+    portrait.setAttribute('aria-label', `Placeholder portrait: ${SILHOUETTE_LABELS[kind]}. Change it.`);
+    portrait.title = 'Change the placeholder portrait';
+  }
 }
 
 function load(entry, { firstLoad = false } = {}) {
@@ -326,41 +578,85 @@ function load(entry, { firstLoad = false } = {}) {
   state.layers = parseLayers(entry.body, sheetFields());
   state.savedBody = composedBody();
   if (firstLoad) state.depth = deepestFilled(state.layers);
+  noteEntryStatus();
   renderAll();
 }
 
+// Keeps the sidebar and the cards current with the entry being edited.
+function noteEntryStatus() {
+  const status = normalizeStatus(state.frontmatter.status);
+  if (!state.section.many) {
+    state.statusCache[state.section.id] = status;
+    return;
+  }
+  const c = state.characters.find((x) => x.slug === state.entry.slug);
+  if (c) Object.assign(c, { title: state.frontmatter.title ?? c.title, status, description: state.frontmatter.description ?? '', silhouette: state.frontmatter.silhouette ?? 'neutral' });
+}
+
 function renderAll() {
+  renderHead();
   renderNav();
   renderStatus();
   renderDepth();
   renderWork();
 }
 
+// The sidebar: built sections link to their pages, and Characters opens like a folder to list every character.
 function renderNav() {
-  const scope = state.settings.scope;
-  const item = (s) => {
-    if (s.id === state.section.id) {
-      const st = statusOf();
-      const note = skipped() ? 'Skipped' : st.word;
-      return `<li><a href="#" aria-current="page"><span class="nav-title">${esc(s.title)}</span>
-        <span class="nav-state"><span aria-hidden="true">${skipped() ? '–' : st.shape}</span> ${note}</span></a></li>`;
+  const current = state.section?.id;
+  const sectionState = (s) => {
+    if (state.settings.sections?.[s.id]?.skipped) return { shape: '–', word: 'Skipped' };
+    if (s.many) {
+      const n = state.characters.length;
+      return { shape: n ? '◐' : '○', word: n ? `${n} ${n === 1 ? 'character' : 'characters'}` : 'None yet' };
     }
-    return `<li><span class="nav-item-off"><span class="nav-title">${esc(s.title)}</span>
-      <span class="nav-state">Not built yet</span></span></li>`;
+    return STATUS[state.statusCache[s.id]] ?? STATUS.empty;
   };
-  const sections = state.sectionSet.sections.filter((s) => !s.onlyFor || s.onlyFor === scope);
+  const item = (s) => {
+    if (!s.built) {
+      return `<li><span class="nav-item-off"><span class="nav-title">${esc(s.title)}</span>
+        <span class="nav-state">Not built yet</span></span></li>`;
+    }
+    const st = sectionState(s);
+    const isPage = s.id === current && (state.page === 'list' || !s.many);
+    const link = `<a href="#/${s.id}"${isPage ? ' aria-current="page"' : ''}><span class="nav-title">${esc(s.title)}</span>
+        <span class="nav-state"><span aria-hidden="true">${st.shape}</span> ${st.word}</span></a>`;
+    if (!s.many || !state.characters.length) return `<li>${link}</li>`;
+    const open = prefs.values.layout.charactersOpen;
+    const names = state.characters
+      .map((c) => {
+        const here = s.id === current && state.entry?.slug === c.slug;
+        return `<li><a href="#/${s.id}/${encodeURIComponent(c.slug)}"${here ? ' aria-current="page"' : ''}><span aria-hidden="true">${STATUS[c.status]?.shape ?? '○'}</span> ${esc(c.title)}</a></li>`;
+      })
+      .join('');
+    return `<li class="nav-folder${open ? ' is-open' : ''}">
+        <div class="nav-folder-row">${link}
+          <button type="button" class="nav-folder-toggle" data-folder="${s.id}" aria-expanded="${open}" aria-controls="nav-folder-${s.id}" aria-label="${open ? 'Hide' : 'Show'} the ${esc(s.title.toLowerCase())}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+        </div>
+        <div class="nav-folder-body" id="nav-folder-${s.id}"${open ? '' : ' inert'}><ul class="nav-sublist">${names}</ul></div>
+      </li>`;
+  };
+  const sections = visibleSections();
   document.getElementById('nav-lists').innerHTML = `
     <ol class="nav-list">${sections.map(item).join('')}</ol>
     <ul class="nav-list nav-areas">${(state.sectionSet.areas ?? []).map(item).join('')}</ul>`;
+  document.querySelectorAll('[data-folder]').forEach((b) =>
+    b.addEventListener('click', () => {
+      prefs.update({ layout: { charactersOpen: !prefs.values.layout.charactersOpen } });
+      renderNav();
+      document.querySelector(`[data-folder="${b.dataset.folder}"]`)?.focus();
+    }),
+  );
 
   // The folded list: one status shape per section, with the name for screen readers and as a tooltip.
   const railItem = (s) => {
-    if (s.id === state.section.id) {
-      const st = statusOf();
-      const note = skipped() ? 'skipped' : st.word.toLowerCase();
-      return `<li><a href="#" aria-current="page" title="${esc(s.title)}"><span aria-hidden="true">${skipped() ? '–' : st.shape}</span><span class="visually-hidden">${esc(s.title)}, ${note}</span></a></li>`;
+    if (!s.built) {
+      return `<li><span class="nav-item-off" title="${esc(s.title)}, not built yet"><span aria-hidden="true">○</span><span class="visually-hidden">${esc(s.title)}, not built yet</span></span></li>`;
     }
-    return `<li><span class="nav-item-off" title="${esc(s.title)}, not built yet"><span aria-hidden="true">○</span><span class="visually-hidden">${esc(s.title)}, not built yet</span></span></li>`;
+    const st = sectionState(s);
+    return `<li><a href="#/${s.id}"${s.id === current ? ' aria-current="page"' : ''} title="${esc(s.title)}"><span aria-hidden="true">${st.shape}</span><span class="visually-hidden">${esc(s.title)}, ${st.word.toLowerCase()}</span></a></li>`;
   };
   document.getElementById('nav-rail').innerHTML = sections.map(railItem).join('');
 }
@@ -537,21 +833,25 @@ function renderWork() {
     </div>`;
   // One field fills the page; the Sheet's full form stacks its parts at a fixed height.
   const fields = isSheet ? (interview ? [def.fields[step]] : def.fields) : [def.fields[0]];
-  const fill = fields.length === 1;
+  const single = fields.length === 1;
+  // A short field (Age, Type) stays two lines tall instead of filling the page; Archetype adds a picker.
+  const fieldHtml = (f) => {
+    const fill = single && !f.kind;
+    const rows = fill ? '' : f.kind ? ' rows="2"' : ' rows="6"';
+    return `
+      <div class="field writing-field${fill ? ' fill' : ''}${f.kind ? ` field-${f.kind}` : ''}">
+        <label for="field-${f.id}"${single ? ' class="visually-hidden"' : ''}>${esc(f.label)}</label>
+        ${f.kind === 'archetype' ? archetypeChips(f) : ''}
+        <textarea id="field-${f.id}" data-field="${f.id}" spellcheck="true" aria-describedby="question-text"${single ? ` placeholder="${PLACEHOLDERS[state.depth]}"` : ''}${rows}></textarea>
+      </div>`;
+  };
   // The paper hangs from the question panel with no gap, the earlier depths clipped across its top.
   work.innerHTML = `${card}
     <div class="paper">
       ${contextStrip()}
-      ${fields
-        .map(
-          (f) => `
-          <div class="field writing-field${fill ? ' fill' : ''}">
-            <label for="field-${f.id}"${fill ? ' class="visually-hidden"' : ''}>${esc(f.label)}</label>
-            <textarea id="field-${f.id}" data-field="${f.id}" spellcheck="true" aria-describedby="question-text"${fill ? ` placeholder="${PLACEHOLDERS[state.depth]}"` : ' rows="6"'}></textarea>
-          </div>`,
-        )
-        .join('')}
+      ${fields.map(fieldHtml).join('')}
     </div>`;
+  work.querySelectorAll('[data-archetype]').forEach((chip) => chip.addEventListener('click', () => toggleArchetype(chip)));
   document.getElementById('context-toggle')?.addEventListener('click', () => setContextOpen(!state.contextOpen));
   document.getElementById('focus-done')?.addEventListener('click', () => closeFocus());
   work.querySelectorAll('[data-goto]').forEach((b) => b.addEventListener('click', () => setDepth(b.dataset.goto, true)));
@@ -595,6 +895,31 @@ function renderWork() {
       work.querySelector(`[data-question="${b.dataset.question}"]`).focus();
     }),
   );
+}
+
+// Archetypes are kept as plain text in the file ("Sage, Trickster"). The chips add or remove names from that
+// text, and anything typed by hand counts as the writer's own archetype.
+const splitList = (text) => text.split(',').map((s) => s.trim()).filter(Boolean);
+
+function archetypeChips(f) {
+  const chosen = splitList(fieldValue(f.id)).map((s) => s.toLowerCase());
+  return `<div class="archetype-chips" role="group" aria-label="Archetypes to add">
+    ${f.options
+      .map((o) => `<button type="button" class="chip" data-archetype="${esc(o)}" data-for="${f.id}" aria-pressed="${chosen.includes(o.toLowerCase())}">${esc(o)}</button>`)
+      .join('')}
+  </div>`;
+}
+
+function toggleArchetype(chip) {
+  const t = document.getElementById(`field-${chip.dataset.for}`);
+  const names = splitList(t.value);
+  const name = chip.dataset.archetype;
+  const i = names.findIndex((n) => n.toLowerCase() === name.toLowerCase());
+  if (i >= 0) names.splice(i, 1);
+  else names.push(name);
+  t.value = names.join(', ');
+  t.dispatchEvent(new Event('input'));
+  chip.setAttribute('aria-pressed', String(i < 0));
 }
 
 function fieldValue(id) {
@@ -685,18 +1010,20 @@ function restoreCaret(snap) {
   }
 }
 
+// Each entry page's Focus button calls this; the dialog itself is set up once.
+function openFocus() {
+  const dialog = document.getElementById('focus-dialog');
+  const snap = caretSnapshot();
+  state.focusOpen = true;
+  document.getElementById('focus-slot').append(document.getElementById('work'));
+  dialog.showModal();
+  renderWork(); // Done appears beside the tabs
+  restoreCaret(snap);
+  requestAnimationFrame(() => dialog.classList.add('is-open'));
+}
+
 function setupFocus() {
   const dialog = document.getElementById('focus-dialog');
-  const opener = document.getElementById('focus-open');
-  opener.addEventListener('click', () => {
-    const snap = caretSnapshot();
-    state.focusOpen = true;
-    document.getElementById('focus-slot').append(document.getElementById('work'));
-    dialog.showModal();
-    renderWork(); // Done appears beside the tabs
-    restoreCaret(snap);
-    requestAnimationFrame(() => dialog.classList.add('is-open'));
-  });
   closeFocus = () => {
     if (!dialog.open || !dialog.classList.contains('is-open')) return;
     dialog.classList.remove('is-open');
@@ -783,6 +1110,7 @@ async function writeEntry(change, baseVersion = state.baseVersion, baseContent =
     state.baseContent = result.content;
     state.savedBody = body;
     state.frontmatter = result.frontmatter;
+    noteEntryStatus();
     renderStatus();
     renderNav();
     if (skipped() && body.trim()) await setSkipped(false);
@@ -858,10 +1186,22 @@ async function skipSection() {
   }
 }
 
+// Characters added, renamed, or edited outside the app show up in the sidebar and on the cards.
+let charactersTimer = null;
+function refreshCharactersSoon() {
+  clearTimeout(charactersTimer);
+  charactersTimer = setTimeout(async () => {
+    await loadCharacters();
+    if (state.page === 'list') renderListPage();
+    else renderNav();
+  }, 200);
+}
+
 function listen() {
   store.changes((change) => {
     if (change.path === SETTINGS_FILE) return prefs.reload(change.version);
-    if (change.path !== entryPath() || change.version === state.baseVersion) return;
+    if (change.path.startsWith('characters/')) refreshCharactersSoon();
+    if (state.page !== 'entry' || change.path !== entryPath() || change.version === state.baseVersion) return;
     if (state.saving) state.remotePending = true;
     else checkRemote();
   });

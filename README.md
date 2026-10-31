@@ -3,7 +3,7 @@ A local app that walks writers through building a Story Bible as plain Markdown 
 
 ## Sections
 
-Each story type has its own set of sections, and every one also gets Notes and media. Premise is built so far. The rest are planned.
+Each story type has its own set of sections, and every one also gets Notes and media. Premise and Characters are built so far. The rest are planned.
 
 - **Prose fiction:** Premise, Characters, Relationships, World and settings, Timeline and events, Plot and structure, Themes, motifs, and symbols, Voice and style, and Series continuity (for a series).
 - **Screenplay:** Logline and premise, Characters, Relationships, World and settings, Timeline and events, Structure, Themes, motifs, and symbols, Voice and format, and Series continuity (for a series).

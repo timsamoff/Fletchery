@@ -46,7 +46,180 @@
         }
       }
     },
-    { "id": "characters", "title": "Characters" },
+    {
+      "id": "characters",
+      "title": "Characters",
+      "built": true,
+      "many": true,
+      "folder": "characters",
+      "descriptionFrom": "seed",
+      "depths": {
+        "seed": {
+          "label": "Seed",
+          "guide": "One sentence: who they are and the shape of their story.",
+          "questions": [
+            "Who is this person, in a few words? Not their name: what they are.",
+            "What do they want most?",
+            "What gets in their way?",
+            "Put it together in one sentence."
+          ],
+          "fields": [
+            {
+              "id": "seed",
+              "label": "Their story in one sentence"
+            }
+          ]
+        },
+        "sketch": {
+          "label": "Sketch",
+          "guide": "One paragraph: their story from start to finish, as they live it.",
+          "questions": [
+            "Where do they start, and what’s ordinary for them?",
+            "What changes for them, and how do they respond?",
+            "What do they try, and what does it cost them?",
+            "What turns things for them?",
+            "Where do they end up, and how are they different?"
+          ],
+          "fields": [
+            {
+              "id": "sketch",
+              "label": "Their story in one paragraph"
+            }
+          ]
+        },
+        "sheet": {
+          "label": "Sheet",
+          "guide": "As much as you know. Leave anything you haven’t decided.",
+          "fields": [
+            {
+              "id": "name",
+              "label": "Name",
+              "question": "What’s their full name, and what do other people call them? Who uses which name?",
+              "kind": "short"
+            },
+            {
+              "id": "type",
+              "label": "Type",
+              "question": "What kind of being are they, and where do they belong?",
+              "kind": "short"
+            },
+            {
+              "id": "archetype",
+              "label": "Archetype",
+              "question": "Which patterns do they fit? Pick any that apply, or name your own.",
+              "kind": "archetype",
+              "options": [
+                "Innocent",
+                "Everyman",
+                "Hero",
+                "Caregiver",
+                "Explorer",
+                "Rebel",
+                "Lover",
+                "Creator",
+                "Jester",
+                "Sage",
+                "Magician",
+                "Ruler",
+                "Shadow",
+                "Trickster",
+                "Wise Old Man",
+                "Great Mother",
+                "Child"
+              ]
+            },
+            {
+              "id": "age",
+              "label": "Age",
+              "question": "How old are they? If age doesn’t apply, or it’s complicated, say how.",
+              "kind": "short"
+            },
+            {
+              "id": "gender",
+              "label": "Gender identity or expression",
+              "question": "How do they understand and express their gender?",
+              "kind": "short"
+            },
+            {
+              "id": "appearance",
+              "label": "Physical appearance",
+              "question": "What would someone notice first, and what only later?"
+            },
+            {
+              "id": "voice",
+              "label": "Voice",
+              "question": "What do they sound like? How fast, how loud, and which words do they reach for?"
+            },
+            {
+              "id": "personality",
+              "label": "Personality",
+              "question": "What are they like to be around, and where do they contradict themselves?"
+            },
+            {
+              "id": "background",
+              "label": "Background and history",
+              "question": "Where do they come from, and what happened that still shapes them?"
+            },
+            {
+              "id": "want-need",
+              "label": "Want and need",
+              "question": "What do they want, and what do they actually need?"
+            },
+            {
+              "id": "lie",
+              "label": "The lie they believe",
+              "question": "What do they believe about themselves or the world that isn’t true?"
+            },
+            {
+              "id": "obstacles",
+              "label": "What stands in their way",
+              "question": "What’s against them, outside and inside?"
+            },
+            {
+              "id": "arc",
+              "label": "Arc",
+              "question": "How are they different at the end, or why do they stay the same?"
+            },
+            {
+              "id": "relevance",
+              "label": "Relevance to the story",
+              "question": "Why does the story need them?"
+            },
+            {
+              "id": "playable",
+              "label": "Playable or NPC",
+              "question": "Can the player be this character, or do they meet them?",
+              "kind": "short"
+            },
+            {
+              "id": "gameplay-role",
+              "label": "Gameplay role",
+              "question": "What do they do in play: guide, rival, vendor, boss, companion?"
+            },
+            {
+              "id": "barks",
+              "label": "Barks and callouts",
+              "question": "What do they say in passing, in combat, or when the player lingers?"
+            },
+            {
+              "id": "secrets",
+              "label": "Secrets",
+              "question": "What are they hiding, and from whom?"
+            },
+            {
+              "id": "relationships",
+              "label": "Relationships",
+              "question": "Who matters most to them, and how?"
+            },
+            {
+              "id": "appearances",
+              "label": "Appearances",
+              "question": "Where do they appear in the story?"
+            }
+          ]
+        }
+      }
+    },
     { "id": "relationships", "title": "Relationships" },
     { "id": "world", "title": "World and settings" },
     { "id": "factions", "title": "Factions" },

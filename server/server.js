@@ -56,6 +56,11 @@ export function createServer(projectDir) {
     if (route === 'PUT /api/file') return send(res, 200, await writeFile(await readBody(req)));
     if (route === 'DELETE /api/file') return send(res, 200, await deleteFile(await readBody(req)));
     if (route === 'POST /api/move') return send(res, 200, await moveFile(await readBody(req)));
+    if (route === 'POST /api/move-folder') {
+      const { from, to } = await readBody(req);
+      await bible.moveFolder(from, to);
+      return send(res, 200, {});
+    }
     if (route === 'GET /api/events') return events(req, res);
     if (req.method === 'GET') return serveStatic(url.pathname, res);
     return send(res, 404, { error: 'Not found.' });

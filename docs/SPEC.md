@@ -82,6 +82,10 @@ Each story type's sections live in `sections/<type>.json`, by ID and title. IDs 
 
 What each section covers is in the approved plan and `first-prompt/FLETCHERLING-PROMPT.md`. It's recorded in each section's data as the section is built.
 
+### Characters (step 1 built 2026-10-30)
+
+Each character is `characters/<slug>/<slug>.md`, its folder created with the entry. The name the writer gives is the frontmatter `title`; the slug comes from it. Renaming in the app moves the folder and the file together and updates `title`, so the folder stays readable for writers who work in it directly. A character entry may carry `silhouette: neutral | female | male` for its placeholder portrait. Pages have addresses: `#/premise`, `#/characters`, and `#/characters/<slug>`. The Sheet is seventeen optional fields (more for screenplay and game), stored as `###` parts; Archetype is plain text such as `Sage, Trickster`. Empty fields are never counted or flagged.
+
 ### Entry depths (built 2026-10-30)
 
 An entry's body holds up to three layers under `## Seed`, `## Sketch`, and `## Sheet` headings. A Sheet whose section data gives it its own `questions` is one box of free text, like Seed and Sketch (the Premise, decided 2026-10-30). A Sheet made of separate fields, as Characters will be, stores each field as a `###` subsection named by its label. Only layers with text are written. A body with no layer headings is read as the Seed, and text the app doesn't recognize is kept. Frontmatter `depth` is the deepest layer with text. Status is empty or draft from the text, and canon only by the writer. Editing a canon entry's text returns it to draft. (Renamed from "settled" on 2026-10-30: "canon" is the term writers use for established bible facts, and "final" would imply a fact never changes. Files with `status: settled` read as canon.)

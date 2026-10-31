@@ -12,7 +12,7 @@ const DEFAULTS = {
   writingFont: 'literata', // or 'interface'
   paste: 'paragraphs', // or 'lines'
   fade: { on: true, scope: 'sidebar', pauseSeconds: 2 }, // scope 'sidebar' or 'full'
-  layout: { questionMode: 'interview', sectionsFolded: false, grid: false },
+  layout: { questionMode: 'interview', sectionsFolded: false, charactersOpen: false, grid: false },
 };
 
 const isObject = (v) => v && typeof v === 'object' && !Array.isArray(v);

@@ -100,7 +100,8 @@ When a character is added, Fletchery asks for a name first, since the name sets 
 16. **Relationships:** Who matters most to them, and how?
 17. **Appearances:** Where do they appear in the story?
 
-## Questions still open
+## Built
 
-1. **The draft questions above:** approve or edit.
-2. **Rename and silhouettes:** approve the proposals above.
+1. **Step 1, character entries (2026-10-30):** the Characters page with cards (silhouette placeholders), Add a character, the editor for each character with all approved fields and questions, the Archetype chips, Rename (moving folder and file through a new folder-move API), the placeholder portrait that cycles neutral, female, male, the sidebar folder (closed by default, remembered in Settings), page addresses with Back and reload, and the Premise Sheet's Go to Characters. Rewriting links on rename waits for the media library's link rewriting, since nothing links to characters yet.
+
+Tim approved the questions, the rename plan, and the silhouettes 2026-10-30.

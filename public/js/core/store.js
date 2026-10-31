@@ -39,6 +39,11 @@ export class LocalServerStore {
     return (await this.#call('POST', '/api/move', { from, to, baseVersion })).version;
   }
 
+  // Moves a whole folder. Refused if anything already has the new name.
+  async moveFolder(from, to) {
+    await this.#call('POST', '/api/move-folder', { from, to });
+  }
+
   // Calls onChange({ path, version }) for each outside change. Returns a function that stops listening.
   changes(onChange) {
     const source = new EventSource('/api/events');

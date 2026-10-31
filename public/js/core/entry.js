@@ -44,7 +44,7 @@ export function newFrontmatter({ title, type }, now = new Date()) {
 }
 
 // The file content after a change. Starts from the template when the file doesn't exist.
-// change: { body?, depth?, description?, canon?: true | false }. Returns { content, frontmatter, reverted }.
+// change: { body?, depth?, description?, canon?: true | false, set?: { other fields } }. Returns { content, frontmatter, reverted }.
 // Status rules: empty and draft follow the text; canon is the writer's decision, and editing
 // the text of a canon entry drops it back to draft (reverted: true).
 export function updateEntry(raw, change, template, now = new Date()) {
@@ -56,6 +56,7 @@ export function updateEntry(raw, change, template, now = new Date()) {
   let reverted = false;
 
   if (change.depth) frontmatter.depth = change.depth;
+  if (change.set) Object.assign(frontmatter, change.set); // other fields, such as a renamed title or a character's silhouette
   if (change.description !== undefined) frontmatter.description = change.description;
   if (change.canon === true) {
     frontmatter.status = 'canon';
