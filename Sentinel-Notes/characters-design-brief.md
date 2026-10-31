@@ -28,15 +28,42 @@ The phase is too big to review in one go, so it splits into five steps. Each one
 4. **Relationships.** Entries that link two characters: how they're connected, the core dynamic, tension, key moments, and how it changes. They appear on both characters' pages.
 5. **Indexes.** Generated `characters/index.md` (and the others as sections arrive), and the `fletchery index` command.
 
-## Questions for Tim
+## Tim's answers (2026-10-30)
 
-1. **The Characters page.** Options:
-   - cards on the page (name, the Seed line, the status shape), like index cards on a desk; or
-   - a list of names under Characters in the sidebar.
+- **Characters page:** cards, with the character's photo cropped at the top if one exists, and a generic silhouette if not. The sidebar list is wanted too, as long as it can collapse so a large cast doesn't make it endless. Proposed: Characters in the sidebar opens and closes like a folder, closed by default, with the open state saved in Settings. Silhouettes: male, female, and neutral, picked on the card (neutral by default, since the gender field is free text and shouldn't be guessed from).
+- **File names:** `characters/mara-quill/mara-quill.md`.
+- **Renaming:** Tim's concern is writers who work in the folder directly. Proposed:
+  - "Rename" in the app changes the name, the folder, and the file together, and rewrites every link in the bible to match, using the same link rewriting as Move to library. It reports any link it couldn't update.
+  - Renaming outside the app breaks links, and the app can't see what moved. The audit (with or without AI) flags broken links and offers to repoint them, matching by the entry's `title`.
+- **"Conflict":** becomes "What stands in their way?"
+- **Sheet fields:** based on Tim's list, the original brief's list, and current craft practice (want and need, the wound or ghost, the lie the character believes). Proposed below.
 
-   Cards suit the layout views planned later. The sidebar list makes switching between characters quick. Both can coexist.
-2. **File names.** `characters/mara-quill/mara-quill.md` (the file says what it is anywhere it travels) or `characters/mara-quill/character.md` (shorter, the same name in every folder).
-3. **Renaming.** Proposed: renaming a character changes the name shown everywhere but keeps the folder and file, so links and images never break. The name lives in the entry's frontmatter `title`.
-4. **The Sheet fields.** Is the list above right? "Conflict (what blocks the goal)" may want the same treatment as the Premise questions: "What stands in the way?" fits more stories.
-5. **Field questions.** Each Sheet field gets its own question, like the Premise. I'd draft them for Tim's edits, in the "change, not disaster" spirit.
-6. **No empty-field anxiety.** Fourteen fields is a lot. The guided-interview brief says not to demand decisions before the story needs them. Proposed: the Sheet shows its questions one at a time as usual, empty parts aren't counted or flagged anywhere, and a character page never shows "7 of 14."
+## Proposed Sheet fields (prose)
+
+Short facts take one line; the rest take paragraphs. Every field is optional, and empty ones are never counted or flagged.
+
+1. **Name:** full name, nicknames, and who uses each. (One line, plus a short list.)
+2. **Type:** what kind of being and where they belong: species or race, class, and the setting's flavor (contemporary, historical, fantasy, mythic). (One line.)
+3. **Archetype:** pick one or more, or add your own. The list offers the twelve popular archetypes (Innocent, Everyman, Hero, Caregiver, Explorer, Rebel, Lover, Creator, Jester, Sage, Magician, Ruler), which come from Carol Pearson's adaptation of Jung, plus Jung's own figures (Shadow, Trickster, Wise Old Man, Great Mother, Child). Stored as plain text in the file, for example `Sage, Trickster`.
+4. **Age:** (one line).
+5. **Gender identity or expression:** (one line, free text).
+6. **Physical appearance:** body type, height, hair, eyes, skin, clothing and color scheme, posture and signature pose, gestures, facial expressions, distinguishing marks.
+7. **Voice:** vocal tone and pace, speech patterns, favorite words, what they never say.
+8. **Personality:** strengths, flaws, contradictions, moods, nervous tics, and how all of it shows in how they look and move.
+9. **Background and history:** where they come from, and the wound: the past event that still shapes them.
+10. **What they want and what they need:** the conscious goal, and the truth they'd have to accept to change. Craft writers note that the two should differ.
+11. **The lie they believe:** the false belief the wound left behind, if there is one.
+12. **What stands in their way:** outside obstacles and inner ones.
+13. **Arc:** how they change by the end, or why they don't.
+14. **Relevance to the story:** their role and why the story needs them.
+15. **Secrets:** what they hide, and from whom.
+16. **Relationships:** links to Relationship entries, filled in automatically once step 4 exists.
+17. **Appearances:** where they appear (scenes, chapters, or books in a series).
+
+Screenplay adds the introduction line as written in the script and casting notes. Game adds playable or NPC, gameplay role, and bark or callout style.
+
+## Questions still open
+
+1. **The field list above:** approve or edit.
+2. **Field questions:** each field gets a question, drafted for Tim's edits once the list is set.
+3. **Rename and silhouettes:** approve the proposals above.
