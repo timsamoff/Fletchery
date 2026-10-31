@@ -12,7 +12,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Bug: renaming a character shows "Not found." in the name dialog; see HANDOFF.md.
 - [ ] Make it clearer where the story-bible folder actually lives on disk.
 - [ ] Hook up a Google Drive connector for storage (web edition and import both lean on it).
-- [ ] Full canon search across the whole bible.
+- [ ] Full-text search across all of the writer's text in the bible, and maybe image file names too.
 - [ ] PWA install: copy the approach in `Documents/_samoff.com/Sentinel`, which is well refined.
 - [ ] Help section.
 - [ ] About section.
