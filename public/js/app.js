@@ -455,7 +455,7 @@ function renderListPage() {
     .map(
       (c) => `
       <li data-slug="${esc(c.slug)}">
-        <a class="character-card" href="#/${section.id}/${encodeURIComponent(c.slug)}" draggable="true" aria-describedby="reorder-help">
+        <a class="character-card" href="#/${section.id}/${encodeURIComponent(c.slug)}" aria-describedby="reorder-help">
           <span class="card-portrait">${silhouetteSvg(c.silhouette)}</span>
           <span class="card-body">
             <span class="card-name">${esc(c.title)}</span>
@@ -495,55 +495,169 @@ function renderListPage() {
 
 // Moves elements with a FLIP animation: note where each item was, make the change, then glide each one from its
 // old spot to its new one.
-function flip(list, change) {
-  const items = [...list.children];
+function flip(list, change, exclude = null, easing = undefined) {
+  const items = [...list.children].filter((el) => el !== exclude);
   const before = new Map(items.map((el) => [el, el.getBoundingClientRect()]));
   change();
-  for (const el of items) {
+  items.forEach((el, i) => {
     const a = before.get(el);
     const b = el.getBoundingClientRect();
     const dx = a.left - b.left;
     const dy = a.top - b.top;
-    if (dx || dy) animate(el, [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 200 });
-  }
+    if (dx || dy) animate(el, [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], { duration: 240, delay: Math.min(i, 6) * 12, ...(easing ? { easing } : {}) });
+  });
 }
 
 const cardOrder = (grid) => [...grid.children].map((li) => li.dataset.slug);
 
+// Dragging is drawn by hand rather than with the browser's drag and drop, which always shows a faint ghost copy.
+// The real card lifts, follows the pointer with a little lag, tilts with the drag's direction and speed, and
+// springs into its slot. The gap it leaves is plain space that the other cards flow around.
+const SPRING = 'cubic-bezier(0.34, 1.56, 0.64, 1)'; // a small overshoot
+const LIFT = 1.03;
+const DRAG_START_PX = 6;
+const TOUCH_HOLD_MS = 250; // on touch screens, press and hold to pick a card up, so a swipe still scrolls
+
 function setupCardReorder() {
   const grid = document.getElementById('card-grid');
   if (!grid) return;
-  let dragged = null;
-  let startOrder = null;
+  let press = null; // { li, x, y, pointerId, timer, touch }
+  let drag = null; // the card being dragged and its motion
+  let suppressClick = false;
 
-  grid.addEventListener('dragstart', (e) => {
-    dragged = e.target.closest('li');
-    if (!dragged) return;
-    startOrder = cardOrder(grid);
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/plain', dragged.dataset.slug);
-    requestAnimationFrame(() => dragged?.classList.add('is-dragging'));
+  const cards = () => [...grid.children].filter((el) => el.matches('li[data-slug]') && el !== drag?.li);
+
+  grid.addEventListener('pointerdown', (e) => {
+    const card = e.target.closest('.character-card');
+    if (!card || e.button !== 0 || drag) return;
+    press = { li: card.closest('li'), x: e.clientX, y: e.clientY, pointerId: e.pointerId, touch: e.pointerType === 'touch' };
+    if (press.touch) press.timer = setTimeout(() => press && beginDrag(press.x, press.y), TOUCH_HOLD_MS);
   });
-  grid.addEventListener('dragover', (e) => {
-    if (!dragged) return;
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
-    const over = e.target.closest('li');
-    if (!over || over === dragged) return;
-    // Before or after the card underneath, by which half of it the pointer is over.
+  window.addEventListener('pointermove', (e) => {
+    if (drag) return drag.ending || moveDrag(e);
+    if (!press || e.pointerId !== press.pointerId) return;
+    const moved = Math.hypot(e.clientX - press.x, e.clientY - press.y) > DRAG_START_PX;
+    if (!moved) return;
+    if (press.touch) {
+      clearTimeout(press.timer); // a swipe before the hold ends is a scroll
+      press = null;
+      return;
+    }
+    beginDrag(e.clientX, e.clientY);
+    moveDrag(e);
+  });
+  window.addEventListener('pointerup', () => {
+    if (press?.timer) clearTimeout(press.timer);
+    press = null;
+    if (drag && !drag.ending) endDrag(false);
+  });
+  window.addEventListener('pointercancel', () => {
+    press = null;
+    if (drag && !drag.ending) endDrag(true);
+  });
+  // While a touch drag is under way, the page mustn't scroll.
+  grid.addEventListener('touchmove', (e) => drag && e.preventDefault(), { passive: false });
+  window.addEventListener('keydown', (e) => {
+    if (drag && !drag.ending && e.key === 'Escape') endDrag(true);
+  });
+  // A drag ends with a click on the card; it shouldn't open the character.
+  grid.addEventListener(
+    'click',
+    (e) => {
+      if (!suppressClick) return;
+      e.preventDefault();
+      e.stopPropagation();
+      suppressClick = false;
+    },
+    true,
+  );
+  grid.addEventListener('dragstart', (e) => e.preventDefault()); // links are natively draggable
+
+  function beginDrag(x, y) {
+    const li = press.li;
+    press = null;
+    const r = li.getBoundingClientRect();
+    const slot = document.createElement('li');
+    slot.className = 'card-slot';
+    slot.style.height = `${r.height}px`;
+    grid.insertBefore(slot, li);
+    const reduced = reducedMotion.matches;
+    drag = { li, slot, startIndex: cards().indexOf(slot), offsetX: x - r.left, offsetY: y - r.top, x: r.left, y: r.top, tx: r.left, ty: r.top, tilt: 0, reduced, raf: 0, px: x, py: y };
+    Object.assign(li.style, { position: 'fixed', left: '0', top: '0', width: `${r.width}px`, height: `${r.height}px`, zIndex: '20', pointerEvents: 'none' });
+    li.classList.add('is-lifted');
+    suppressClick = true;
+    step();
+  }
+
+  function moveDrag(e) {
+    drag.px = e.clientX;
+    drag.py = e.clientY;
+    drag.tx = e.clientX - drag.offsetX;
+    drag.ty = e.clientY - drag.offsetY;
+    // Make room: the slot moves before or after whichever card the pointer is over, by which half it's on.
+    const over = cards().find((el) => {
+      if (el === drag.slot) return false;
+      const r = el.getBoundingClientRect();
+      return e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+    });
+    if (!over) return;
     const r = over.getBoundingClientRect();
-    const after = e.clientX > r.left + r.width / 2;
-    const target = after ? over.nextElementSibling : over;
-    if (target === dragged || target === dragged.nextElementSibling) return;
-    flip(grid, () => grid.insertBefore(dragged, target));
-  });
-  grid.addEventListener('drop', (e) => e.preventDefault());
-  grid.addEventListener('dragend', () => {
-    dragged?.classList.remove('is-dragging');
-    dragged = null;
-    const order = cardOrder(grid);
-    if (order.join() !== startOrder?.join()) saveCharacterOrder(order);
-  });
+    const target = e.clientX > r.left + r.width / 2 ? over.nextElementSibling : over;
+    if (target === drag.slot || target === drag.slot.nextElementSibling) return;
+    flip(grid, () => grid.insertBefore(drag.slot, target), drag.li);
+  }
+
+  // Each frame the card eases toward the pointer, and its tilt follows its sideways speed.
+  function step() {
+    if (!drag) return;
+    const ease = drag.reduced ? 1 : 0.3;
+    const lastX = drag.x;
+    drag.x += (drag.tx - drag.x) * ease;
+    drag.y += (drag.ty - drag.y) * ease;
+    const lean = drag.reduced ? 0 : Math.max(-8, Math.min(8, (drag.x - lastX) * 0.6));
+    drag.tilt += (lean - drag.tilt) * 0.2;
+    drag.li.style.transform = `translate(${drag.x}px, ${drag.y}px) rotate(${drag.tilt}deg) scale(${drag.reduced ? 1 : LIFT})`;
+    // Near the window's top or bottom edge, the page scrolls along.
+    const edge = 64;
+    if (drag.py < edge) window.scrollBy(0, -8);
+    else if (drag.py > window.innerHeight - edge) window.scrollBy(0, 8);
+    drag.raf = requestAnimationFrame(step);
+  }
+
+  // Once a drag is ending, its spring runs to the end; later releases or keys don't start it again.
+  function endDrag(cancelled) {
+    drag.ending = true;
+    const { li, slot, startIndex } = drag;
+    cancelAnimationFrame(drag.raf);
+    if (cancelled) {
+      // Spring back to where it started.
+      const others = cards().filter((el) => el !== slot);
+      flip(grid, () => grid.insertBefore(slot, others[startIndex] ?? null), li);
+    }
+    const to = slot.getBoundingClientRect();
+    const from = li.style.transform;
+    const settle = () => {
+      li.removeAttribute('style');
+      li.classList.remove('is-lifted');
+      grid.insertBefore(li, slot);
+      slot.remove();
+      drag = null;
+      setTimeout(() => (suppressClick = false), 0);
+      const order = cardOrder(grid);
+      if (!cancelled && order.join() !== state.characters.map((c) => c.slug).join()) saveCharacterOrder(order);
+    };
+    if (drag.reduced) return settle();
+    const anim = li.animate([{ transform: from }, { transform: `translate(${to.left}px, ${to.top}px) rotate(0deg) scale(1)` }], {
+      duration: 320,
+      easing: SPRING,
+      fill: 'forwards',
+    });
+    li.classList.remove('is-lifted');
+    anim.onfinish = () => {
+      anim.cancel();
+      settle();
+    };
+  }
 
   grid.addEventListener('keydown', (e) => {
     if (!e.altKey || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
@@ -551,10 +665,10 @@ function setupCardReorder() {
     if (!li) return;
     e.preventDefault();
     const back = e.key === 'ArrowLeft' || e.key === 'ArrowUp';
-    const target = back ? li.previousElementSibling : li.nextElementSibling?.nextElementSibling ?? null;
     if (back && !li.previousElementSibling) return;
     if (!back && !li.nextElementSibling) return;
-    flip(grid, () => grid.insertBefore(li, target));
+    const target = back ? li.previousElementSibling : li.nextElementSibling.nextElementSibling;
+    flip(grid, () => grid.insertBefore(li, target), null, SPRING);
     li.querySelector('a').focus();
     const order = cardOrder(grid);
     const name = state.characters.find((c) => c.slug === li.dataset.slug)?.title ?? '';

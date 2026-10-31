@@ -1596,12 +1596,17 @@ textarea::placeholder {
 .nav-folder-toggle:hover {
   background: var(--color-bg);
 }
-/* A card being dragged stays in place as a faint outline while the others make room. */
+/* A lifted card follows the pointer under a deeper shadow; the gap it leaves is plain space, never a ghost. */
 .character-card {
   cursor: grab;
 }
-.card-grid li.is-dragging .character-card {
-  opacity: 0.4;
-  box-shadow: none;
-  outline: 1px dashed var(--color-border-quiet);
+.card-grid li.is-lifted {
+  cursor: grabbing;
+}
+.card-grid li.is-lifted .character-card {
+  box-shadow: var(--shadow-sheet);
+  transition: box-shadow var(--duration-base) ease;
+}
+.card-slot {
+  list-style: none;
 }
