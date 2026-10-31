@@ -12,6 +12,10 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Bug: renaming a character shows "Not found." in the name dialog; see HANDOFF.md.
 - [ ] Make it clearer where the story-bible folder actually lives on disk.
 - [ ] Hook up a Google Drive connector for storage (web edition and import both lean on it).
+- [ ] Full canon search across the whole bible.
+- [ ] PWA install: copy the approach in `Documents/_samoff.com/Sentinel`, which is well refined.
+- [ ] Help section.
+- [ ] About section.
 - [ ] Notes and media (Inbox, quick capture, maps), then the remaining sections from data for all three story types.
 - [ ] Bridge: request queue, proposals, `BIBLE.md`, skills, install script. Proposals in files or UI only: pick the better UX (guided-interview brief).
 - [ ] Layout views (document, board, canvas, outline), animated drag and drop, canon status board, Fletchery name; see [layout-views-design-brief.md](layout-views-design-brief.md).
