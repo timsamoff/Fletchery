@@ -858,11 +858,16 @@ function renderNav() {
   document.getElementById('nav-lists').innerHTML = `
     <ol class="nav-list">${sections.map(item).join('')}</ol>
     <ul class="nav-list nav-areas">${(state.sectionSet.areas ?? []).map(item).join('')}</ul>`;
+  // The folder opens and closes in place, so its height can animate; redrawing the sidebar would make it snap.
   document.querySelectorAll('[data-folder]').forEach((b) =>
     b.addEventListener('click', () => {
-      prefs.update({ layout: { charactersOpen: !prefs.values.layout.charactersOpen } });
-      renderNav();
-      document.querySelector(`[data-folder="${b.dataset.folder}"]`)?.focus();
+      const open = !prefs.values.layout.charactersOpen;
+      prefs.update({ layout: { charactersOpen: open } });
+      const folder = b.closest('.nav-folder');
+      folder.classList.toggle('is-open', open);
+      folder.querySelector('.nav-folder-body').inert = !open;
+      b.setAttribute('aria-expanded', String(open));
+      b.setAttribute('aria-label', `${open ? 'Hide' : 'Show'} the ${b.dataset.folder}`);
     }),
   );
 

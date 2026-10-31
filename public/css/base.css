@@ -1610,3 +1610,19 @@ textarea::placeholder {
 .card-slot {
   list-style: none;
 }
+/* The narrow-screen Sections menu opens and closes smoothly where the browser supports animating details. */
+@supports (interpolate-size: allow-keywords) {
+  .section-nav {
+    interpolate-size: allow-keywords;
+  }
+  .nav-full::details-content {
+    height: 0;
+    overflow: hidden;
+    transition:
+      height var(--duration-base) var(--ease-out),
+      content-visibility var(--duration-base) allow-discrete;
+  }
+  .nav-full[open]::details-content {
+    height: auto;
+  }
+}
