@@ -4,13 +4,13 @@ Written 2026-10-31. Characters step 2 (portrait and images) is built and waiting
 
 ## 1. Current task and status
 
-**Characters, step 2 of 5** ([characters-design-brief.md](characters-design-brief.md)) is built, browser-tested against a copy of EOL, and committed in `fdddb5c` (not pushed). It covers:
+**Characters, step 2 of 5** ([characters-design-brief.md](characters-design-brief.md)) is built, browser-tested against a copy of EOL, and committed through `6353547` (not pushed), with image cards at their own proportions and a large image modal. It covers:
 - the portrait menu: the photo, ten silhouettes, Upload a photo, and Choose the part to use;
 - the crop view, which saves `portrait: { image, x, y, size }` and a 512px `portrait.jpg`;
 - the Images tab after Sheet: drop, paste, or pick; thumbnails; a details dialog with sidecar fields, Use as portrait, and a two-click Remove;
 - photo portraits on the cards.
 
-Tim has to restart `fletchery` to get the new server routes.
+Tim restarted `fletchery`; uploads work for him.
 
 ## 2. Files touched
 
