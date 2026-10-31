@@ -26,7 +26,9 @@ Written 2026-10-30. Characters step 1 is built; steps 2 to 5 remain.
 
 ## 3. Next step
 
-Get Tim's review of step 1 and OK to push. Then step 2, images: an image zone on each character, with `.meta.md` sidecars (caption, alt text, what to notice). It needs a server route for binary uploads.
+First, fix the rename bug Tim found on 2026-10-30: renaming Barb to Deb from the pencil shows "Not found." in the dialog (a 404 from the server). It worked when step 1 was tested. Start by checking whether the running server predates `POST /api/move-folder` (restart `fletchery`), then trace `renameCharacter()` in `public/js/app.js`: the folder move, then the file move, then the `order.characters` update.
+
+After that, Get Tim's review of step 1 and OK to push. Then step 2, images: an image zone on each character, with `.meta.md` sidecars (caption, alt text, what to notice). It needs a server route for binary uploads.
 
 ## 4. Open questions for Tim
 

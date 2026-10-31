@@ -9,6 +9,9 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Fletchery web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
 - [ ] Characters with images, the media library, relationships, and indexes: step 1 built and revised (Sheet as form, fluid dragging); see [characters-design-brief.md](characters-design-brief.md).
 - [ ] World and settings need images too: reuse the Characters image zone and sidecars once step 2 is built.
+- [ ] Bug: renaming a character shows "Not found." in the name dialog; see HANDOFF.md.
+- [ ] Make it clearer where the story-bible folder actually lives on disk.
+- [ ] Hook up a Google Drive connector for storage (web edition and import both lean on it).
 - [ ] Notes and media (Inbox, quick capture, maps), then the remaining sections from data for all three story types.
 - [ ] Bridge: request queue, proposals, `BIBLE.md`, skills, install script. Proposals in files or UI only: pick the better UX (guided-interview brief).
 - [ ] Layout views (document, board, canvas, outline), animated drag and drop, canon status board, Fletchery name; see [layout-views-design-brief.md](layout-views-design-brief.md).
