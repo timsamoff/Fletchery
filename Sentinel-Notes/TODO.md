@@ -5,7 +5,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 ## Build phases
 
 - [ ] Visual redesign before more feature work: steps 1-3 built, motion added, Focus sheet reworked, links updated; see [visual-redesign-design-brief.md](visual-redesign-design-brief.md).
-- [ ] Settings page: credit (shown as Written by), fonts, paste, fade built; AI preview; key location set; see [settings-page-design-brief.md](settings-page-design-brief.md).
+- [ ] Settings page: credit (shown as Written by), fonts, paste, fade built; AI preview with Gemini; key location set; see [settings-page-design-brief.md](settings-page-design-brief.md).
 - [ ] Fletchery web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
 - [ ] Characters with images, the media library, relationships, and indexes: plan proposed, in 5 steps; see [characters-design-brief.md](characters-design-brief.md).
 - [ ] Notes and media (Inbox, quick capture, maps), then the remaining sections from data for all three story types.
@@ -14,7 +14,7 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Accessibility and responsiveness pass, tested with the keyboard and at 320px and ultra-wide.
 - [ ] README: install, launch, directory layout, handing a bible to Claude Code, and the edition comparison from the web edition brief.
 - [ ] Later, only with approval: a `claude -p` "Run now" option for Ask AI.
-- [ ] Google (Gemini) API as an AI choice beside Claude Code, Anthropic, and OpenRouter; key in fletchery-api.json.
+- [ ] Make the Google Gemini API work as an AI choice (listed in Settings); key in fletchery-api.json.
 - [ ] PDF export of the story bible (browser print styles first; a library only if those fall short).
 - [ ] .docx export of the story bible with docx.js (a new dependency, so it goes in SPEC.md when added).
 - [ ] Formatting editor: a light Markdown toolbar or full formatting, never dropping text; text zoom and margin notes wait on it.

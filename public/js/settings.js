@@ -186,7 +186,8 @@ function formHtml(v) {
       <p class="settings-question">AI for Ask AI</p>
       ${radio('ai', 'none', 'None', 'none', 'Fletchery works fully without AI.').replace('/>', 'disabled />')}
       ${radio('ai', 'claude-code', 'Claude Code on this computer', 'none', 'Uses your Claude Code session. No key needed.').replace('/>', 'disabled />')}
-      ${radio('ai', 'anthropic', 'Anthropic API', 'none', 'Uses your Anthropic API key.').replace('/>', 'disabled />')}
+      ${radio('ai', 'anthropic', 'Anthropic API', 'none', 'Reaches Claude with your Anthropic API key. Works in the web edition too.').replace('/>', 'disabled />')}
+      ${radio('ai', 'gemini', 'Google Gemini API', 'none', 'Uses your Gemini API key from Google AI Studio.').replace('/>', 'disabled />')}
       ${radio('ai', 'openrouter', 'OpenRouter', 'none', 'Reaches models from OpenAI, Google, and others with one key.').replace('/>', 'disabled />')}
       <div class="field settings-select">
         <label for="set-ai-key">API key</label>

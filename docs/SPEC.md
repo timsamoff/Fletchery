@@ -90,7 +90,7 @@ An entry's body holds up to three layers under `## Seed`, `## Sketch`, and `## S
 
 Fletchery also runs as a static web app, with no install and no server. Working detail and open questions are in `Sentinel-Notes/web-edition-design-brief.md`.
 
-- **AI is a choice.** A writer can work without AI, or connect a provider: Anthropic (API key) or OpenRouter (sign-in or key), which reaches OpenAI, Google, and other models. Choosing no AI shows plainly which features go away. The guided interview, depths, status, indexes, `BIBLE.md`, link suggestions, and the structural audit all work without AI.
+- **AI is a choice.** A writer can work without AI, or connect a provider: Claude Code on this computer (local edition), the Anthropic API (Claude, with an Anthropic key), the Google Gemini API (a key from Google AI Studio, added 2026-10-30), or OpenRouter (sign-in or key), which reaches OpenAI, Google, and other models. Choosing no AI shows plainly which features go away. The guided interview, depths, status, indexes, `BIBLE.md`, link suggestions, and the structural audit all work without AI.
 - **Provider interface.** Each provider sits behind one adapter interface, so more can be added later (direct Gemini, local Ollama). Every AI response is validated against the expected proposal or draft format before anything is written, and a response that fails shows a clear message instead of producing a broken file.
 - **Storage is a choice.** On this computer (a folder the writer picks), or Google Drive. The bible format is identical in both, and in the local edition.
 - **Same rules for AI writing.** API-generated content follows the same rules as Claude Code: proposals for existing text, `author: ai-draft` for new entries, and nothing becomes canon without the writer.
