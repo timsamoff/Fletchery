@@ -21,7 +21,7 @@ Polishing the redesign and the Settings panel on Tim's notes. Everything asked s
   - Don't assume a story folder is a git repo (CLAUDE.md).
   - Text zoom waits for the formatting editor.
 
-Unpushed: `3f8fbfc`, `509aff7`, `afa6c6a`, `0e3696d`, `982b838`.
+Unpushed: `3f8fbfc`, `509aff7`, `afa6c6a`, `0e3696d`, `982b838`, `d4e4ed1`, `3dbdc98`, and `41006f7`.
 
 ## 2. Files touched this stretch
 
@@ -36,10 +36,12 @@ Unpushed: `3f8fbfc`, `509aff7`, `afa6c6a`, `0e3696d`, `982b838`.
 
 ## 3. Next step
 
-Ask Tim to OK pushing the commits (`d4e4ed1` and the five before it). Then fix this bug in Focus, which Tim reported with screenshots:
-- **Overlap at mid widths:** the absolutely positioned Done covers "Show seed and sketch" until the tab row wraps. Reserve room for Done in the tab row, for example padding-right on `.focus-slot .question-tabs-row` equal to Done's width plus a gap, so the link wraps before it reaches Done.
-- **The wrapped link:** once it drops to its own line, it sits on the sheet's cream at the left edge. Tim wants it on the question panel's color (`--color-panel`) and inset like the panel's contents (`--space-5`).
-- **Phones:** Tim says Focus looks fine at narrower widths otherwise.
+The Focus overlap bug is fixed in `41006f7` and tested at widths from 375px to 1440px.
+- **Clear space:** the Focus tab row keeps Done's width (96px plus a gap) clear, so the link never runs under it.
+- **Container queries:** below 560px on the page, and below 720px of card width in Focus, the link moves to its own line on the panel's color, inset like the panel's contents, and runs the panel's full width.
+- **No unstyled wrap:** at no tested width does the link wrap without that styling.
+
+Next: ask Tim to OK pushing the eight local commits, `3f8fbfc` through `41006f7` plus this handoff. Then ask what's next. The open questions below are the candidates.
 
 ## 4. Open questions for Tim
 
