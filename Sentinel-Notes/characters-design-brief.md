@@ -45,7 +45,7 @@ Short facts take one line; the rest take paragraphs. Every field is optional, an
 1. **Name:** full name, nicknames, and who uses each. (One line, plus a short list.)
 2. **Type:** what kind of being and where they belong: species or race, class, and the setting's flavor (contemporary, historical, fantasy, mythic). (One line.)
 3. **Archetype:** pick one or more, or add your own. The list offers the twelve popular archetypes (Innocent, Everyman, Hero, Caregiver, Explorer, Rebel, Lover, Creator, Jester, Sage, Magician, Ruler), which come from Carol Pearson's adaptation of Jung, plus Jung's own figures (Shadow, Trickster, Wise Old Man, Great Mother, Child). Stored as plain text in the file, for example `Sage, Trickster`.
-4. **Age:** (one line).
+4. **Age:** free text, so a writer can explain an ageless, unknown, or complicated age.
 5. **Gender identity or expression:** (one line, free text).
 6. **Physical appearance:** body type, height, hair, eyes, skin, clothing and color scheme, posture and signature pose, gestures, facial expressions, distinguishing marks.
 7. **Voice:** vocal tone and pace, speech patterns, favorite words, what they never say.
@@ -62,8 +62,45 @@ Short facts take one line; the rest take paragraphs. Every field is optional, an
 
 Screenplay adds the introduction line as written in the script and casting notes. Game adds playable or NPC, gameplay role, and bark or callout style.
 
+Tim approved the list 2026-10-30, with Age as free text.
+
+## Draft questions (for Tim's edits)
+
+When a character is added, Fletchery asks for a name first, since the name sets the folder and file.
+
+**Seed** (guide: "One sentence: who they are and the shape of their story.")
+1. Who is this person, in a few words? Not their name: what they are.
+2. What do they want most?
+3. What gets in their way?
+4. Put it together in one sentence.
+
+**Sketch** (guide: "One paragraph: their story from start to finish, as they live it.")
+1. Where do they start, and what's ordinary for them?
+2. What changes for them, and how do they respond?
+3. What do they try, and what does it cost them?
+4. What turns things for them?
+5. Where do they end up, and how are they different?
+
+**Sheet** (guide: "As much as you know. Leave anything you haven't decided.")
+1. **Name:** What's their full name, and what do other people call them? Who uses which name?
+2. **Type:** What kind of being are they, and where do they belong?
+3. **Archetype:** Which patterns do they fit? Pick any that apply, or name your own.
+4. **Age:** How old are they? If age doesn't apply, or it's complicated, say how.
+5. **Gender identity or expression:** How do they understand and express their gender?
+6. **Physical appearance:** What would someone notice first, and what only later?
+7. **Voice:** What do they sound like? How fast, how loud, and which words do they reach for?
+8. **Personality:** What are they like to be around, and where do they contradict themselves?
+9. **Background and history:** Where do they come from, and what happened that still shapes them?
+10. **Want and need:** What do they want, and what do they actually need?
+11. **The lie they believe:** What do they believe about themselves or the world that isn't true?
+12. **What stands in their way:** What's against them, outside and inside?
+13. **Arc:** How are they different at the end, or why do they stay the same?
+14. **Relevance to the story:** Why does the story need them?
+15. **Secrets:** What are they hiding, and from whom?
+16. **Relationships:** Who matters most to them, and how?
+17. **Appearances:** Where do they appear in the story?
+
 ## Questions still open
 
-1. **The field list above:** approve or edit.
-2. **Field questions:** each field gets a question, drafted for Tim's edits once the list is set.
-3. **Rename and silhouettes:** approve the proposals above.
+1. **The draft questions above:** approve or edit.
+2. **Rename and silhouettes:** approve the proposals above.
