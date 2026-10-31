@@ -4,112 +4,167 @@
   <defs>
     <style>
       .st0 {
+        fill: url(#linear-gradient2);
+      }
+
+      .st1 {
         stroke-opacity: .75;
       }
 
-      .st0, .st1, .st2, .st3, .st4, .st5 {
+      .st1, .st2, .st3, .st4, .st5, .st6, .st7 {
         fill: none;
       }
 
-      .st0, .st2, .st3, .st4 {
+      .st1, .st4, .st5, .st6 {
         stroke: #e0601e;
       }
 
-      .st0, .st5 {
+      .st1, .st7 {
         stroke-linecap: round;
         stroke-width: 3px;
       }
 
-      .st6, .st4 {
-        stroke-width: 1.5px;
+      .st8 {
+        fill: url(#linear-gradient1);
       }
 
-      .st6, .st7 {
-        fill: #2a2d32;
+      .st3 {
+        opacity: .6;
+        stroke: #0f1012;
       }
 
-      .st6, .st8 {
-        stroke: #3b3f46;
-      }
-
-      .st2 {
+      .st4 {
         stroke-dasharray: 6 4;
         stroke-opacity: .85;
       }
 
-      .st2, .st3, .st8 {
+      .st4, .st5, .st9 {
         stroke-width: 2px;
       }
 
-      .st3 {
-        stroke-opacity: .55;
-      }
-
-      .st4 {
-        stroke-opacity: .3;
-      }
-
-      .st9 {
-        fill: #1d1f23;
+      .st10 {
+        fill: #15171a;
       }
 
       .st5 {
-        stroke: #2a2d32;
+        stroke-opacity: .55;
       }
 
-      .st10 {
-        clip-path: url(#clippath);
+      .st6 {
+        stroke-opacity: .3;
+        stroke-width: 1.5px;
       }
 
       .st11 {
+        fill: url(#linear-gradient4);
+      }
+
+      .st12 {
+        fill: #1d1f23;
+      }
+
+      .st13 {
+        fill: url(#linear-gradient3);
+      }
+
+      .st14 {
+        fill: #2a2d32;
+      }
+
+      .st9 {
+        stroke: #3b3f46;
+      }
+
+      .st15 {
+        fill: url(#linear-gradient);
+      }
+
+      .st7 {
+        stroke: #2a2d32;
+      }
+
+      .st16 {
+        clip-path: url(#clippath);
+      }
+
+      .st17 {
         fill: #e0601e;
       }
     </style>
+    <linearGradient id="linear-gradient" x1="-687.02" y1="795.88" x2="-686.02" y2="795.88" gradientTransform="translate(30267 366363) scale(44 -460)" gradientUnits="userSpaceOnUse">
+      <stop offset=".4" stop-color="#42464d"/>
+      <stop offset=".97" stop-color="#15171a"/>
+      <stop offset="1" stop-color="#2e3237"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient1" x1="-690.78" y1="785.21" x2="-690.78" y2="784.21" gradientTransform="translate(41508 18945) scale(60 -24)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#42464d"/>
+      <stop offset=".3" stop-color="#202226"/>
+      <stop offset="1" stop-color="#15171a"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient2" gradientTransform="translate(41508 19041) scale(60 -24)" xlink:href="#linear-gradient1"/>
+    <linearGradient id="linear-gradient3" gradientTransform="translate(41508 19137) scale(60 -24)" xlink:href="#linear-gradient1"/>
+    <linearGradient id="linear-gradient4" gradientTransform="translate(41508 19233) scale(60 -24)" xlink:href="#linear-gradient1"/>
     <clipPath id="clippath">
-      <path class="st1" d="M290,309v66c0,14,14,26,36,34,22-8,36-20,36-34v-66c-6-26-26-48-36-56-10,8-30,30-36,56Z"/>
+      <path class="st2" d="M290,309v66c0,14,14,26,36,34,22-8,36-20,36-34v-66c-6-26-26-48-36-56-10,8-30,30-36,56Z"/>
     </clipPath>
   </defs>
-  <path id="Base" class="st7" d="M46,26h404c12.15,0,22,9.85,22,22v416c0,12.15-9.85,22-22,22H46c-4.42,0-8-3.58-8-8V34c0-4.42,3.58-8,8-8Z"/>
-  <path id="Spine" class="st9" d="M176,26H46c-4.42,0-8,3.58-8,8v444c0,4.42,3.58,8,8,8h130V26Z"/>
-  <path id="Separator" class="st8" d="M176,26v460"/>
+  <path id="Base" class="st14" d="M46,26h404c12.15,0,22,9.85,22,22v416c0,12.15-9.85,22-22,22H46c-4.42,0-8-3.58-8-8V34c0-4.42,3.58-8,8-8Z"/>
+  <path id="Spine_end" class="st10" d="M176,26H46c-4.42,0-8,3.58-8,8v444c0,4.42,3.58,8,8,8h130V26Z"/>
+  <path id="Binding" class="st12" d="M176,26h-75.54c-2.57,0-4.65,3.58-4.65,8v444c0,4.42,2.08,8,4.65,8h75.54V26Z"/>
+  <path id="Spine" class="st15" d="M82,26h-36c-4.42,0-8,3.58-8,8v444c0,4.42,3.58,8,8,8h36V26Z"/>
+  <path id="Separator" class="st9" d="M176,26v460"/>
   <g id="Spine_bands">
-    <rect class="st6" x="31" y="100" width="60" height="24" rx="11" ry="11"/>
-    <rect class="st6" x="31" y="196" width="60" height="24" rx="11" ry="11"/>
-    <rect class="st6" x="31" y="292" width="60" height="24" rx="11" ry="11"/>
-    <rect class="st6" x="31" y="388" width="60" height="24" rx="11" ry="11"/>
+    <g>
+      <g>
+        <rect class="st8" x="31" y="100" width="60" height="24" rx="11" ry="11"/>
+        <rect class="st3" x="31" y="100" width="60" height="24" rx="11" ry="11"/>
+      </g>
+      <g>
+        <rect class="st0" x="31" y="196" width="60" height="24" rx="11" ry="11"/>
+        <rect class="st3" x="31" y="196" width="60" height="24" rx="11" ry="11"/>
+      </g>
+      <g>
+        <rect class="st13" x="31" y="292" width="60" height="24" rx="11" ry="11"/>
+        <rect class="st3" x="31" y="292" width="60" height="24" rx="11" ry="11"/>
+      </g>
+      <g>
+        <rect class="st11" x="31" y="388" width="60" height="24" rx="11" ry="11"/>
+        <rect class="st3" x="31" y="388" width="60" height="24" rx="11" ry="11"/>
+      </g>
+    </g>
   </g>
   <g id="Spine_lines">
-    <path class="st0" d="M39.5,160h26.5M39.5,256h26.5M39.5,352h26.5"/>
+    <path class="st1" d="M39.5,160h26.5M39.5,256h26.5M39.5,352h26.5"/>
   </g>
-  <path id="Stitching" class="st2" d="M171,33v446"/>
-  <rect id="Outer_outline" class="st3" x="208" y="55" width="236" height="402" rx="6" ry="6"/>
-  <rect id="Inner_outline" class="st4" x="216" y="63" width="220" height="386" rx="3" ry="3"/>
-  <g>
-    <g id="Arrow">
-      <path id="Arrowhead" class="st11" d="M326,95l9,34h-18l9-34Z"/>
-      <rect id="Shaft" class="st11" x="323" y="127" width="6" height="290" rx="2" ry="2"/>
-      <path id="Feathers_right" class="st11" d="M326,253c10,8,30,30,36,56v66c0,14-14,26-36,34v-156Z"/>
-      <path id="Feathers_left" class="st11" d="M326,253c-10,8-30,30-36,56v66c0,14,14,26,36,34v-156Z"/>
+  <path id="Stitching" class="st4" d="M171,33v446"/>
+  <rect id="Outer_outline" class="st5" x="208" y="55" width="236" height="402" rx="6" ry="6"/>
+  <rect id="Inner_outline" class="st6" x="216" y="63" width="220" height="386" rx="3" ry="3"/>
+  <g id="Arrow">
+    <g id="Arrow1" data-name="Arrow">
+      <path id="Arrowhead" class="st17" d="M326,95l9,34h-18l9-34Z"/>
+      <rect id="Shaft" class="st17" x="323" y="127" width="6" height="290" rx="2" ry="2"/>
+      <path id="Feathers_right" class="st17" d="M326,253c10,8,30,30,36,56v66c0,14-14,26-36,34v-156Z"/>
+      <path id="Feathers_left" class="st17" d="M326,253c-10,8-30,30-36,56v66c0,14,14,26,36,34v-156Z"/>
     </g>
     <g id="Feather_lines">
-      <g class="st10">
+      <g class="st16">
         <g>
-          <path class="st5" d="M330,311l36-24"/>
-          <path class="st5" d="M322,311l-36-24"/>
-          <path class="st5" d="M330,325l36-24"/>
-          <path class="st5" d="M322,325l-36-24"/>
-          <path class="st5" d="M330,339l36-24"/>
-          <path class="st5" d="M322,339l-36-24"/>
-          <path class="st5" d="M330,353l36-24"/>
-          <path class="st5" d="M322,353l-36-24"/>
-          <path class="st5" d="M330,367l36-24"/>
-          <path class="st5" d="M322,367l-36-24"/>
-          <path class="st5" d="M330,381l36-24"/>
-          <path class="st5" d="M322,381l-36-24"/>
-          <path class="st5" d="M330,395l36-24"/>
-          <path class="st5" d="M322,395l-36-24"/>
-          <path class="st5" d="M330,409l36-24"/>
-          <path class="st5" d="M322,409l-36-24"/>
+          <path class="st7" d="M330,311l36-24"/>
+          <path class="st7" d="M322,311l-36-24"/>
+          <path class="st7" d="M330,325l36-24"/>
+          <path class="st7" d="M322,325l-36-24"/>
+          <path class="st7" d="M330,339l36-24"/>
+          <path class="st7" d="M322,339l-36-24"/>
+          <path class="st7" d="M330,353l36-24"/>
+          <path class="st7" d="M322,353l-36-24"/>
+          <path class="st7" d="M330,367l36-24"/>
+          <path class="st7" d="M322,367l-36-24"/>
+          <path class="st7" d="M330,381l36-24"/>
+          <path class="st7" d="M322,381l-36-24"/>
+          <path class="st7" d="M330,395l36-24"/>
+          <path class="st7" d="M322,395l-36-24"/>
+          <path class="st7" d="M330,409l36-24"/>
+          <path class="st7" d="M322,409l-36-24"/>
         </g>
       </g>
     </g>
