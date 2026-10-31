@@ -338,7 +338,15 @@ async function openEntry(path, slug) {
     <div class="section-main">
       ${section.many ? `<a class="crumb" href="#/${section.id}">${esc(section.title)}</a>` : ''}
       <div class="section-head">
-        ${section.many ? `<button type="button" class="portrait-button" id="portrait"></button>` : ''}
+        ${
+          section.many
+            ? `<button type="button" class="portrait-button" id="portrait" popovertarget="portrait-menu">
+                 <span class="portrait-face"></span>
+                 <span class="portrait-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg></span>
+               </button>
+               <div class="portrait-menu" id="portrait-menu" popover></div>`
+            : ''
+        }
         <div class="title-group">
           <h1 id="section-title"></h1>
           ${
@@ -375,7 +383,7 @@ async function openEntry(path, slug) {
   document.getElementById('canon').addEventListener('click', toggleCanon);
   document.getElementById('skip')?.addEventListener('click', skipSection);
   document.getElementById('rename')?.addEventListener('click', () => openNameDialog('rename'));
-  document.getElementById('portrait')?.addEventListener('click', cycleSilhouette);
+  setupPortraitMenu();
 
   try {
     load(toEntry(await store.read(path)), { firstLoad: true });
@@ -433,18 +441,51 @@ async function loadSingleStatuses() {
   }
 }
 
-const SILHOUETTES = ['neutral', 'female', 'male'];
-const SILHOUETTE_LABELS = { neutral: 'neutral', female: 'female', male: 'male' };
+// Head-and-shoulders placeholders for characters with no photo yet. Each is a head, hair, and shoulders in one fill,
+// so a style has to show in the outline. Labels are for screen readers; the menu shows only the drawings.
+const HEAD = '<circle cx="52" cy="40" r="15"/>';
+const WIDE_HEAD = '<ellipse cx="52" cy="41" rx="17" ry="16"/>';
+const SHOULDERS = 'M24 100c0-19 12-30 28-30s28 11 28 30z';
+const BROAD = 'M20 100c0-20 14-32 32-32s32 12 32 32z';
+const NEUTRAL_HAIR = 'M38 34c0-9 7-15 14-15s14 6 14 15c0 3-1 5-2 7-2-6-6-9-12-9s-10 3-12 9c-1-2-2-4-2-7z';
+const MALE_HAIR = 'M38 32c0-8 6-13 14-13s14 5 14 13c0 2 0 4-1 5-2-4-6-6-13-6s-11 2-13 6c-1-1-1-3-1-5z';
+const widen = (d) => `<g transform="translate(52 41) scale(1.13 1.07) translate(-52 -40)"><path d="${d}"/></g>`;
+const SILHOUETTES = {
+  neutral: { label: 'Neutral', head: HEAD, hair: `<path d="${NEUTRAL_HAIR}"/>`, body: SHOULDERS },
+  female: {
+    label: 'Female',
+    head: HEAD,
+    hair: '<path d="M33 46c-2-16 6-27 19-27s21 11 19 27c-1 6-3 11-6 14l-2-14c-2-7-6-10-11-10s-9 3-11 10l-2 14c-3-3-5-8-6-14z"/>',
+    body: SHOULDERS,
+  },
+  male: { label: 'Male', head: HEAD, hair: `<path d="${MALE_HAIR}"/>`, body: BROAD },
+  'long-hair': {
+    label: 'Long hair',
+    head: HEAD,
+    hair: '<path d="M35 40c0-14 7-22 17-22s17 8 17 22c0 12 3 23 8 32l-4 6H31l-4-6c5-9 8-20 8-32z"/>',
+    body: SHOULDERS,
+  },
+  combed: {
+    label: 'Combed hair',
+    head: HEAD,
+    hair: '<path d="M36 38c-2-10 0-20 7-24 2 2 3 5 3 8 4-6 12-8 17-5 5 3 7 8 6 15-6-4-14-6-21-4-6 2-9 5-12 10z"/>',
+    body: BROAD,
+  },
+  afro: { label: 'Afro', head: '<circle cx="52" cy="46" r="14"/>', hair: '<circle cx="52" cy="29" r="23"/>', body: SHOULDERS },
+  heavyset: { label: 'Heavyset', head: WIDE_HEAD, hair: widen(NEUTRAL_HAIR), body: 'M10 100c0-22 17-34 42-34s42 12 42 34z' },
+  'heavyset-male': { label: 'Heavyset male', head: WIDE_HEAD, hair: widen(MALE_HAIR), body: 'M8 100c0-23 18-35 44-35s44 12 44 35z' },
+  'heavyset-female': {
+    label: 'Heavyset female',
+    head: WIDE_HEAD,
+    hair: '<path d="M32 47c-2-17 6-28 20-28s22 11 20 28c-1 6-3 10-6 13l-2-13c-2-7-6-10-12-10s-10 3-12 10l-2 13c-3-3-5-7-6-13z"/>',
+    body: 'M10 100c0-22 17-34 42-34s42 12 42 34z',
+  },
+  'heavyset-bald': { label: 'Heavyset, bald', head: WIDE_HEAD, hair: '', body: 'M8 100c0-23 18-35 44-35s44 12 44 35z' },
+};
 
-// Head-and-shoulders placeholders for characters with no photo yet.
 function silhouetteSvg(kind) {
-  const hair = {
-    neutral: '<path d="M38 34c0-9 7-15 14-15s14 6 14 15c0 3-1 5-2 7-2-6-6-9-12-9s-10 3-12 9c-1-2-2-4-2-7z"/>',
-    female: '<path d="M33 46c-2-16 6-27 19-27s21 11 19 27c-1 6-3 11-6 14l-2-14c-2-7-6-10-11-10s-9 3-11 10l-2 14c-3-3-5-8-6-14z"/>',
-    male: '<path d="M38 32c0-8 6-13 14-13s14 5 14 13c0 2 0 4-1 5-2-4-6-6-13-6s-11 2-13 6c-1-1-1-3-1-5z"/>',
-  }[kind];
-  const shoulders = kind === 'male' ? 'M20 100c0-20 14-32 32-32s32 12 32 32z' : 'M24 100c0-19 12-30 28-30s28 11 28 30z';
-  return `<svg viewBox="0 0 104 100" aria-hidden="true" class="silhouette"><circle cx="52" cy="40" r="15"/>${hair}<path d="${shoulders}"/></svg>`;
+  const s = SILHOUETTES[kind] ?? SILHOUETTES.neutral;
+  return `<svg viewBox="0 0 104 100" aria-hidden="true" class="silhouette">${s.head}${s.hair}<path d="${s.body}"/></svg>`;
 }
 
 function renderListPage() {
@@ -766,13 +807,49 @@ async function renameCharacter(name) {
   await openEntry(state.entry.path, slug);
 }
 
-// The placeholder portrait cycles neutral, female, male. A photo replaces it in a later step.
-async function cycleSilhouette() {
-  const current = state.frontmatter.silhouette ?? 'neutral';
-  const next = SILHOUETTES[(SILHOUETTES.indexOf(current) + 1) % SILHOUETTES.length];
-  await writeEntry({ set: { silhouette: next } });
-  renderHead();
-  document.getElementById('portrait').focus();
+// The portrait's menu: every placeholder silhouette, with the current one marked. Photos join it in step 2.
+function setupPortraitMenu() {
+  const button = document.getElementById('portrait');
+  const menu = document.getElementById('portrait-menu');
+  if (!button || !menu) return;
+  menu.innerHTML = `<div class="silhouette-grid" role="group" aria-label="Placeholder portrait">${Object.entries(SILHOUETTES)
+    .map(([kind, s]) => `<button type="button" class="silhouette-choice" data-kind="${kind}" aria-label="${s.label}">${silhouetteSvg(kind)}</button>`)
+    .join('')}</div>`;
+  menu.addEventListener('beforetoggle', (e) => {
+    if (e.newState !== 'open') return;
+    const r = button.getBoundingClientRect();
+    menu.style.left = `${r.left}px`;
+    menu.style.top = `${r.bottom + 8}px`;
+    const current = state.frontmatter.silhouette ?? 'neutral';
+    menu.querySelectorAll('[data-kind]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.kind === current)));
+  });
+  // It's placed once when it opens, so a scroll closes it rather than leaving it behind.
+  const closeOnScroll = () => menu.hidePopover();
+  menu.addEventListener('toggle', (e) => {
+    if (e.newState !== 'open') return window.removeEventListener('scroll', closeOnScroll);
+    menu.querySelector('[aria-pressed="true"]')?.focus();
+    window.addEventListener('scroll', closeOnScroll, { passive: true });
+  });
+  menu.addEventListener('click', async (e) => {
+    const choice = e.target.closest('[data-kind]');
+    if (!choice) return;
+    menu.hidePopover();
+    button.focus();
+    if (choice.dataset.kind === (state.frontmatter.silhouette ?? 'neutral')) return;
+    await writeEntry({ set: { silhouette: choice.dataset.kind } });
+    renderHead();
+  });
+  // Arrow keys move through the grid, five to a row.
+  menu.addEventListener('keydown', (e) => {
+    const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -5, ArrowDown: 5 }[e.key];
+    if (!step) return;
+    const choices = [...menu.querySelectorAll('[data-kind]')];
+    const next = choices[choices.indexOf(document.activeElement) + step];
+    if (next) {
+      e.preventDefault();
+      next.focus();
+    }
+  });
 }
 
 function renderHead() {
@@ -781,9 +858,9 @@ function renderHead() {
   const portrait = document.getElementById('portrait');
   if (portrait) {
     const kind = state.frontmatter.silhouette ?? 'neutral';
-    portrait.innerHTML = silhouetteSvg(kind);
-    portrait.setAttribute('aria-label', `Placeholder portrait: ${SILHOUETTE_LABELS[kind]}. Change it.`);
-    portrait.title = 'Change the placeholder portrait';
+    portrait.querySelector('.portrait-face').innerHTML = silhouetteSvg(kind);
+    portrait.setAttribute('aria-label', `Portrait: ${(SILHOUETTES[kind] ?? SILHOUETTES.neutral).label} silhouette. Change it.`);
+    portrait.title = 'Change the portrait';
   }
 }
 
