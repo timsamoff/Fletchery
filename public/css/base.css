@@ -1361,9 +1361,25 @@ textarea::placeholder {
   font-size: var(--text-small);
   color: var(--color-text-quiet);
 }
+/* Each field's box is inset, a shade darker than the paper with a fine border, so it reads apart from its label. */
 .paper .form-field textarea {
   min-height: 0; /* its rows set the height: two for short facts, four for the rest */
-  padding-block: var(--space-2) var(--space-4);
+  width: calc(100% - 2 * var(--space-7));
+  margin: var(--space-2) var(--space-7) var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius);
+}
+@media (max-width: 719px) {
+  .paper .form-field textarea {
+    width: calc(100% - 2 * var(--space-3));
+    margin-inline: var(--space-3);
+  }
+}
+/* A lone prompt sits evenly in its panel. */
+.question-panel > .question:first-child {
+  margin-top: 0;
 }
 .paper .form-field .archetype-chips {
   padding-top: var(--space-2);

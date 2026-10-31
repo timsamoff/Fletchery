@@ -84,7 +84,7 @@ What each section covers is in the approved plan and `first-prompt/FLETCHERLING-
 
 ### Characters (step 1 built 2026-10-30)
 
-Each character is `characters/<slug>/<slug>.md`, its folder created with the entry. The name the writer gives is the frontmatter `title`; the slug comes from it. Renaming in the app moves the folder and the file together and updates `title`, so the folder stays readable for writers who work in it directly. A character entry may carry `silhouette: neutral | female | male` for its placeholder portrait. Pages have addresses: `#/premise`, `#/characters`, and `#/characters/<slug>`. Seed and Sketch have one prompt each, and the Sheet is a form of seventeen optional fields (more for screenplay and game), each with a short description, stored as `###` parts; Archetype is plain text such as `Sage, Trickster`. Empty fields are never counted or flagged.
+Each character is `characters/<slug>/<slug>.md`, its folder created with the entry. The name the writer gives is the frontmatter `title`; the slug comes from it. Renaming in the app moves the folder and the file together and updates `title`, so the folder stays readable for writers who work in it directly. A character entry may carry `silhouette: neutral | female | male` for its placeholder portrait. Pages have addresses: `#/premise`, `#/characters`, and `#/characters/<slug>`. Seed and Sketch have one prompt each, and the Sheet is a form of eighteen optional fields (more for screenplay and game), each with a short description, stored as `###` parts; Archetype is plain text such as `Sage, Trickster`. Empty fields are never counted or flagged.
 
 ### Entry depths (built 2026-10-30)
 

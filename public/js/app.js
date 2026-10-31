@@ -828,8 +828,7 @@ function renderWork() {
     <div class="question-card">
       ${row ? `<div class="question-tabs-row">${row}</div>` : ''}
       <section class="question-panel" id="question-panel" aria-label="Prompt">
-        <p class="question-guide">${esc(def.guide)}</p>
-        ${form ? '' : `<p class="question" id="question-text">${esc(questions[0])}</p>`}
+        ${form ? `<p class="question-guide">${esc(def.guide)}</p>` : `<p class="question" id="question-text">${esc(questions[0])}</p>`}
       </section>
     </div>`;
   };

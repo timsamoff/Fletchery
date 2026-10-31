@@ -136,12 +136,18 @@
             {
               "id": "appearance",
               "label": "Physical appearance",
-              "question": "What would someone notice first, and what only later?"
+              "question": "What would someone notice first, and what only later? Include distinguishing marks: skin, birthmarks, scars, tattoos."
             },
             {
               "id": "voice",
               "label": "Voice",
               "question": "What do they sound like? How fast, how loud, and which words do they reach for?"
+            },
+            {
+              "id": "traits",
+              "label": "Personality traits",
+              "question": "Which words describe them? Strengths and flaws both.",
+              "kind": "short"
             },
             {
               "id": "personality",
