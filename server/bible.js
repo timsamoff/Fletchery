@@ -58,19 +58,19 @@ export class Bible {
     }
   }
 
-  // Writes to a temp file in the same folder, then renames it over the target.
+  // Writes text or a Buffer to a temp file in the same folder, then renames it over the target.
   async writeAtomic(rel, content) {
     const full = this.resolve(rel);
     await fs.mkdir(path.dirname(full), { recursive: true });
     const tmp = path.join(path.dirname(full), TMP_PREFIX + crypto.randomBytes(4).toString('hex'));
-    await fs.writeFile(tmp, content, 'utf8');
+    await fs.writeFile(tmp, content, typeof content === 'string' ? 'utf8' : undefined);
     try {
       await retryOnWindowsLock(() => fs.rename(tmp, full));
     } catch (err) {
       await fs.rm(tmp, { force: true });
       throw err;
     }
-    return hash(content);
+    return hash(typeof content === 'string' ? content : content.toString('utf8'));
   }
 
   async remove(rel) {

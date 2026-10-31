@@ -25,6 +25,16 @@ const TYPES = {
   '.json': 'application/json; charset=utf-8',
 };
 
+// Images the bible may hold. SVG is left out because it can carry scripts.
+export const IMAGE_TYPES = {
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.webp': 'image/webp',
+  '.gif': 'image/gif',
+};
+const MAX_IMAGE_BYTES = 25_000_000;
+
 export function createServer(projectDir) {
   const bible = new Bible(projectDir);
   const clients = new Set();
@@ -61,6 +71,12 @@ export function createServer(projectDir) {
       await bible.moveFolder(from, to);
       return send(res, 200, {});
     }
+    if (route === 'GET /api/media') return serveMedia(url.searchParams.get('path'), res);
+    if (route === 'POST /api/upload') {
+      const p = url.searchParams;
+      return send(res, 200, await upload(p.get('dir'), p.get('name'), p.get('replace') === '1', req));
+    }
+    if (route === 'DELETE /api/media') return send(res, 200, await removeMedia((await readBody(req)).path));
     if (route === 'GET /api/events') return events(req, res);
     if (req.method === 'GET') return serveStatic(url.pathname, res);
     return send(res, 404, { error: 'Not found.' });
@@ -96,6 +112,52 @@ export function createServer(projectDir) {
     watcher.expect(to, current.version);
     await bible.move(from, to);
     return { version: current.version };
+  }
+
+  async function serveMedia(rel, res) {
+    const type = IMAGE_TYPES[path.extname(rel ?? '').toLowerCase()];
+    if (!type) throw new BibleError(400, 'That isn’t an image Fletchery shows.');
+    let data;
+    try {
+      data = await fs.readFile(bible.resolve(rel));
+    } catch (err) {
+      if (err.code === 'ENOENT') throw new BibleError(404, 'There is no image there.');
+      throw err;
+    }
+    res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-cache', 'X-Content-Type-Options': 'nosniff' });
+    res.end(data);
+  }
+
+  // Saves an uploaded image into a folder. A clash gets -2, -3, and so on, unless replace is set (the portrait copy).
+  async function upload(dir, name, replace, req) {
+    if (typeof dir !== 'string' || !dir) throw new BibleError(400, 'Missing folder.');
+    const ext = path.extname(name ?? '').toLowerCase();
+    if (!IMAGE_TYPES[ext]) throw new BibleError(415, 'Fletchery takes JPEG, PNG, WebP, and GIF images.');
+    const chunks = [];
+    let size = 0;
+    for await (const chunk of req) {
+      size += chunk.length;
+      if (size > MAX_IMAGE_BYTES) throw new BibleError(413, 'That image is over 25 MB.');
+      chunks.push(chunk);
+    }
+    const data = Buffer.concat(chunks);
+    const base = safeName(path.basename(name, path.extname(name)));
+    let rel = `${dir}/${base}${ext}`;
+    const taken = (r) => fs.access(bible.resolve(r)).then(() => true, () => false);
+    for (let n = 2; !replace && (await taken(rel)); n++) rel = `${dir}/${base}-${n}${ext}`;
+    watcher.expect(rel, hash(data.toString('utf8')));
+    await bible.writeAtomic(rel, data);
+    watcher.start();
+    return { path: rel };
+  }
+
+  async function removeMedia(rel) {
+    if (!IMAGE_TYPES[path.extname(rel ?? '').toLowerCase()]) throw new BibleError(400, 'That isn’t an image.');
+    watcher.expect(rel, null);
+    await bible.remove(rel).catch((err) => {
+      if (err.code !== 'ENOENT') throw err;
+    });
+    return {};
   }
 
   function events(req, res) {
@@ -168,6 +230,19 @@ export function createServer(projectDir) {
 function send(res, status, body) {
   res.writeHead(status, { 'Content-Type': TYPES['.json'], 'Cache-Control': 'no-cache' });
   res.end(JSON.stringify(body));
+}
+
+// A file name that's safe on every platform: lowercase letters, digits, and hyphens.
+function safeName(base) {
+  return (
+    base
+      .normalize('NFKD')
+      .replace(/[̀-ͯ]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60) || 'image'
+  );
 }
 
 async function readBody(req) {

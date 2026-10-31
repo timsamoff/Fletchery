@@ -44,6 +44,21 @@ export class LocalServerStore {
     await this.#call('POST', '/api/move-folder', { from, to });
   }
 
+  // Saves an image (a Blob) into a folder and returns its path. A clash gets a number unless replace is set.
+  async upload(dir, name, blob, { replace = false } = {}) {
+    const query = new URLSearchParams({ dir, name, ...(replace ? { replace: '1' } : {}) });
+    return (await this.#call('POST', `/api/upload?${query}`, blob)).path;
+  }
+
+  async deleteMedia(path) {
+    await this.#call('DELETE', '/api/media', { path });
+  }
+
+  // An address the page can show an image from. stamp changes it when the file is replaced.
+  mediaUrl(path, stamp = '') {
+    return `/api/media?path=${encodeURIComponent(path)}${stamp ? `&v=${encodeURIComponent(stamp)}` : ''}`;
+  }
+
   // Calls onChange({ path, version }) for each outside change. Returns a function that stops listening.
   changes(onChange) {
     const source = new EventSource('/api/events');
@@ -54,10 +69,11 @@ export class LocalServerStore {
   async #call(method, url, body) {
     let res;
     try {
+      const raw = typeof Blob !== 'undefined' && body instanceof Blob; // an image goes as it is
       res = await fetch(url, {
         method,
-        headers: body ? { 'Content-Type': 'application/json' } : {},
-        body: body ? JSON.stringify(body) : undefined,
+        headers: body ? { 'Content-Type': raw ? body.type || 'application/octet-stream' : 'application/json' } : {},
+        body: raw ? body : body ? JSON.stringify(body) : undefined,
       });
     } catch {
       throw new StoreError('Fletchery isn’t responding. Is it still running in the terminal?');

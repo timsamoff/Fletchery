@@ -1,6 +1,7 @@
 // First-run setup, section navigation, and the section editor, with live sync and conflict handling.
 import { normalizeStatus, parseEntry, updateEntry } from './core/entry.js';
 import { DEPTHS, deepestFilled, parseLayers, serializeLayers } from './core/layers.js';
+import { isImage, parseSidecar, PORTRAIT_FILE, PORTRAIT_SIZE, sidecarPath, updateSidecar } from './core/media.js';
 import { LocalServerStore, StoreConflict } from './core/store.js';
 import { Settings, SETTINGS_FILE, setupSettingsPanel } from './settings.js';
 
@@ -284,6 +285,44 @@ async function showEditor(settings, settingsVersion) {
           <button type="button" class="button button-quiet" id="name-cancel">Cancel</button>
         </div>
       </form>
+    </dialog>
+    <dialog class="image-dialog" id="image-dialog" aria-label="Image details">
+      <img class="image-dialog-preview" id="image-preview" alt="" />
+      <div class="image-dialog-fields">
+        <div class="field">
+          <label for="image-caption">Caption</label>
+          <input type="text" id="image-caption" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="image-alt">Alt text</label>
+          <input type="text" id="image-alt" autocomplete="off" aria-describedby="image-alt-hint" />
+          <p class="hint" id="image-alt-hint">What the image shows, for someone who can’t see it.</p>
+        </div>
+        <div class="field">
+          <label for="image-notice">What to notice</label>
+          <textarea id="image-notice" rows="3"></textarea>
+        </div>
+        <div class="button-row">
+          <button type="button" class="button" id="image-done">Done</button>
+          <button type="button" class="button button-quiet" id="image-use-portrait">Use as portrait</button>
+          <button type="button" class="button button-quiet" id="image-remove">Remove</button>
+        </div>
+      </div>
+    </dialog>
+    <dialog class="crop-dialog" id="crop-dialog" aria-labelledby="crop-title">
+      <h2 id="crop-title">Choose the part to use</h2>
+      <div class="crop-stage" id="crop-stage" aria-describedby="crop-help">
+        <img id="crop-image" alt="" draggable="false" />
+      </div>
+      <p class="hint" id="crop-help">Drag to move the image. Zoom with the slider or the scroll wheel.</p>
+      <div class="field">
+        <label for="crop-zoom">Zoom</label>
+        <input type="range" id="crop-zoom" min="1" max="4" step="0.01" value="1" />
+      </div>
+      <div class="button-row">
+        <button type="button" class="button" id="crop-save">Use this</button>
+        <button type="button" class="button button-quiet" id="crop-cancel">Cancel</button>
+      </div>
     </dialog>`;
 
   WIDE.addEventListener('change', (e) => {
@@ -294,6 +333,9 @@ async function showEditor(settings, settingsVersion) {
   document.getElementById('nav-toggle').addEventListener('click', () => setNavOpen(state.navCollapsed));
   setupFocus();
   setupNameDialog();
+  setupImageDialog();
+  setupCropDialog();
+  document.addEventListener('paste', onImagePaste);
 
   await Promise.all([loadCharacters(), loadSingleStatuses()]);
   listen();
@@ -331,6 +373,7 @@ async function openEntry(path, slug) {
   state.page = 'entry';
   state.entry = { path, slug };
   state.step = 0;
+  state.view = 'text';
   state.contextOpen = false;
   state.frontmatter = {};
   const page = document.getElementById('page');
@@ -366,6 +409,7 @@ async function openEntry(path, slug) {
       </div>
       <div id="conflict-slot"></div>
       <div id="work-home"><div id="work"></div></div>
+      ${hasImages(section) ? '<div class="images-home" id="images-home" hidden></div>' : ''}
       <div class="button-row section-actions">
         <button type="button" class="button button-quiet" id="canon"></button>
         ${section.many ? '' : '<button type="button" class="button button-soft" id="skip">Skip for now</button>'}
@@ -417,7 +461,14 @@ async function loadCharacters() {
       if (!file.exists) return null;
       try {
         const { frontmatter } = parseEntry(file.content);
-        return { slug, title: frontmatter.title || slug, status: normalizeStatus(frontmatter.status), description: frontmatter.description ?? '', silhouette: frontmatter.silhouette ?? 'neutral' };
+        return {
+          slug,
+          title: frontmatter.title || slug,
+          status: normalizeStatus(frontmatter.status),
+          description: frontmatter.description ?? '',
+          silhouette: frontmatter.silhouette ?? 'neutral',
+          photo: frontmatter.portrait ? store.mediaUrl(`${section.folder}/${slug}/${PORTRAIT_FILE}`, frontmatter.updated) : '',
+        };
       } catch {
         return { slug, title: slug, status: 'empty', description: '', silhouette: 'neutral' };
       }
@@ -497,7 +548,7 @@ function renderListPage() {
       (c) => `
       <li data-slug="${esc(c.slug)}">
         <a class="character-card" href="#/${section.id}/${encodeURIComponent(c.slug)}" aria-describedby="reorder-help">
-          <span class="card-portrait">${silhouetteSvg(c.silhouette)}</span>
+          <span class="card-portrait${c.photo ? ' has-photo' : ''}">${c.photo ? `<img src="${c.photo}" alt="" />` : silhouetteSvg(c.silhouette)}</span>
           <span class="card-body">
             <span class="card-name">${esc(c.title)}</span>
             ${c.description ? `<span class="card-seed">${esc(c.description)}</span>` : ''}
@@ -807,21 +858,17 @@ async function renameCharacter(name) {
   await openEntry(state.entry.path, slug);
 }
 
-// The portrait's menu: every placeholder silhouette, with the current one marked. Photos join it in step 2.
+// The portrait's menu: the photo if there is one, every placeholder silhouette, and the photo options.
 function setupPortraitMenu() {
   const button = document.getElementById('portrait');
   const menu = document.getElementById('portrait-menu');
   if (!button || !menu) return;
-  menu.innerHTML = `<div class="silhouette-grid" role="group" aria-label="Placeholder portrait">${Object.entries(SILHOUETTES)
-    .map(([kind, s]) => `<button type="button" class="silhouette-choice" data-kind="${kind}" aria-label="${s.label}">${silhouetteSvg(kind)}</button>`)
-    .join('')}</div>`;
   menu.addEventListener('beforetoggle', (e) => {
     if (e.newState !== 'open') return;
+    renderPortraitMenu(menu);
     const r = button.getBoundingClientRect();
     menu.style.left = `${r.left}px`;
     menu.style.top = `${r.bottom + 8}px`;
-    const current = state.frontmatter.silhouette ?? 'neutral';
-    menu.querySelectorAll('[data-kind]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.kind === current)));
   });
   // It's placed once when it opens, so a scroll closes it rather than leaving it behind.
   const closeOnScroll = () => menu.hidePopover();
@@ -831,13 +878,32 @@ function setupPortraitMenu() {
     window.addEventListener('scroll', closeOnScroll, { passive: true });
   });
   menu.addEventListener('click', async (e) => {
+    if (e.target.closest('#portrait-upload')) return document.getElementById('portrait-input').click();
+    if (e.target.closest('#portrait-crop')) {
+      menu.hidePopover();
+      return openCrop(`${entryFolder()}/${state.frontmatter.portrait.image}`);
+    }
     const choice = e.target.closest('[data-kind]');
     if (!choice) return;
     menu.hidePopover();
     button.focus();
-    if (choice.dataset.kind === (state.frontmatter.silhouette ?? 'neutral')) return;
-    await writeEntry({ set: { silhouette: choice.dataset.kind } });
+    if (choice.getAttribute('aria-pressed') === 'true') return;
+    // A silhouette replaces the photo. The photo itself stays in Images.
+    await writeEntry({ set: { silhouette: choice.dataset.kind, portrait: undefined } });
+    await store.deleteMedia(`${entryFolder()}/${PORTRAIT_FILE}`).catch(() => {});
     renderHead();
+    refreshCharactersSoon();
+  });
+  menu.addEventListener('change', async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    menu.hidePopover();
+    try {
+      openCrop(await store.upload(entryFolder(), file.name, file));
+    } catch (err) {
+      setStatus(`Couldn’t add the photo. ${err.message}`);
+    }
   });
   // Arrow keys move through the grid, five to a row.
   menu.addEventListener('keydown', (e) => {
@@ -852,14 +918,364 @@ function setupPortraitMenu() {
   });
 }
 
+function renderPortraitMenu(menu) {
+  const photo = state.frontmatter.portrait;
+  const current = photo ? 'photo' : (state.frontmatter.silhouette ?? 'neutral');
+  const choice = (kind, label, art) =>
+    `<button type="button" class="silhouette-choice" data-kind="${kind}" aria-label="${label}" aria-pressed="${kind === current}">${art}</button>`;
+  menu.innerHTML = `
+    <div class="silhouette-grid" role="group" aria-label="Portrait">
+      ${photo ? choice('photo', 'Photo', `<img src="${portraitUrl()}" alt="" />`) : ''}
+      ${Object.entries(SILHOUETTES).map(([kind, s]) => choice(kind, s.label, silhouetteSvg(kind))).join('')}
+    </div>
+    <div class="portrait-actions">
+      <button type="button" class="link-button" id="portrait-upload">Upload a photo</button>
+      ${photo ? '<button type="button" class="link-button" id="portrait-crop">Choose the part to use</button>' : ''}
+      <input type="file" id="portrait-input" accept="${IMAGE_ACCEPT}" hidden />
+    </div>`;
+}
+
+// ---------- Images ----------
+// A character's images live in its folder, each with an optional sidecar. The portrait is a small cropped copy of
+// one of them, with the crop kept in the frontmatter so it can be redone.
+
+const IMAGE_ACCEPT = 'image/jpeg,image/png,image/webp,image/gif';
+const hasImages = (section) => Boolean(section.many && section.folder);
+const entryFolder = () => `${state.section.folder}/${state.entry.slug}`;
+const portraitUrl = () => store.mediaUrl(`${entryFolder()}/${PORTRAIT_FILE}`, state.frontmatter.updated);
+
+function setView(view, depth = state.depth) {
+  const toImages = view === 'images';
+  state.view = view;
+  if (!toImages) {
+    state.depth = depth;
+    state.step = 0;
+  }
+  document.getElementById('work-home').hidden = toImages;
+  document.querySelector('.section-actions').hidden = toImages;
+  document.getElementById('focus-open').hidden = toImages;
+  const home = document.getElementById('images-home');
+  home.hidden = !toImages;
+  renderDepth();
+  // Images sits after Sheet, so it slides in from the right and the text comes back from the left.
+  if (toImages) {
+    renderImages();
+    animate(home, [{ opacity: 0, transform: 'translateX(16px)' }, { opacity: 1, transform: 'none' }]);
+  } else {
+    renderWork();
+    animate(document.getElementById('work'), [{ opacity: 0, transform: 'translateX(-16px)' }, { opacity: 1, transform: 'none' }]);
+  }
+}
+
+async function renderImages() {
+  const home = document.getElementById('images-home');
+  if (!home || state.view !== 'images') return;
+  const dir = entryFolder();
+  const files = (await store.list(dir)).filter((e) => e.type === 'file' && isImage(e.name) && e.name !== PORTRAIT_FILE);
+  state.images = await Promise.all(
+    files.map(async ({ name }) => {
+      const path = `${dir}/${name}`;
+      let meta;
+      try {
+        meta = parseSidecar((await store.read(sidecarPath(path))).content);
+      } catch {
+        meta = parseSidecar(null);
+      }
+      return { path, name, ...meta };
+    }),
+  );
+  const grid = state.images.length
+    ? `<ul class="image-grid">${state.images
+        .map(
+          (img) => `
+        <li><button type="button" class="image-thumb" data-path="${esc(img.path)}" aria-label="${esc(img.caption || img.name)}. Edit its details.">
+          <img src="${store.mediaUrl(img.path)}" alt="" loading="lazy" />
+          ${img.caption ? `<span class="image-caption">${esc(img.caption)}</span>` : ''}
+        </button></li>`,
+        )
+        .join('')}</ul>`
+    : '';
+  home.innerHTML = `
+    <div class="image-drop" id="image-drop">
+      <p>Drop images here or paste them, or <button type="button" class="link-button" id="image-pick">choose files</button>.</p>
+      <p class="hint">JPEG, PNG, WebP, or GIF, up to 25 MB each.</p>
+      <input type="file" id="image-input" accept="${IMAGE_ACCEPT}" multiple hidden />
+    </div>
+    ${grid}`;
+  home.querySelectorAll('.image-grid li').forEach((li, i) => riseIn(li, { delay: i * 30, fill: 'backwards' }));
+  if (!home.dataset.ready) setupImagesHome(home);
+}
+
+// Listeners on the images area itself, which stays put while its contents are redrawn.
+function setupImagesHome(home) {
+  home.dataset.ready = '1';
+  home.addEventListener('click', (e) => {
+    if (e.target.closest('#image-pick')) return document.getElementById('image-input').click();
+    const thumb = e.target.closest('.image-thumb');
+    if (thumb) openImage(thumb.dataset.path);
+  });
+  home.addEventListener('change', (e) => {
+    if (e.target.id !== 'image-input') return;
+    uploadImages(e.target.files);
+    e.target.value = '';
+  });
+  home.addEventListener('dragover', (e) => {
+    if (![...e.dataTransfer.types].includes('Files')) return;
+    e.preventDefault();
+    home.classList.add('is-dropping');
+  });
+  home.addEventListener('dragleave', (e) => {
+    if (!home.contains(e.relatedTarget)) home.classList.remove('is-dropping');
+  });
+  home.addEventListener('drop', (e) => {
+    e.preventDefault();
+    home.classList.remove('is-dropping');
+    uploadImages(e.dataTransfer.files);
+  });
+}
+
+let imagesTimer = null;
+function refreshImagesSoon() {
+  clearTimeout(imagesTimer);
+  imagesTimer = setTimeout(() => !state.imageOpen && renderImages(), 300);
+}
+
+async function uploadImages(files) {
+  const images = [...files].filter((f) => IMAGE_ACCEPT.split(',').includes(f.type));
+  if (!images.length) return setStatus('Fletchery takes JPEG, PNG, WebP, and GIF images.');
+  let added = 0;
+  for (const file of images) {
+    try {
+      await store.upload(entryFolder(), file.name || `pasted.${file.type.split('/')[1]}`, file);
+      added++;
+    } catch (err) {
+      setStatus(`Couldn’t add ${file.name}. ${err.message}`);
+    }
+  }
+  if (added) setStatus(added === 1 ? 'Added an image.' : `Added ${added} images.`);
+  await renderImages();
+}
+
+// Pasting an image while the Images tab is open adds it, unless the writer is pasting into a field.
+function onImagePaste(e) {
+  if (state.page !== 'entry' || state.view !== 'images' || e.target.closest?.('input, textarea')) return;
+  const files = [...(e.clipboardData?.files ?? [])].filter((f) => f.type.startsWith('image/'));
+  if (!files.length) return;
+  e.preventDefault();
+  uploadImages(files);
+}
+
+let imageTimer = null;
+const IMAGE_FIELDS = { caption: 'image-caption', alt: 'image-alt', notice: 'image-notice' };
+const imageValues = () => Object.fromEntries(Object.entries(IMAGE_FIELDS).map(([k, id]) => [k, document.getElementById(id).value.trim()]));
+
+function setupImageDialog() {
+  const dialog = document.getElementById('image-dialog');
+  Object.values(IMAGE_FIELDS).forEach((id) =>
+    document.getElementById(id).addEventListener('input', () => {
+      clearTimeout(imageTimer);
+      imageTimer = setTimeout(saveImageDetails, 600);
+    }),
+  );
+  document.getElementById('image-done').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', async () => {
+    const path = state.imageOpen?.path;
+    await saveImageDetails();
+    state.imageOpen = null;
+    await renderImages();
+    document.querySelector(`.image-thumb[data-path="${CSS.escape(path ?? '')}"]`)?.focus();
+  });
+  document.getElementById('image-use-portrait').addEventListener('click', async () => {
+    const { path } = state.imageOpen;
+    dialog.close();
+    openCrop(path);
+  });
+  // Removing takes a second click, so a slip doesn't delete a file.
+  const remove = document.getElementById('image-remove');
+  remove.addEventListener('click', async () => {
+    if (!remove.dataset.armed) {
+      remove.dataset.armed = '1';
+      remove.textContent = 'Remove it from the folder?';
+      return;
+    }
+    const { path } = state.imageOpen;
+    try {
+      await store.deleteMedia(path);
+      const side = await store.read(sidecarPath(path));
+      if (side.exists) await store.delete(sidecarPath(path), side.version);
+      setStatus('Removed the image.');
+    } catch (err) {
+      setStatus(`Couldn’t remove the image. ${err.message}`);
+    }
+    state.imageOpen = null;
+    dialog.close();
+  });
+}
+
+async function openImage(path) {
+  const img = state.images.find((i) => i.path === path);
+  const side = await store.read(sidecarPath(path));
+  state.imageOpen = { path, raw: side.content, version: side.version, saved: { caption: img.caption, alt: img.alt, notice: img.notice } };
+  for (const [key, id] of Object.entries(IMAGE_FIELDS)) document.getElementById(id).value = img[key];
+  const preview = document.getElementById('image-preview');
+  preview.src = store.mediaUrl(path);
+  preview.alt = img.alt;
+  const remove = document.getElementById('image-remove');
+  delete remove.dataset.armed;
+  remove.textContent = 'Remove';
+  document.getElementById('image-dialog').showModal();
+}
+
+// Writes the sidecar if anything changed. If it changed on disk meanwhile, the writer's fields go over the new copy.
+async function saveImageDetails() {
+  clearTimeout(imageTimer);
+  const open = state.imageOpen;
+  if (!open) return;
+  const values = imageValues();
+  if (Object.keys(values).every((k) => values[k] === open.saved[k])) return;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const content = updateSidecar(open.raw, values);
+    try {
+      open.version = await store.write(sidecarPath(open.path), content, open.version);
+      open.raw = content;
+      open.saved = values;
+      return;
+    } catch (err) {
+      if (!(err instanceof StoreConflict)) return setStatus(`Couldn’t save the image details. ${err.message}`);
+      open.raw = err.current.content;
+      open.version = err.current.version;
+    }
+  }
+}
+
+// The crop view: a circle over the image, which moves and scales under it. k is screen pixels per image pixel,
+// and x and y are the image's offset in the stage.
+const crop = { path: '', k: 1, min: 1, x: 0, y: 0, drag: null };
+
+function setupCropDialog() {
+  const dialog = document.getElementById('crop-dialog');
+  const stage = document.getElementById('crop-stage');
+  const zoom = document.getElementById('crop-zoom');
+  stage.tabIndex = 0;
+  stage.addEventListener('pointerdown', (e) => {
+    stage.setPointerCapture(e.pointerId);
+    crop.drag = { x: e.clientX, y: e.clientY };
+  });
+  stage.addEventListener('pointermove', (e) => {
+    if (!crop.drag) return;
+    crop.x += e.clientX - crop.drag.x;
+    crop.y += e.clientY - crop.drag.y;
+    crop.drag = { x: e.clientX, y: e.clientY };
+    placeCrop();
+  });
+  stage.addEventListener('pointerup', () => (crop.drag = null));
+  stage.addEventListener('pointercancel', () => (crop.drag = null));
+  stage.addEventListener(
+    'wheel',
+    (e) => {
+      e.preventDefault();
+      zoomCrop(Number(zoom.value) * (e.deltaY < 0 ? 1.08 : 1 / 1.08));
+    },
+    { passive: false },
+  );
+  stage.addEventListener('keydown', (e) => {
+    const move = { ArrowLeft: [8, 0], ArrowRight: [-8, 0], ArrowUp: [0, 8], ArrowDown: [0, -8] }[e.key];
+    if (move) {
+      e.preventDefault();
+      crop.x += move[0];
+      crop.y += move[1];
+      placeCrop();
+    } else if (['+', '=', '-'].includes(e.key)) {
+      e.preventDefault();
+      zoomCrop(Number(zoom.value) * (e.key === '-' ? 1 / 1.08 : 1.08));
+    }
+  });
+  zoom.addEventListener('input', () => zoomCrop(Number(zoom.value)));
+  document.getElementById('crop-cancel').addEventListener('click', () => dialog.close());
+  document.getElementById('crop-save').addEventListener('click', saveCrop);
+  dialog.addEventListener('close', () => document.getElementById('portrait')?.focus());
+}
+
+async function openCrop(path) {
+  const img = document.getElementById('crop-image');
+  img.src = store.mediaUrl(path);
+  try {
+    await img.decode();
+  } catch {
+    return setStatus('That image can’t be opened. It may have been moved or removed.');
+  }
+  crop.path = path;
+  document.getElementById('crop-dialog').showModal();
+  const S = document.getElementById('crop-stage').clientWidth;
+  crop.min = S / Math.min(img.naturalWidth, img.naturalHeight);
+  // Reopening the same image starts from the saved crop.
+  const saved = state.frontmatter.portrait;
+  if (saved?.image === path.split('/').pop() && saved.size) {
+    crop.k = S / saved.size;
+    crop.x = -saved.x * crop.k;
+    crop.y = -saved.y * crop.k;
+  } else {
+    crop.k = crop.min;
+    crop.x = (S - img.naturalWidth * crop.k) / 2;
+    crop.y = (S - img.naturalHeight * crop.k) / 2;
+  }
+  document.getElementById('crop-zoom').value = String(crop.k / crop.min);
+  placeCrop();
+}
+
+// Zooms around the middle of the circle, so the part being looked at stays put.
+function zoomCrop(z) {
+  const zoom = document.getElementById('crop-zoom');
+  const clamped = Math.min(Number(zoom.max), Math.max(1, z));
+  zoom.value = String(clamped);
+  const middle = document.getElementById('crop-stage').clientWidth / 2;
+  const k = crop.min * clamped;
+  crop.x = middle - ((middle - crop.x) / crop.k) * k;
+  crop.y = middle - ((middle - crop.y) / crop.k) * k;
+  crop.k = k;
+  placeCrop();
+}
+
+// The image always covers the circle's square.
+function placeCrop() {
+  const img = document.getElementById('crop-image');
+  const S = document.getElementById('crop-stage').clientWidth;
+  const w = img.naturalWidth * crop.k;
+  const h = img.naturalHeight * crop.k;
+  crop.x = Math.min(0, Math.max(S - w, crop.x));
+  crop.y = Math.min(0, Math.max(S - h, crop.y));
+  img.style.width = `${w}px`;
+  img.style.transform = `translate(${crop.x}px, ${crop.y}px)`;
+}
+
+async function saveCrop() {
+  const img = document.getElementById('crop-image');
+  const S = document.getElementById('crop-stage').clientWidth;
+  const area = { x: Math.round(-crop.x / crop.k), y: Math.round(-crop.y / crop.k), size: Math.round(S / crop.k) };
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = PORTRAIT_SIZE;
+  canvas.getContext('2d').drawImage(img, area.x, area.y, area.size, area.size, 0, 0, PORTRAIT_SIZE, PORTRAIT_SIZE);
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.9));
+  try {
+    await store.upload(entryFolder(), PORTRAIT_FILE, blob, { replace: true });
+    await writeEntry({ set: { portrait: { image: crop.path.split('/').pop(), ...area } } });
+  } catch (err) {
+    return setStatus(`Couldn’t save the portrait. ${err.message}`);
+  }
+  document.getElementById('crop-dialog').close();
+  renderHead();
+  refreshCharactersSoon();
+}
+
 function renderHead() {
   const many = state.section.many;
   document.getElementById('section-title').textContent = many ? (state.frontmatter.title ?? state.entry.slug) : state.section.title;
   const portrait = document.getElementById('portrait');
   if (portrait) {
     const kind = state.frontmatter.silhouette ?? 'neutral';
-    portrait.querySelector('.portrait-face').innerHTML = silhouetteSvg(kind);
-    portrait.setAttribute('aria-label', `Portrait: ${(SILHOUETTES[kind] ?? SILHOUETTES.neutral).label} silhouette. Change it.`);
+    const photo = state.frontmatter.portrait;
+    portrait.querySelector('.portrait-face').innerHTML = photo ? `<img src="${portraitUrl()}" alt="" />` : silhouetteSvg(kind);
+    portrait.setAttribute('aria-label', photo ? 'Portrait: photo. Change it.' : `Portrait: ${(SILHOUETTES[kind] ?? SILHOUETTES.neutral).label} silhouette. Change it.`);
     portrait.title = 'Change the portrait';
   }
 }
@@ -1056,13 +1472,17 @@ function renderDepth() {
     steps.innerHTML =
       DEPTHS.map(
         (d) => `<button type="button" class="depth-step" data-depth="${d}">${esc(state.section.depths[d].label)}</button>`,
-      ).join('') + '<span class="depth-indicator" aria-hidden="true"></span>';
+      ).join('') +
+      (hasImages(state.section) ? '<button type="button" class="depth-step" data-view="images">Images</button>' : '') +
+      '<span class="depth-indicator" aria-hidden="true"></span>';
     steps.querySelectorAll('[data-depth]').forEach((b) => b.addEventListener('click', () => setDepth(b.dataset.depth, false)));
+    steps.querySelector('[data-view="images"]')?.addEventListener('click', () => setView('images'));
     new ResizeObserver(placeDepthIndicator).observe(steps);
     requestAnimationFrame(() => steps.classList.add('is-ready'));
   }
-  steps.querySelectorAll('[data-depth]').forEach((b) => {
-    if (b.dataset.depth === state.depth) b.setAttribute('aria-current', 'step');
+  steps.querySelectorAll('.depth-step').forEach((b) => {
+    const current = state.view === 'images' ? b.dataset.view === 'images' : b.dataset.depth === state.depth;
+    if (current) b.setAttribute('aria-current', 'step');
     else b.removeAttribute('aria-current');
   });
   placeDepthIndicator();
@@ -1274,6 +1694,7 @@ function animate(el, keyframes, options = {}) {
 const riseIn = (el, options) => animate(el, [{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], options);
 
 function setDepth(depth, focusField) {
+  if (state.view === 'images') return setView('text', depth);
   const direction = Math.sign(DEPTHS.indexOf(depth) - DEPTHS.indexOf(state.depth));
   state.depth = depth;
   state.step = 0;
@@ -1526,6 +1947,7 @@ function listen() {
   store.changes((change) => {
     if (change.path === SETTINGS_FILE) return prefs.reload(change.version);
     if (change.path.startsWith('characters/')) refreshCharactersSoon();
+    if (state.page === 'entry' && state.view === 'images' && change.path.startsWith(`${entryFolder()}/`)) refreshImagesSoon();
     if (state.page !== 'entry' || change.path !== entryPath() || change.version === state.baseVersion) return;
     if (state.saving) state.remotePending = true;
     else checkRemote();

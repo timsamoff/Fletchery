@@ -18,16 +18,17 @@ As of the Premise step:
 | Path | Role |
 |---|---|
 | `bin/fletchery.js` | Launcher. Parses `--port` and `--no-open`, finds a free port from 3000, starts the server, and opens the browser at `127.0.0.1`. |
-| `server/server.js` | HTTP server: static files, section definitions, fonts from `node_modules/@fontsource`, the browser build of `yaml` at `/vendor/yaml/`, the file API (including moving a whole folder, for renames), and server-sent events. |
+| `server/server.js` | HTTP server: static files, section definitions, fonts from `node_modules/@fontsource`, the browser build of `yaml` at `/vendor/yaml/`, the file API (including moving a whole folder, for renames), image upload and serving, and server-sent events. |
 | `server/bible.js` | File storage inside `story-bible/`: the path guard, atomic writes, list, delete, move, and content hashing. It knows nothing about entries. |
 | `server/watch.js` | Recursive `fs.watch` on the bible. It reports a change only when a file's content hash differs from the last one seen or written. |
 | `public/index.html` | Page shell: skip link, header, `main`, and footer with the save-status live region. |
-| `public/js/app.js` | First-run setup, page addresses (`#/premise`, `#/characters`, `#/characters/<slug>`), the sidebar, the Characters cards, adding and renaming characters, and the entry editor: depth control, the "One at a time" and "All questions" layouts, status and marking canon, Skip for now, autosave, live updates, and the conflict panel. |
+| `public/js/app.js` | First-run setup, page addresses (`#/premise`, `#/characters`, `#/characters/<slug>`), the sidebar, the Characters cards, adding and renaming characters, the portrait menu and crop view, the Images tab, and the entry editor: depth control, the "One at a time" and "All questions" layouts, status and marking canon, Skip for now, autosave, live updates, and the conflict panel. |
 | `public/js/settings.js` | The writer's settings in `story-bible/fletchery-settings.json` (load, merge, save with a version check, reload on outside edits) and the Settings panel. |
 | `public/js/core/layers.js` | The Seed, Sketch, and Sheet layers inside an entry body. Unknown text is kept. |
 | `sections/<type>.json` | Section definitions for each story type: IDs, titles, and for built sections the why-it-matters line, guiding questions, and fields at each depth. Served at `/sections/`. |
 | `public/js/core/entry.js` | Entry files: frontmatter parsing and serialization, new-entry frontmatter, and the body update rules. It imports the bare name `yaml`, which the page's import map points at `/vendor/yaml/` and Node resolves from `node_modules`, so the same module runs in both. |
 | `public/js/core/store.js` | The storage interface and `LocalServerStore`, its backend for the local edition. |
+| `public/js/core/media.js` | Image names and sidecars: reading and writing `<image>.meta.md` (caption, alt text, and what to notice), keeping any other text. |
 | `public/css/tokens.css` | Every color, type size, rhythm, and spacing value, plus the `@font-face` rules. |
 | `public/css/base.css` | Layout and components, built only from tokens. |
 | `sentinel-gate/` | The quality gate: `commit-msg` and `pre-push` hooks and the session-start hook. See `INTEGRATION_CHECKLIST.md`. |
@@ -44,6 +45,10 @@ The server is a file store. Paths are relative to `story-bible/`, and a version 
 | `PUT /api/file` | Writes `content` only if the stored version still matches `baseVersion` (`null` means the file must not exist yet). Otherwise returns 409 with the current file. |
 | `DELETE /api/file` | Deletes a file, with the same version check. |
 | `POST /api/move` | Moves a file, with the same version check. Refuses if the destination exists. |
+| `POST /api/move-folder` | Moves a whole folder, such as a renamed character's. Refuses if anything has the new name. |
+| `POST /api/upload?dir=&name=` | Saves the request body as an image (JPEG, PNG, WebP, or GIF, up to 25 MB) in `dir`, under a safe version of `name`. A clash gets `-2`, `-3`, and so on, unless `replace=1` (used for the portrait copy). Returns the path. |
+| `GET /api/media?path=` | An image from the bible, with its own content type. SVG isn't served, because it can carry scripts. |
+| `DELETE /api/media` | Deletes an image. |
 | `GET /api/events` | Server-sent events, one `change` event (path and version) per real content change. |
 
 ### Saving and conflicts
