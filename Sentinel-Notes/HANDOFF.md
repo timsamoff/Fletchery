@@ -26,7 +26,7 @@ Written 2026-10-30. Characters step 1 is built; steps 2 to 5 remain.
 
 ## 3. Next step
 
-The rename bug is fixed: the server Tim ran on 2026-10-30 predated the folder-move route, and the page now says to restart Fletchery when that happens. Tim will retry the rename.
+The rename bug is fixed: the server Tim ran on 2026-10-30 predated the folder-move route, and the page now says to restart Fletchery when that happens. Tim confirmed renaming works.
 
 Portrait choices are waiting on Tim: a pencil badge plus a three-silhouette menu (recommended), and whether a crop saves numbers, a small copy, or both.
 
