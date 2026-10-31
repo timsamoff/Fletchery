@@ -1,25 +1,117 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="t d">
-  <title id="t">Fletchery icon</title>
-  <desc id="d">A square book cover with a spine and a double frame. An upright arrow with feathered fletching in rust orange is centered inside the frame.</desc>
-  <!-- cover -->
-  <rect x="24" y="24" width="464" height="464" rx="28" fill="#2A2D32"/>
-  <!-- spine -->
-  <path d="M52 24 H76 V488 H52 A28 28 0 0 1 24 460 V52 A28 28 0 0 1 52 24 Z" fill="#1D1F23"/>
-  <path d="M76 24 V488" stroke="#3B3F46" stroke-width="2"/>
-  <g stroke="#E0601E" stroke-opacity=".75" stroke-width="3" stroke-linecap="round">
-    <path d="M38 96 H62 M38 104 H62 M38 408 H62 M38 416 H62"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Icon" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512">
+  <!-- Generator: Adobe Illustrator 30.8.2, SVG Export Plug-In . SVG Version: 2.1.4 Build 7)  -->
+  <defs>
+    <style>
+      .st0 {
+        stroke-opacity: .75;
+      }
+
+      .st0, .st1, .st2, .st3, .st4, .st5 {
+        fill: none;
+      }
+
+      .st0, .st2, .st3, .st4 {
+        stroke: #e0601e;
+      }
+
+      .st0, .st5 {
+        stroke-linecap: round;
+        stroke-width: 3px;
+      }
+
+      .st6, .st4 {
+        stroke-width: 1.5px;
+      }
+
+      .st6, .st7 {
+        fill: #2a2d32;
+      }
+
+      .st6, .st8 {
+        stroke: #3b3f46;
+      }
+
+      .st2 {
+        stroke-dasharray: 6 4;
+        stroke-opacity: .85;
+      }
+
+      .st2, .st3, .st8 {
+        stroke-width: 2px;
+      }
+
+      .st3 {
+        stroke-opacity: .55;
+      }
+
+      .st4 {
+        stroke-opacity: .3;
+      }
+
+      .st9 {
+        fill: #1d1f23;
+      }
+
+      .st5 {
+        stroke: #2a2d32;
+      }
+
+      .st10 {
+        clip-path: url(#clippath);
+      }
+
+      .st11 {
+        fill: #e0601e;
+      }
+    </style>
+    <clipPath id="clippath">
+      <path class="st1" d="M290,309v66c0,14,14,26,36,34,22-8,36-20,36-34v-66c-6-26-26-48-36-56-10,8-30,30-36,56Z"/>
+    </clipPath>
+  </defs>
+  <path id="Base" class="st7" d="M46,26h404c12.15,0,22,9.85,22,22v416c0,12.15-9.85,22-22,22H46c-4.42,0-8-3.58-8-8V34c0-4.42,3.58-8,8-8Z"/>
+  <path id="Spine" class="st9" d="M176,26H46c-4.42,0-8,3.58-8,8v444c0,4.42,3.58,8,8,8h130V26Z"/>
+  <path id="Separator" class="st8" d="M176,26v460"/>
+  <g id="Spine_bands">
+    <rect class="st6" x="31" y="100" width="60" height="24" rx="11" ry="11"/>
+    <rect class="st6" x="31" y="196" width="60" height="24" rx="11" ry="11"/>
+    <rect class="st6" x="31" y="292" width="60" height="24" rx="11" ry="11"/>
+    <rect class="st6" x="31" y="388" width="60" height="24" rx="11" ry="11"/>
   </g>
-  <!-- cover frame, centered on the cover face (x 76-488) -->
-  <rect x="122" y="56" width="320" height="400" rx="6" fill="none" stroke="#E0601E" stroke-opacity=".55" stroke-width="2"/>
-  <rect x="130" y="64" width="304" height="384" rx="3" fill="none" stroke="#E0601E" stroke-opacity=".3" stroke-width="1.5"/>
-  <!-- arrow with fletching, bounding box centered at (282, 256) -->
-  <defs><clipPath id="v"><path d="M266,262 C276,270 296,292 302,318 L302,384 C302,398 288,410 266,418 Z"/><path d="M266,262 C256,270 236,292 230,318 L230,384 C230,398 244,410 266,418 Z"/></clipPath></defs>
-  <g transform="translate(16 -9)">
-    <g fill="#E0601E">
-      <path d="M266,104 L275,138 H257 Z"/>
-      <rect x="263" y="136" width="6" height="290" rx="2"/>
-      <path d="M266,262 C276,270 296,292 302,318 L302,384 C302,398 288,410 266,418 Z"/><path d="M266,262 C256,270 236,292 230,318 L230,384 C230,398 244,410 266,418 Z"/>
+  <g id="Spine_lines">
+    <path class="st0" d="M39.5,160h26.5M39.5,256h26.5M39.5,352h26.5"/>
+  </g>
+  <path id="Stitching" class="st2" d="M171,33v446"/>
+  <rect id="Outer_outline" class="st3" x="208" y="55" width="236" height="402" rx="6" ry="6"/>
+  <rect id="Inner_outline" class="st4" x="216" y="63" width="220" height="386" rx="3" ry="3"/>
+  <g>
+    <g id="Arrow">
+      <path id="Arrowhead" class="st11" d="M326,95l9,34h-18l9-34Z"/>
+      <rect id="Shaft" class="st11" x="323" y="127" width="6" height="290" rx="2" ry="2"/>
+      <path id="Feathers_right" class="st11" d="M326,253c10,8,30,30,36,56v66c0,14-14,26-36,34v-156Z"/>
+      <path id="Feathers_left" class="st11" d="M326,253c-10,8-30,30-36,56v66c0,14,14,26,36,34v-156Z"/>
     </g>
-    <g stroke="#2A2D32" stroke-width="3" stroke-linecap="round" fill="none" clip-path="url(#v)"><path d="M270,320 L306,296"/><path d="M262,320 L226,296"/><path d="M270,334 L306,310"/><path d="M262,334 L226,310"/><path d="M270,348 L306,324"/><path d="M262,348 L226,324"/><path d="M270,362 L306,338"/><path d="M262,362 L226,338"/><path d="M270,376 L306,352"/><path d="M262,376 L226,352"/><path d="M270,390 L306,366"/><path d="M262,390 L226,366"/><path d="M270,404 L306,380"/><path d="M262,404 L226,380"/><path d="M270,418 L306,394"/><path d="M262,418 L226,394"/></g>
+    <g id="Feather_lines">
+      <g class="st10">
+        <g>
+          <path class="st5" d="M330,311l36-24"/>
+          <path class="st5" d="M322,311l-36-24"/>
+          <path class="st5" d="M330,325l36-24"/>
+          <path class="st5" d="M322,325l-36-24"/>
+          <path class="st5" d="M330,339l36-24"/>
+          <path class="st5" d="M322,339l-36-24"/>
+          <path class="st5" d="M330,353l36-24"/>
+          <path class="st5" d="M322,353l-36-24"/>
+          <path class="st5" d="M330,367l36-24"/>
+          <path class="st5" d="M322,367l-36-24"/>
+          <path class="st5" d="M330,381l36-24"/>
+          <path class="st5" d="M322,381l-36-24"/>
+          <path class="st5" d="M330,395l36-24"/>
+          <path class="st5" d="M322,395l-36-24"/>
+          <path class="st5" d="M330,409l36-24"/>
+          <path class="st5" d="M322,409l-36-24"/>
+        </g>
+      </g>
+    </g>
   </g>
 </svg>
