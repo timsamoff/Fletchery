@@ -286,7 +286,7 @@ async function showEditor(settings, settingsVersion) {
         </div>
       </form>
     </dialog>
-    <dialog class="image-dialog" id="image-dialog" aria-label="Image details">
+    <dialog class="image-dialog" id="image-dialog" aria-label="Image">
       <img class="image-dialog-preview" id="image-preview" alt="" />
       <div class="image-dialog-fields">
         <div class="field">
@@ -898,11 +898,13 @@ function setupPortraitMenu() {
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
-    menu.hidePopover();
+    // The menu stays open until the upload works, so a problem shows where the writer is looking.
     try {
-      openCrop(await store.upload(entryFolder(), file.name, file));
+      const path = await store.upload(entryFolder(), file.name, file);
+      menu.hidePopover();
+      openCrop(path);
     } catch (err) {
-      setStatus(`Couldn’t add the photo. ${err.message}`);
+      menu.querySelector('#portrait-error').textContent = `Couldn’t add the photo. ${err.message}`;
     }
   });
   // Arrow keys move through the grid, five to a row.
@@ -932,6 +934,7 @@ function renderPortraitMenu(menu) {
       <button type="button" class="link-button" id="portrait-upload">Upload a photo</button>
       ${photo ? '<button type="button" class="link-button" id="portrait-crop">Choose the part to use</button>' : ''}
       <input type="file" id="portrait-input" accept="${IMAGE_ACCEPT}" hidden />
+      <p class="form-error" id="portrait-error" role="alert"></p>
     </div>`;
 }
 
@@ -984,23 +987,28 @@ async function renderImages() {
       return { path, name, ...meta };
     }),
   );
+  // Cards like the character cards, each image at its own proportions.
   const grid = state.images.length
     ? `<ul class="image-grid">${state.images
         .map(
           (img) => `
-        <li><button type="button" class="image-thumb" data-path="${esc(img.path)}" aria-label="${esc(img.caption || img.name)}. Edit its details.">
-          <img src="${store.mediaUrl(img.path)}" alt="" loading="lazy" />
-          ${img.caption ? `<span class="image-caption">${esc(img.caption)}</span>` : ''}
+        <li><button type="button" class="character-card image-card" data-path="${esc(img.path)}" aria-label="${esc(img.caption || img.name)}. Open it larger.">
+          <img src="${store.mediaUrl(img.path)}" alt="${esc(img.alt)}" loading="lazy" />
+          <span class="card-body">
+            <span class="card-name">${esc(img.caption || img.name)}</span>
+            ${img.notice ? `<span class="card-seed">${esc(img.notice)}</span>` : ''}
+          </span>
         </button></li>`,
         )
         .join('')}</ul>`
     : '';
   home.innerHTML = `
-    <div class="image-drop" id="image-drop">
-      <p>Drop images here or paste them, or <button type="button" class="link-button" id="image-pick">choose files</button>.</p>
-      <p class="hint">JPEG, PNG, WebP, or GIF, up to 25 MB each.</p>
-      <input type="file" id="image-input" accept="${IMAGE_ACCEPT}" multiple hidden />
-    </div>
+    <button type="button" class="image-drop" id="image-drop">
+      <span>Drop images here, paste them, or click to choose files.</span>
+      <span class="hint">JPEG, PNG, WebP, or GIF, up to 25 MB each.</span>
+    </button>
+    <input type="file" id="image-input" accept="${IMAGE_ACCEPT}" multiple hidden />
+    <p class="form-error" id="images-error" role="alert"></p>
     ${grid}`;
   home.querySelectorAll('.image-grid li').forEach((li, i) => riseIn(li, { delay: i * 30, fill: 'backwards' }));
   if (!home.dataset.ready) setupImagesHome(home);
@@ -1010,8 +1018,8 @@ async function renderImages() {
 function setupImagesHome(home) {
   home.dataset.ready = '1';
   home.addEventListener('click', (e) => {
-    if (e.target.closest('#image-pick')) return document.getElementById('image-input').click();
-    const thumb = e.target.closest('.image-thumb');
+    if (e.target.closest('#image-drop')) return document.getElementById('image-input').click();
+    const thumb = e.target.closest('.image-card');
     if (thumb) openImage(thumb.dataset.path);
   });
   home.addEventListener('change', (e) => {
@@ -1040,20 +1048,29 @@ function refreshImagesSoon() {
   imagesTimer = setTimeout(() => !state.imageOpen && renderImages(), 300);
 }
 
+// Problems show in the tab itself, since the status line under the writing is hidden here.
 async function uploadImages(files) {
   const images = [...files].filter((f) => IMAGE_ACCEPT.split(',').includes(f.type));
-  if (!images.length) return setStatus('Fletchery takes JPEG, PNG, WebP, and GIF images.');
+  if (!images.length) return showImagesError('Fletchery takes JPEG, PNG, WebP, and GIF images.');
   let added = 0;
+  let problem = '';
   for (const file of images) {
     try {
       await store.upload(entryFolder(), file.name || `pasted.${file.type.split('/')[1]}`, file);
       added++;
     } catch (err) {
-      setStatus(`Couldn’t add ${file.name}. ${err.message}`);
+      problem = `Couldn’t add ${file.name}. ${err.message}`;
     }
   }
   if (added) setStatus(added === 1 ? 'Added an image.' : `Added ${added} images.`);
   await renderImages();
+  if (problem) showImagesError(problem);
+}
+
+function showImagesError(text) {
+  setStatus(text);
+  const line = document.getElementById('images-error');
+  if (line) line.textContent = text;
 }
 
 // Pasting an image while the Images tab is open adds it, unless the writer is pasting into a field.
@@ -1083,7 +1100,7 @@ function setupImageDialog() {
     await saveImageDetails();
     state.imageOpen = null;
     await renderImages();
-    document.querySelector(`.image-thumb[data-path="${CSS.escape(path ?? '')}"]`)?.focus();
+    document.querySelector(`.image-card[data-path="${CSS.escape(path ?? '')}"]`)?.focus();
   });
   document.getElementById('image-use-portrait').addEventListener('click', async () => {
     const { path } = state.imageOpen;

@@ -1744,6 +1744,13 @@ textarea::placeholder {
 
 /* The Images tab: a drop area, then the character's images as a grid of thumbnails. */
 .image-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  font: inherit;
+  color: var(--color-text);
+  cursor: pointer;
   padding: var(--space-5) var(--space-4);
   border: var(--border) dashed var(--color-rule);
   border-radius: var(--radius);
@@ -1753,60 +1760,41 @@ textarea::placeholder {
     border-color var(--duration-fast) ease,
     background-color var(--duration-fast) ease;
 }
-.image-drop p {
-  margin: 0 auto;
+.image-drop .hint {
+  margin: 0;
 }
-.image-drop .link-button {
-  display: inline;
-  font-size: inherit;
-}
+.image-drop:hover,
 .images-home.is-dropping .image-drop {
   border-color: var(--color-accent);
   background: var(--color-surface);
 }
+/* Columns rather than a grid, so cards of different heights pack without gaps. */
 .image-grid {
   list-style: none;
   max-width: none;
   margin: var(--space-4) 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: var(--space-3);
+  columns: 240px;
+  column-gap: var(--space-4);
 }
-.image-thumb {
-  display: flex;
-  flex-direction: column;
+.image-grid li {
+  break-inside: avoid;
+  margin-bottom: var(--space-4);
+}
+.image-card {
   width: 100%;
   padding: 0;
-  overflow: hidden;
   border: 0;
-  border-radius: var(--radius);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-paper);
   font: inherit;
-  color: var(--color-text);
   text-align: left;
   cursor: pointer;
-  transition:
-    transform var(--duration-fast) var(--ease-out),
-    box-shadow var(--duration-fast) ease;
 }
-.image-thumb:hover {
-  transform: translateY(calc(-1 * var(--space-1) / 2));
-  box-shadow: var(--shadow-sheet);
-}
-.image-thumb img {
+.image-card img {
   display: block;
   width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
+  height: auto;
   background: var(--color-panel);
 }
-.image-caption {
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--text-small);
-}
-
 /* Image details and the crop view open over the page, like the name dialog. */
 .image-dialog,
 .crop-dialog {
@@ -1821,20 +1809,22 @@ textarea::placeholder {
 .crop-dialog::backdrop {
   background: var(--color-backdrop-soft);
 }
+/* The image leads, as large as the window allows, with its details in a column beside it. */
 .image-dialog {
-  width: min(880px, 100vw - 2 * var(--space-3));
+  width: min(1280px, 100vw - 2 * var(--space-5));
+  max-height: calc(100vh - 2 * var(--space-5));
 }
 .image-dialog[open] {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) 320px;
+  align-items: start;
   gap: var(--space-5);
 }
 .image-dialog-preview {
-  width: 100%;
-  max-height: 70vh;
-  object-fit: contain;
+  justify-self: center;
+  max-width: 100%;
+  max-height: calc(100vh - 4 * var(--space-5));
   border-radius: var(--radius);
-  background: var(--color-panel);
 }
 .image-dialog textarea {
   min-height: 0;
