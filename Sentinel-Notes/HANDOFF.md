@@ -1,6 +1,6 @@
 # Handoff
 
-Written 2026-10-31. Characters step 2 (portrait and images) is built and waiting on Tim's review.
+Updated 2026-11-02. Characters step 2 (portrait and images) is built and confirmed working by Tim.
 
 ## 1. Current task and status
 
@@ -23,12 +23,11 @@ Tim restarted `fletchery`; uploads work for him.
 
 ## 3. Next step
 
-Get Tim's review of step 2 and OK to push. Then step 3, the media library: a gallery of every image in the bible, picking existing images into an entry, and Move to library or Move to entry with link rewriting.
+Step 3, the media library: a gallery of every image in the bible, picking existing images into an entry, and Move to library or Move to entry with link rewriting.
 
 ## 4. Open questions for Tim
 
 - Cards crop the square portrait into a wide strip, so some of the top or bottom is lost. Should cards show the whole circle instead?
-- Whether a dragged writing-box height should be kept in Settings.
 - The AI section going live, and the formatting editor.
 
 ## 5. Tried and failed
