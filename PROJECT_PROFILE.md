@@ -1,71 +1,80 @@
 # Project profile: Fletchery
 
-Produced by Sentinel `00-project-discovery.md`, version 1.6.1, on 2026-10-29.
+Produced by Sentinel `00-project-discovery.md`, version 1.7.1, on 2026-11-02. This is an update run over the 1.6.1 profile of 2026-10-29.
 
-The app was renamed from Fletcherling to Fletchery on 2026-10-30. The fields below use the new name. The GitHub repo and the local folder were renamed the same day.
+The app was renamed from Fletcherling to Fletchery on 2026-10-30. Dated records (the design audit report, early commits) keep the old name.
 
 ## Run type
 
-- **Sentinel version:** 1.6.1 (checked against GitHub: current).
-- **Run:** fresh run. No earlier `PROJECT_PROFILE.md` existed, so there is no existing quality gate to re-validate.
-- **Blank-project run:** no. The project is small (2 commits, skeleton phase), but it has a manifest, real source files, and a working app. Nothing was deferred for blankness.
-- **Renamed conventions:** a pre-1.0 `production_notes/` folder existed. The user chose to rename it, and it is now `Sentinel-Notes/` (holding `todo.md`). `.gitignore` and `CLAUDE.md` were updated to the new name.
+- **Sentinel version:** 1.7.1 (installed and GitHub agree, so no update offered).
+- **Run:** update run, from 1.6.1.
+- **Blank-project run:** no.
+- **Quality gate re-validation:** a quality gate exists (`sentinel-gate/`, hooks `commit-msg` and `pre-push`, wired through `core.hooksPath`). It was built after the 1.6.1 profile, so it should already reflect 1.7.x, but `03` has not re-checked it against 1.7.1. Items to confirm there: the trailer allowlist (present: `ALLOWED_TRAILERS`), the version-check in the session-start hook (present: `session-start.js` mentions version), and the guide-change check (not applicable, since no maintainer guide exists).
+- **Renamed conventions:** none left. `Sentinel-Notes/` is correctly spelled and tracked; no `production_notes/` folder remains.
 - **Leftover renamed prompt files:** none (`03-gate-check-implementation.md` is not present).
+- **Maintainer guide:** no `Maintainer guide:` line and no `Sentinel-Maintainer-Guide/` folder. `04` has not been run.
+- **Skipped update:** none recorded.
 
 ## Agent and environment
 
 - **AI coding agent:** Claude Code (VS Code extension, Windows 11).
-- **Project context file:** `CLAUDE.md` (this project's name for `AGENTS.md`). It exists at the root and is gitignored by the user's choice.
-- **Permission mechanism:** `.claude/settings.json` (project) or `.claude/settings.local.json`. Neither exists yet.
+- **Project context file:** `CLAUDE.md`. Now tracked in git (changed since 1.6.1, when it was gitignored).
+- **Permission mechanism:** `.claude/settings.json` (tracked). It holds the SessionStart hook that runs `sentinel-gate/session-start.js`.
 
 ## Values for `[PROJECT-SPECIFIC]` brackets
 
-- **Project name:** Fletchery (confirmed by the user; matches `README.md` title and `package.json` `name`).
-- **Tech stack:** JavaScript (ES modules) on Node 20+ (developed on Node 25.2). Server uses Node's built-in `http`, `fs`, and recursive `fs.watch`; no framework. Front end is plain HTML, CSS, and JavaScript with no build step. Package manager: npm (`package.json`, `package-lock.json`). Dependencies: `@fontsource/source-sans-3`, `@fontsource/atkinson-hyperlegible`, `@fontsource/literata`, `yaml`.
+- **Project name:** Fletchery (confirmed earlier; matches the `README.md` title and `package.json` `name`).
+- **Tech stack:** JavaScript (ES modules) on Node 20+. Server uses Node's built-in `http` and `fs`, no framework. Front end is plain HTML, CSS, and JavaScript with no build step yet (one is allowed by `docs/SPEC.md`). Package manager: npm. Dependencies: `@fontsource/source-sans-3`, `@fontsource/atkinson-hyperlegible`, `@fontsource/literata`, `yaml`. Entry logic in `public/js/core/` runs in both browser and Node.
 - **Application surfaces:**
-  1. The local web app: CLI launcher (`bin/fletchery.js`), server (`server/`), and browser front end (`public/`). One surface; the three folders share one process and one API.
-  - Planned, not yet built: Claude Code skills (`skills/`) and an install script (`scripts/`). These will be a second surface that reads the same bible format but shares no code with the app.
-- **Design/token system file:** `public/css/tokens.css` (CSS custom properties for palette, type, rhythm, and spacing; `public/css/base.css` consumes them).
-- **Recurring unit of work:** a bible section (confirmed by the user). Adding one touches its data file in `sections/`, the section page, server read and write, generated indexes, `BIBLE.md`, and the skills.
-- **Existing design document:** `DESIGN.md` (architecture overview, added 2026-10-30). `docs/SPEC.md` holds the agreed decisions and wins over the brief. Supporting: `first-prompt/FLETCHERLING-PROMPT.md` (the original brief, untracked) and the approved plan at `C:\Users\Tim\.claude\plans\bubbly-enchanting-trinket.md` (outside the repo).
+  1. The local web app: CLI launcher (`bin/fletchery.js`), server (`server/`: `server.js`, `bible.js`, `watch.js`), and browser front end (`public/`: `index.html`, `js/app.js`, `js/settings.js`, `js/core/`, `css/`). One surface; the folders share one process and one API.
+  2. The quality gate (`sentinel-gate/`): tooling for the repo, not part of the product.
+  - Planned, not built: Claude Code skills and an install script; the web edition (see `Sentinel-Notes/web-edition-design-brief.md`).
+- **Design/token system file:** `public/css/tokens.css` (palette, type, rhythm, spacing); `public/css/base.css` consumes it.
+- **Recurring unit of work:** a bible section (confirmed earlier). Section data files live in `sections/` (`prose.json`, `game.json`, `screenplay.json`). `INTEGRATION_CHECKLIST.md` lists the touchpoints.
+- **Existing design document:** `DESIGN.md` (architecture overview). `docs/SPEC.md` holds the decisions and wins over the brief. Also `docs/premise-end-to-end-design-brief.md`. The original brief, `first-prompt/FLETCHERLING-PROMPT.md`, is gitignored on purpose.
 
 ## VCS and release
 
-- **VCS:** git. 2 commits, 1 author (Tim Samoff). Branch `main`, 1 commit ahead of `origin/main` (not pushed).
-- **Remote:** `https://github.com/timsamoff/Fletchery.git` (renamed from `Fletcherling` on 2026-10-30; GitHub redirects the old URL), **public**.
-- **Commit-message convention detected:** single-line subjects, no bodies, no prefixes (both commits). This matches the user's global preference: single-line summaries by default, a few single-sentence bullets only when genuinely needed, no co-author trailers.
-- **Version/release status:** `package.json` version `0.1.0`; no tags or releases. Pre-release.
+- **VCS:** git. 109 commits, 1 author (Tim Samoff), 2026-10-29 to 2026-10-31. Branch `main`, in sync with `origin/main`. Working tree clean.
+- **Remote:** `https://github.com/timsamoff/Fletchery.git`, public.
+- **Commit-message convention:** single-line subjects in plain sentence form, no prefixes, bodies rare. Recorded in `CLAUDE.md` under Commits, including the one allowed trailer (`Sentinel-Override`, written only by Tim) and the agent-voice ban.
+- **Version/release status:** `package.json` version `0.1.0`; no tags or releases. Pre-release, in active build (Characters step 2 of 5 done).
 
 ## Existing automation
 
-- Git hooks: none (only samples; `core.hooksPath` unset).
-- CI: none.
-- npm scripts: none.
-- Pre-commit framework: none.
-- No existing quality-gate or enforcement system.
-- Testing so far is manual: Playwright-driven browser checks during development, plus the user's own testing.
+- **Git hooks:** `core.hooksPath` is `sentinel-gate/hooks`, with `commit-msg` and `pre-push`. Installed by `npm install` (`prepare`) or `npm run sentinel:install`.
+- **Gate logic:** `sentinel-gate/check.js`, with `baseline.json`, `exceptions.json` (empty), `known-extensions.txt`, `readme-map.json`, and `spec-review.json` (in `Sentinel-Notes/`).
+- **npm scripts:** `sentinel:install`, `sentinel:full`, `sentinel:report`, `sentinel:spec-reviewed`.
+- **Session-start hook:** yes, tracked in `.claude/settings.json`, as the remote-session answer requires.
+- **CI:** none.
+- **Pre-existing, non-Sentinel gate:** none. All of the above is Sentinel's own.
+- **Tests:** none automated. Verification is manual browser runs (Playwright) plus Tim's own testing.
 
 ## Existing docs and scaffolding
 
 | Item | Present |
 |---|---|
-| `AGENTS.md` / `CLAUDE.md` | `CLAUDE.md` yes (gitignored) |
-| `README.md` | yes (two lines; full README is Phase 8 of the build) |
+| `CLAUDE.md` (the `AGENTS.md` equivalent) | yes, tracked |
+| `README.md` | yes |
 | `LICENSE` | yes, MIT, matches `package.json` |
 | `.gitignore` | yes |
-| `Sentinel-Notes/` | yes (renamed this run; gitignored) |
-| `scratch/` | no |
+| `Sentinel-Notes/` | yes, tracked (`TODO.md`, `HANDOFF.md`, design briefs, `archive/`) |
+| `scratch/` | yes, gitignored |
+| `Sentinel-Prompts/` | yes, gitignored |
+| `Sentinel-Maintainer-Guide/` | no |
+
+## Session conventions (recorded in `CLAUDE.md`)
+
+- Remote sessions: yes. `CLAUDE.md` and `Sentinel-Notes/` are tracked for that reason.
+- Handoff: `Sentinel-Notes/HANDOFF.md`, with a full rewrite rule and a close-out section in `CLAUDE.md`.
 
 ## Flagged for follow-up
 
-- **Public repo and untracked folders.** `first-prompt/` (the brief) and `Sentinel-Prompts/` are untracked and not ignored, so a careless `git add .` would publish them. Decide whether each should be tracked, ignored, or kept as is.
-- **Gitignored context in a public repo.** `CLAUDE.md` and `Sentinel-Notes/` are gitignored. That keeps them private, but a remote or cloud session would not see either. Relevant to the remote-session question in `01`, Part 11.
-- **No automated tests.** Verification depends on manual browser runs. The conflict-detection and path-guard logic in `server/` are the parts most worth covering first.
-- **`.gitattributes` uses `* text=auto`.** Every commit on Windows prints LF-to-CRLF warnings. Harmless for now; noted so it isn't mistaken for a problem later.
-- **Unpushed commit.** `main` is 1 ahead of `origin/main`.
+- **Stale 1.6.1 flags resolved.** `first-prompt/` and `Sentinel-Prompts/` are now gitignored; `CLAUDE.md` and `Sentinel-Notes/` are now tracked; the unpushed commit is pushed. `.gitattributes` still uses `* text=auto` (with LF forced for the hook scripts), so LF-to-CRLF warnings on Windows are expected and harmless.
+- **No automated tests.** Already tracked as TODO item T1 (conflict detection, path guard, frontmatter completeness in `server/`). The portable `public/js/core/` modules are another good candidate.
 
 ## How to use this
 
-When running `01-design-quality-audit.md` or `02-integration-audit.md`, fill their `[PROJECT-SPECIFIC]` brackets from the values above instead of re-detecting. `03-quality-gate-implementation.md` can reuse the "Existing automation" section: there is none, so it builds from scratch.
+When running `01-design-quality-audit.md` or `02-integration-audit.md`, fill their `[PROJECT-SPECIFIC]` brackets from the values above instead of re-detecting. `03-quality-gate-implementation.md` should reuse "Existing automation": the gate exists, so `03` re-validates it rather than building from scratch.
 
-Next step: run the Design & Code Quality Audit (`01-design-quality-audit.md`).
+Next step: this project is well past a fresh start, and the audit (`Sentinel-Notes/design-quality-audit.md`), integration work, and gate have all run once. The specific follow-up from this update is to run `03-quality-gate-implementation.md` to re-validate the existing gate against 1.7.1. Re-running `01` and `02` is only worth it if Tim wants a fresh audit after the Characters work; nothing in the 1.6.1 to 1.7.1 history requires it. `04-maintainer-guide.md` is optional and only runs on request.
