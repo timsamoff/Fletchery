@@ -44,6 +44,10 @@ When the AI wants to change writer text, it writes a proposal file to `story-bib
 
 Fletchery writes no ignore files. Everything in `story-bible/`, including `.fletchery/` requests, proposals, and app state, is meant to be tracked, so the history of AI work stays in the repo.
 
+### Maintainer guide (decided 2026-11-02)
+
+`Sentinel-Maintainer-Guide/` is a full guide for a developer new to the code, tracked in the public repo like `CLAUDE.md`. It covers `bin/`, `server/`, `public/`, `sections/`, and `package.json`. A commit that changes covered code updates it in the same commit; the quality gate will remind (not block) when it doesn't. It links to this file for decisions instead of copying them.
+
 ## Settled in plan review
 
 - **Series scope.** One bible for the whole series. The top-level layout matches a standalone. A series adds `books/<slug>/` (that book's `premise.md` and `plot/`) and `series/` (continuity). Characters, relationships, world, timeline, themes, and voice are shared. Top-level `premise/` holds the series premise. A standalone has no `books/` or `series/`, and `plot/` sits at the top level.

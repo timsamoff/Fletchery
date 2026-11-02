@@ -12,7 +12,8 @@ The app was renamed from Fletcherling to Fletchery on 2026-10-30. Dated records 
 - **Quality gate re-validation:** a quality gate exists (`sentinel-gate/`, hooks `commit-msg` and `pre-push`, wired through `core.hooksPath`). It was built after the 1.6.1 profile, so it should already reflect 1.7.x, but `03` has not re-checked it against 1.7.1. Items to confirm there: the trailer allowlist (present: `ALLOWED_TRAILERS`), the version-check in the session-start hook (present: `session-start.js` mentions version), and the guide-change check (not applicable, since no maintainer guide exists).
 - **Renamed conventions:** none left. `Sentinel-Notes/` is correctly spelled and tracked; no `production_notes/` folder remains.
 - **Leftover renamed prompt files:** none (`03-gate-check-implementation.md` is not present).
-- **Maintainer guide:** no `Maintainer guide:` line and no `Sentinel-Maintainer-Guide/` folder. `04` has not been run.
+- **Maintainer guide:** Full guide, tracked, last verified 2026-11-02 at 0996626. Folder `Sentinel-Maintainer-Guide/`. Check strictness: reminder. `INTEGRATION_CHECKLIST.md` has the proposed check; `03` has not built it yet.
+Maintainer guide: full, tracked, last verified 2026-11-02 at 0996626
 - **Skipped update:** none recorded.
 
 ## Agent and environment
@@ -61,7 +62,7 @@ The app was renamed from Fletcherling to Fletchery on 2026-10-30. Dated records 
 | `Sentinel-Notes/` | yes, tracked (`TODO.md`, `HANDOFF.md`, design briefs, `archive/`) |
 | `scratch/` | yes, gitignored |
 | `Sentinel-Prompts/` | yes, gitignored |
-| `Sentinel-Maintainer-Guide/` | no |
+| `Sentinel-Maintainer-Guide/` | yes, tracked (14 files) |
 
 ## Session conventions (recorded in `CLAUDE.md`)
 

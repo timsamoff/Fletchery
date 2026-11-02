@@ -92,6 +92,10 @@ Folded in from `PROJECT_PROFILE.md`'s follow-up list:
 
 **Hard check:** a commit that changes a `Sentinel-Notes/*-design-brief.md` file must also change that brief's line in `TODO.md`, or move the brief to `archive/` along with a matching TODO change. **Soft reminder:** commits that touch code a one-line item names get a non-blocking reminder to check `TODO.md`. There's no reliable signal to make this half a hard check. **Format check:** every item line in `TODO.md` is one line, in the form checkbox, optional ID, one sentence.
 
+### Maintainer guide (proposed, not built; `03` builds it)
+
+**Trigger:** a commit changes source files in a covered area without changing `Sentinel-Maintainer-Guide/`. The check reads the coverage map in `Sentinel-Maintainer-Guide/00-README.md` for which paths belong to a covered area, rather than carrying its own list. Source means `bin/`, `server/`, `public/`, `sections/`, and `package.json`; it excludes the guide, tests, lockfiles, and generated files. **Strictness:** a reminder that shows a message and lets the commit through (chosen 2026-11-02). **Limit:** the check proves only that the guide was touched, not that it's right. The verify run in `04-maintainer-guide.md` is what checks accuracy. The guide is tracked, so a hook can see it.
+
 ## Part 3: quality-gate design (not built yet)
 
 ### Commit-time check (`pre-commit` plus `commit-msg`, run automatically)
