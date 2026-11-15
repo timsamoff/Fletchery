@@ -1,30 +1,36 @@
 # Handoff
 
-Updated 2026-11-02. Characters steps 1 and 2 are confirmed working. Four small changes sit uncommitted, waiting on Tim's OK.
+Updated 2026-11-15. A full code review and a round of research are written up. Nothing from this session or the last is committed except this file.
 
 ## 1. Current task and status
 
-Tim confirmed Characters step 2 (portrait and images). He kept the wide strip on cards and decided to leave the writing-box height as it is. Then came cleanup and backlog work, none of it committed or tested in a browser.
+The code review is done and logged, with no code changed. Tim hasn't yet said which findings to fix. The four small changes from 2026-11-02 are still uncommitted and untested in a browser.
 
 ## 2. Files touched (uncommitted)
 
-- `public/js/app.js`: the Characters page shows "Skip for now" only when there are no cards. The sidebar shows "Skipped" for Characters only while it has no cards.
-- `Sentinel-Notes/TODO.md`: Characters line says steps 1 and 2 confirmed. Added onboarding screen, Ask AI button, delete a character, and the formatting editor line now links its brief.
-- `Sentinel-Notes/formatting-editor-design-brief.md` (new): recommends CodeMirror 6 with a small toolbar; library notes are `[UNVERIFIED]`.
+- `Sentinel-Notes/code-review-2026-11-15.md` (new): the review, with findings H1-H3, M1-M7, L1-L8, D1-D4.
+- `Sentinel-Notes/similar-apps-research-design-brief.md` (new): other apps, craft advice, and ideas. Brainstorming only.
+- `Sentinel-Notes/TODO.md`: a "Code review findings" section, a line for the research brief, and the 2026-11-02 edits.
+- `public/js/app.js`: from 2026-11-02. "Skip for now" on the Characters page only with no cards; the sidebar shows "Skipped" for Characters only while it has no cards.
+- `Sentinel-Notes/formatting-editor-design-brief.md` (new, from 2026-11-02).
+- `scratch/review-checks.mjs` (gitignored): reproduces H1, H2, H3, M3, L3.
 
 ## 3. Next step
 
-Ask Tim to check the two `app.js` changes in a browser, then commit them with the docs. After that, either the Ask AI button (enabled, goes to Settings when no AI is chosen) or Characters step 3, the media library: a gallery of every image, picking existing images into an entry, and Move to library or Move to entry with link rewriting.
+Get Tim's answers below. If he approves the first batch, fix H1, H2, M3, M5, and L1 together and add a first `node:test` file for `public/js/core/` (M7), then ask him to test. Before any commit, shorten the two TODO lines over 200 characters (Formatting editor, Delete a character), or the gate blocks it.
 
 ## 4. Open questions for Tim
 
+- Which review findings to fix, and in what order.
+- H3: option A (unknown `## ` headings stay in their layer), option B (show the hidden text read-only), or both.
+- Sentinel 1.8.0: update now, not now, or skip.
+- The two `app.js` changes from 2026-11-02 still need his browser check.
 - Delete a character: a real delete or a trash folder?
-- Formatting editor: marked source or hybrid markers, decided after a prototype.
+- Whether any research idea moves from "discuss later" to planned.
 
 ## 5. Tried and failed
 
 - Long Python patches in a Bash heredoc can break on quoting. Write the script to `scratch/` and run it.
 - After changing JS, reload the page, or Playwright gets the cached copy.
-- A silhouette style has to show in the outline.
 - Test against a copy of Tim's bible in `scratch/` on `--port 3100 --no-open`, never his real story.
-- The Chrome browser tools disconnected this session; use Playwright.
+- The Chrome browser tools disconnected on 2026-11-02; use Playwright.
