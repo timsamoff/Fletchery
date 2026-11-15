@@ -573,9 +573,13 @@ function renderListPage() {
              <p class="visually-hidden" id="reorder-help">Drag to reorder, or press Alt with an arrow key.</p>`
           : '<p class="empty-note">No characters yet. Add the first one, and start with a single sentence.</p>'
       }
-      <div class="button-row section-actions">
+      ${
+        cards
+          ? ''
+          : `<div class="button-row section-actions">
         <button type="button" class="button button-soft" id="skip">Skip for now</button>
-      </div>
+      </div>`
+      }
     </div>`;
   setupCardReorder(document.getElementById('card-grid'), {
     attr: 'slug',
@@ -1385,7 +1389,8 @@ function renderAll() {
 function renderNav() {
   const current = state.section?.id;
   const sectionState = (s) => {
-    if (state.settings.sections?.[s.id]?.skipped) return { shape: '–', word: 'Skipped' };
+    // A skip only holds while a many-entry section is empty; adding a character ends it.
+    if (state.settings.sections?.[s.id]?.skipped && !(s.many && state.characters.length)) return { shape: '–', word: 'Skipped' };
     if (s.many) {
       const n = state.characters.length;
       return { shape: n ? '◐' : '○', word: n ? `${n} ${n === 1 ? 'character' : 'characters'}` : 'None yet' };
