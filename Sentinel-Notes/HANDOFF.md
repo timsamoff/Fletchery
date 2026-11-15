@@ -1,21 +1,18 @@
 # Handoff
 
-Updated 2026-11-15. The code review fixes are tested by Tim, committed, and pushed. H3b is built and waiting on Tim's browser check.
+Updated 2026-11-15. Nothing is in progress. The code review fixes and H3b are tested by Tim, committed, and pushed.
 
 ## 1. Current task and status
 
-H3b: text no box holds (anything before the first layer heading, or before a Sheet's first field) now shows read-only under the entry as "Other text in this file". Checked with Playwright; `npm test` and the gate pass. Not committed.
+None. The last work was the code review (`code-review-2026-11-15.md`), its fixes, the tests in `test/`, and H3b ("Other text in this file" under an entry).
 
-## 2. Files touched (uncommitted)
+## 2. Files touched
 
-- `public/js/app.js`: an `#other-text` section in the entry page, and `renderOtherText`, called from `renderAll`.
-- `public/css/base.css`: `.other-text` styles.
-- `Sentinel-Notes/TODO.md`: H3b moved to Done.
-- Maintainer guide 05, 08, and the changelog.
+None uncommitted.
 
 ## 3. Next step
 
-Ask Tim to check H3b: put a line of text above `## Seed` in a character file, and a line between `## Sheet` and the first `###`, then open the character and scroll to the bottom. A character without such text shows no block. Then commit ("Show text that has no box under the entry") and ask before pushing. After that, Characters step 3 (the media library) is the next feature; discuss it first.
+Characters step 3, the media library: a gallery of every image, picking existing images into an entry, and Move to library or Move to entry with link rewriting. Discuss the design with Tim before building. Settle L2b (thumbnails) as part of it, since the gallery loads many images at once. The review's leftovers (L3, L4, L6, L7b, L8, D4) and the research ideas are in the TODO.
 
 ## 4. Open questions for Tim
 
@@ -30,3 +27,4 @@ Ask Tim to check H3b: put a line of text above `## Seed` in a character file, an
 - Changing `bin/fletchery.js` trips the README gate. The plain "no free port" message (L7b) needs a README edit in the same commit.
 - A Playwright `goto` to a new hash on a loaded page is only a hash change. Reload after it, and check which entry is open before typing.
 - Test against a copy of a bible in `scratch/` on `--port 3100 --no-open`, never Tim's real story.
+- Give Tim test steps in terms of what he does and where. "Add a line above `## Seed`" needed the explanation that it means the file in a text editor, not a box in the app.
