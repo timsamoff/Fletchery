@@ -14,7 +14,11 @@ None uncommitted.
 
 Characters step 3, the media library: a gallery of every image, picking existing images into an entry, and Move to library or Move to entry with link rewriting. Discuss the design with Tim before building. Settle L2b (thumbnails) as part of it, since the gallery loads many images at once. The review's leftovers (L3, L4, L6, L7b, L8, D4) and the research ideas are in the TODO.
 
+A media library proposal went to Tim in chat on 2026-11-15 (five decisions: a `media/` folder, references instead of copies, no thumbnails yet, PDFs later, a `#/media` page under Notes and media). Nothing is built or written into the brief until he answers. After the media library, Tim wants to discuss the overall app design; ask what he has in mind before assuming visual or architectural.
+
 ## 4. Open questions for Tim
+
+- The five media library decisions above.
 
 - Sentinel 1.8.0: update now, not now, or skip.
 - Delete a character: a real delete or a trash folder?
