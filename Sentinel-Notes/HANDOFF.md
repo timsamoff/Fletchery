@@ -1,24 +1,25 @@
 # Handoff
 
-Updated 2026-11-15. The code review fixes are tested by Tim and committed. Nothing is in progress.
+Updated 2026-11-15. The code review fixes are tested by Tim, committed, and pushed. H3b is built and waiting on Tim's browser check.
 
 ## 1. Current task and status
 
-Done: the review, the fixes (H1-H3, M1-M7, L1, L2, L5, L7, D1-D3), the tests, and the docs. Tim verified them in the browser. Four commits are local and not pushed: `4ca2a2e`, `5df2f04`, `b2012b5`, and this handoff.
+H3b: text no box holds (anything before the first layer heading, or before a Sheet's first field) now shows read-only under the entry as "Other text in this file". Checked with Playwright; `npm test` and the gate pass. Not committed.
 
-## 2. Files touched
+## 2. Files touched (uncommitted)
 
-None uncommitted.
+- `public/js/app.js`: an `#other-text` section in the entry page, and `renderOtherText`, called from `renderAll`.
+- `public/css/base.css`: `.other-text` styles.
+- `Sentinel-Notes/TODO.md`: H3b moved to Done.
+- Maintainer guide 05, 08, and the changelog.
 
 ## 3. Next step
 
-Push once Tim says so. Then the strongest next item is H3b (show text the boxes can't hold in a read-only block), because it closes the last gap where a writer's text is kept but not shown. Characters step 3, the media library, is the next feature. Discuss either with Tim before building.
+Ask Tim to check H3b: put a line of text above `## Seed` in a character file, and a line between `## Sheet` and the first `###`, then open the character and scroll to the bottom. A character without such text shows no block. Then commit ("Show text that has no box under the entry") and ask before pushing. After that, Characters step 3 (the media library) is the next feature; discuss it first.
 
 ## 4. Open questions for Tim
 
-- OK to push the four commits?
 - Sentinel 1.8.0: update now, not now, or skip.
-- H3 option A is built and tested. Should H3b follow?
 - Delete a character: a real delete or a trash folder?
 - Whether any research idea moves from "discuss later" to planned.
 
