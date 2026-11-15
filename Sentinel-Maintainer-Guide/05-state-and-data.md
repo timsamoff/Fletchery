@@ -42,7 +42,7 @@ images: [file names]  # characters only, optional order
 ...
 ```
 
-Only layers with text are written, in that order. Text before the first layer heading (`preamble`) is kept. Only the three layer headings split a body: any other `##` heading stays in the layer it sits in, and a `###` heading that isn't a field label stays in its field (`extra` is always empty now). A layer or field heading that appears twice adds to the first. A body with no layer headings reads as the Seed. A Sheet with its own `questions` (Premise) is one free-text box; its text is held in `sheetExtra`.
+Only layers with text are written, in that order. Text before the first layer heading (`preamble`) is kept. Only the three layer headings split a body: any other `##` heading stays in the layer it sits in, and a `###` heading that isn't a field label stays in its field (`extra` is always empty now). A layer or field heading that appears twice adds to the first. `preamble`, and `sheetExtra` in a Sheet of fields, have no box, so `renderOtherText` shows them read-only under the entry ("Other text in this file"). A body with no layer headings reads as the Seed. A Sheet with its own `questions` (Premise) is one free-text box; its text is held in `sheetExtra`.
 
 ### Sidecar
 

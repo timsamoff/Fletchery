@@ -451,7 +451,8 @@ async function openEntry(path, slug) {
     </div>
     <p class="hint" id="ask-ai-note">Ask AI turns on once you choose an AI in Settings, in a later version.</p>
     <dl class="entry-meta" id="entry-meta"></dl>
-    <p class="hint file-note">Saved to <code>story-bible/${esc(path)}</code> as you type. Changes made to that file in another editor appear here.</p>`;
+    <p class="hint file-note">Saved to <code>story-bible/${esc(path)}</code> as you type. Changes made to that file in another editor appear here.</p>
+    <section class="other-text" id="other-text" aria-labelledby="other-text-title" hidden></section>`;
 
   document.getElementById('next-depth').addEventListener('click', goForward);
   document.getElementById('focus-open').addEventListener('click', openFocus);
@@ -1421,6 +1422,22 @@ function renderAll() {
   renderStatus();
   renderDepth();
   renderWork();
+  renderOtherText();
+}
+
+// Text in the file that no box holds is shown as it is, so the writer knows it's there and where to change it.
+function renderOtherText() {
+  const el = document.getElementById('other-text');
+  const parts = [
+    ['Before the first heading', state.layers.preamble],
+    ['In the Sheet, before the first field', sheetFields().length ? state.layers.sheetExtra : ''],
+  ].filter(([, text]) => text);
+  el.hidden = !parts.length;
+  el.innerHTML = parts.length
+    ? `<h2 id="other-text-title">Other text in this file</h2>
+       <p class="hint">Fletchery keeps this text but has no box for it. To change it, open the file in another editor.</p>
+       ${parts.map(([label, text]) => `<h3>${label}</h3><p class="other-text-body">${esc(text)}</p>`).join('')}`
+    : '';
 }
 
 // The sidebar: built sections link to their pages, and Characters opens like a folder to list every character.

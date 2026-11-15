@@ -54,7 +54,6 @@ Conventions: when an item is finished, move its line to the Done section at the 
 
 ## Code review findings (code-review-2026-11-15.md)
 
-- [ ] H3b: Show text the boxes can't hold (before the first layer heading, or before a Sheet's first field) in a read-only block.
 - [ ] L2b: Decide on thumbnails before the media library's gallery; the Images tab still loads originals.
 - [ ] L3: Keep YAML comments in frontmatter on save (`parseDocument`), if writers turn out to use them.
 - [ ] L4: Send the portrait, crop, image-order, and duplicate writes through the same guards as `save()`.
@@ -100,4 +99,5 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [x] L7: The port search stops at 65535.
 - [x] D1-D3: `DESIGN.md`, `INTEGRATION_CHECKLIST.md`, and the gate baseline brought up to date.
 - [x] Found while testing: leaving an entry no longer saves its text into the next one while that one loads.
+- [x] H3b: Text no box holds (before the first layer heading, or before a Sheet's first field) shows read-only under the entry.
 - [x] Rename showed "Not found.": the server predated the folder-move route; the page now says to restart Fletchery.

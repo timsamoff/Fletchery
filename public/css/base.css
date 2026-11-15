@@ -979,6 +979,35 @@ textarea:focus-visible {
   margin-top: var(--line);
 }
 
+/* Text in the file that no box holds, shown read-only under the entry. */
+.other-text {
+  max-width: var(--measure);
+  margin-top: var(--line);
+  padding-top: calc(var(--line) - var(--border)); /* the rule and the padding make one line together */
+  border-top: var(--border) solid var(--color-rule);
+}
+.other-text h2 {
+  margin: 0;
+  font-size: var(--text-h3);
+  line-height: var(--leading-h3);
+}
+.other-text h3 {
+  margin: var(--line) 0 0;
+  font-size: var(--text-small);
+  line-height: var(--line);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-quiet);
+}
+.other-text p {
+  margin: 0;
+}
+.other-text-body {
+  font-family: var(--font-writing);
+  white-space: pre-wrap; /* the text exactly as it is in the file */
+}
+
 /* Focus: the question and fields on a sheet over the page, inset evenly from the window on every side. It rises as
    it fades in, and sinks back on close. Only the writer's text scrolls inside it. */
 .focus-dialog {
