@@ -27,8 +27,9 @@ export class LocalServerStore {
   }
 
   // Pass baseVersion null to create a file that must not exist yet. Returns the new version.
-  async write(path, content, baseVersion) {
-    return (await this.#call('PUT', '/api/file', { path, content, baseVersion })).version;
+  // keepalive lets the request finish after the page closes; browsers allow it for bodies up to about 64 KB.
+  async write(path, content, baseVersion, { keepalive = false } = {}) {
+    return (await this.#call('PUT', '/api/file', { path, content, baseVersion }, { keepalive })).version;
   }
 
   async delete(path, baseVersion) {
@@ -66,7 +67,7 @@ export class LocalServerStore {
     return () => source.close();
   }
 
-  async #call(method, url, body) {
+  async #call(method, url, body, { keepalive = false } = {}) {
     let res;
     try {
       const raw = typeof Blob !== 'undefined' && body instanceof Blob; // an image goes as it is
@@ -74,6 +75,7 @@ export class LocalServerStore {
         method,
         headers: body ? { 'Content-Type': raw ? body.type || 'application/octet-stream' : 'application/json' } : {},
         body: raw ? body : body ? JSON.stringify(body) : undefined,
+        keepalive,
       });
     } catch {
       throw new StoreError('Fletchery isn’t responding. Is it still running in the terminal?');

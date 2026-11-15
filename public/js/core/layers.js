@@ -5,6 +5,7 @@ export const DEPTHS = ['seed', 'sketch', 'sheet'];
 const HEADINGS = { seed: 'Seed', sketch: 'Sketch', sheet: 'Sheet' };
 
 // sheetFields: [{ id, label }] in order. Returns { preamble, seed, sketch, sheet: { [id]: text }, sheetExtra, extra }.
+// extra is always empty now; it stays in the shape so a layers object made before the change still serializes.
 // With no sheetFields, the Sheet is one free-text box and all of it lands in sheetExtra.
 export function parseLayers(body, sheetFields = []) {
   const layers = { preamble: '', seed: '', sketch: '', sheet: {}, sheetExtra: '', extra: '' };
@@ -17,37 +18,54 @@ export function parseLayers(body, sheetFields = []) {
     return layers;
   }
 
+  // A layer or field whose heading appears twice picks up where it left off, one blank line later.
+  const resuming = new Set();
+  const resume = (chunk) => {
+    while (chunk.length && !chunk[chunk.length - 1].trim()) chunk.pop();
+    resuming.add(chunk);
+  };
+  const add = (chunk, line) => {
+    if (resuming.has(chunk)) {
+      if (!line.trim()) return;
+      resuming.delete(chunk);
+      if (chunk.length) chunk.push('');
+    }
+    chunk.push(line);
+  };
+
   let current = 'preamble';
-  const chunks = { preamble: [], seed: [], sketch: [], sheet: [], extra: [] };
+  const chunks = { preamble: [], seed: [], sketch: [], sheet: [] };
   for (const line of lines) {
-    if (/^## /.test(line)) {
+    // Only the three layer names start a new layer. Any other heading is the writer's and stays where it was typed.
+    if (isLayerHeading(line)) {
       const name = line.slice(3).trim().toLowerCase();
-      const depth = DEPTHS.find((d) => HEADINGS[d].toLowerCase() === name);
-      current = depth ?? 'extra';
-      if (!depth) chunks.extra.push(line);
+      current = DEPTHS.find((d) => HEADINGS[d].toLowerCase() === name);
+      resume(chunks[current]);
       continue;
     }
-    chunks[current].push(line);
+    add(chunks[current], line);
   }
   layers.preamble = chunks.preamble.join('\n').trim();
   layers.seed = chunks.seed.join('\n').trim();
   layers.sketch = chunks.sketch.join('\n').trim();
-  layers.extra = chunks.extra.join('\n').trim();
 
-  // Sheet fields are ### subsections matched by label; unknown subsections are kept.
+  // Sheet fields are ### subsections matched by label. Any other ### heading stays in the field it was typed in,
+  // or in sheetExtra when it comes before the first field.
   let field = null;
   const fieldChunks = {};
   const extraSheet = [];
   for (const line of chunks.sheet) {
     if (/^### /.test(line)) {
       const label = line.slice(4).trim().toLowerCase();
-      field = sheetFields.find((f) => f.label.toLowerCase() === label)?.id ?? null;
-      if (field) fieldChunks[field] = [];
-      else extraSheet.push(line);
-      continue;
+      const named = sheetFields.find((f) => f.label.toLowerCase() === label)?.id;
+      if (named) {
+        field = named;
+        fieldChunks[field] ??= [];
+        resume(fieldChunks[field]);
+        continue;
+      }
     }
-    if (field) fieldChunks[field].push(line);
-    else extraSheet.push(line);
+    add(field ? fieldChunks[field] : extraSheet, line);
   }
   for (const f of sheetFields) layers.sheet[f.id] = (fieldChunks[f.id] ?? []).join('\n').trim();
   layers.sheetExtra = extraSheet.join('\n').trim();

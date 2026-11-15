@@ -18,7 +18,10 @@ const DEFAULTS = {
 const isObject = (v) => v && typeof v === 'object' && !Array.isArray(v);
 function merge(base, patch) {
   const out = { ...base };
-  for (const [k, v] of Object.entries(patch ?? {})) out[k] = isObject(v) && isObject(base[k]) ? merge(base[k], v) : v;
+  for (const [k, v] of Object.entries(patch ?? {})) {
+    if (isObject(base[k]) && !isObject(v)) continue; // a hand-edited group that isn't a group is ignored
+    out[k] = isObject(v) && isObject(base[k]) ? merge(base[k], v) : v;
+  }
   return out;
 }
 
@@ -232,10 +235,12 @@ export function setupSettingsPanel(settings) {
     const finish = () => {
       if (done) return;
       done = true;
+      dialog.removeEventListener('transitionend', onEnd);
       dialog.close();
       opener.focus();
     };
-    dialog.addEventListener('transitionend', (e) => e.target === dialog && finish());
+    const onEnd = (e) => e.target === dialog && finish();
+    dialog.addEventListener('transitionend', onEnd);
     setTimeout(finish, 400); // covers reduced motion, where no transition runs
   };
   document.getElementById('settings-close').addEventListener('click', close);

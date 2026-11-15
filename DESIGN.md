@@ -13,7 +13,7 @@ Fletchery runs in two editions that share one front end and one file format:
 
 ## Current structure
 
-As of the Premise step:
+As of Characters step 2:
 
 | Path | Role |
 |---|---|
@@ -24,13 +24,14 @@ As of the Premise step:
 | `public/index.html` | Page shell: skip link, header, `main`, and footer with the save-status live region. |
 | `public/js/app.js` | First-run setup, page addresses (`#/premise`, `#/characters`, `#/characters/<slug>`), the sidebar, the Characters cards, adding and renaming characters, the portrait menu and crop view, the Images tab, and the entry editor: depth control, the "One at a time" and "All questions" layouts, status and marking canon, Skip for now, autosave, live updates, and the conflict panel. |
 | `public/js/settings.js` | The writer's settings in `story-bible/fletchery-settings.json` (load, merge, save with a version check, reload on outside edits) and the Settings panel. |
-| `public/js/core/layers.js` | The Seed, Sketch, and Sheet layers inside an entry body. Unknown text is kept. |
+| `public/js/core/layers.js` | The Seed, Sketch, and Sheet layers inside an entry body. Only those three headings split a body; any other text, headings included, stays where it is. |
 | `sections/<type>.json` | Section definitions for each story type: IDs, titles, and for built sections the why-it-matters line, guiding questions, and fields at each depth. Served at `/sections/`. |
 | `public/js/core/entry.js` | Entry files: frontmatter parsing and serialization, new-entry frontmatter, and the body update rules. It imports the bare name `yaml`, which the page's import map points at `/vendor/yaml/` and Node resolves from `node_modules`, so the same module runs in both. |
 | `public/js/core/store.js` | The storage interface and `LocalServerStore`, its backend for the local edition. |
 | `public/js/core/media.js` | Image names and sidecars: reading and writing `<image>.meta.md` (caption, alt text, and what to notice), keeping any other text. |
 | `public/css/tokens.css` | Every color, type size, rhythm, and spacing value, plus the `@font-face` rules. |
 | `public/css/base.css` | Layout and components, built only from tokens. |
+| `test/` | `node:test` tests for the core and the server, run with `npm test`. |
 | `sentinel-gate/` | The quality gate: `commit-msg` and `pre-push` hooks and the session-start hook. See `INTEGRATION_CHECKLIST.md`. |
 
 ### API
@@ -47,13 +48,13 @@ The server is a file store. Paths are relative to `story-bible/`, and a version 
 | `POST /api/move` | Moves a file, with the same version check. Refuses if the destination exists. |
 | `POST /api/move-folder` | Moves a whole folder, such as a renamed character's. Refuses if anything has the new name. |
 | `POST /api/upload?dir=&name=` | Saves the request body as an image (JPEG, PNG, WebP, or GIF, up to 25 MB) in `dir`, under a safe version of `name`. A clash gets `-2`, `-3`, and so on, unless `replace=1` (used for the portrait copy). Returns the path. |
-| `GET /api/media?path=` | An image from the bible, with its own content type. SVG isn't served, because it can carry scripts. |
+| `GET /api/media?path=` | An image from the bible, with its own content type and an `ETag`, so an unchanged image answers 304. SVG isn't served, because it can carry scripts. |
 | `DELETE /api/media` | Deletes an image. |
 | `GET /api/events` | Server-sent events, one `change` event (path and version) per real content change. |
 
 ### Saving and conflicts
 
-The page keeps the version and full content of the file it loaded. It saves about 500 ms after typing stops, and on blur. The core builds the new file from the loaded content (keeping its frontmatter, filling any missing fields, and updating `updated` and `status`), and the store writes it with the loaded version as `baseVersion`. The server writes only if the file on disk still has that version. Writes go to a temp file in the same folder, which is then renamed over the target, so another program never reads a half-written file.
+The page keeps the version and full content of the file it loaded. It saves about 500 ms after typing stops, on blur, and when the page is closed or left (`pagehide`, with a `keepalive` request). Moving to another page waits for the save, and a save that fails or conflicts keeps the writer where they are. The core builds the new file from the loaded content (keeping its frontmatter, filling any missing fields, and updating `updated` and `status`), and the store writes it with the loaded version as `baseVersion`. The server writes only if the file on disk still has that version. Writes go to a temp file in the same folder, which is then renamed over the target, so another program never reads a half-written file.
 
 When the watcher reports a change to the open file, the page reloads it if nothing is unsaved. If there are unsaved edits, it shows both versions and asks the writer which to keep. The server records the hash of each file it writes, so its own saves never come back as outside changes.
 
@@ -63,7 +64,7 @@ The server binds to `127.0.0.1` only. It rejects any request whose `Host` header
 
 ## Target structure
 
-These changes come next, before the Premise section is built out.
+These changes are planned.
 
 ### Shared core
 
@@ -82,6 +83,8 @@ The core talks to storage only through one interface:
 | `write(path, content, baseVersion)` | Writes only if the stored version still matches. Otherwise it fails with the current content. |
 | `delete(path)`, `move(from, to)` | The same version check. |
 | `changes()` | A stream of outside changes, pushed (watcher, `FileSystemObserver`) or polled (focus, interval). |
+
+`LocalServerStore` has grown past this table: it also has `info()`, `moveFolder(from, to)`, `upload(dir, name, blob)`, `deleteMedia(path)`, and `mediaUrl(path)`. The web backends need all five. `mediaUrl` returns an address at once, which a folder or Drive backend can't do, so it has to become asynchronous (or hand out object URLs) before `FolderStore` is built.
 
 ### Storage backends
 

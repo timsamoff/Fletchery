@@ -14,6 +14,7 @@ const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;
 
 // Splits a file into frontmatter and body. Throws EntryFormatError if the YAML is broken.
 export function parseEntry(raw) {
+  raw = raw.replace(/^\uFEFF/, ''); // some Windows editors start a file with a byte order mark
   const match = raw.match(FRONTMATTER);
   if (!match) return { frontmatter: {}, body: trimOne(raw.replace(/\r\n/g, '\n')) };
   let frontmatter;

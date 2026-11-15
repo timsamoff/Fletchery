@@ -22,8 +22,9 @@ Severity: High (likely to cause a bug or block planned work), Medium (a trap for
 
 All are in `Sentinel-Notes/TODO.md`; they are listed here so a maintainer sees them in one place.
 
-- **No automated tests (T1).** Conflict detection, the path guard, and frontmatter completeness are the first candidates. Verification is manual (`12-verification-checklists.md`).
-- **Baselined gate findings.** 13 `raw-token-value` and 1 `color-literal` in `public/css/base.css` (S1, S2, C1). `npm run sentinel:report` lists them.
+- **The page has no automated tests.** `npm test` covers the core and the server. `app.js` and `settings.js` are verified by hand (`12-verification-checklists.md`).
+- **Text the boxes can't hold is hidden (H3b).** `preamble`, and `sheetExtra` in a Sheet of fields, are kept in the file but shown nowhere.
+- **Baselined gate findings.** 10 `raw-token-value` and 1 `color-literal` in `public/css/base.css` (S1, S2, C1). `npm run sentinel:report` lists them.
 - **Unused or duplicate tokens (S5, S3, S4).** `--unit`, `--baseline`, `--space-6`, and `--color-border-quiet` are unused; a mono font token is missing.
 - **The `yaml` browser build loads as 72 module files (P2).** Acceptable locally, slow for a hosted edition.
 - **The watcher stops if `story-bible/` is deleted and recreated (Q5).**

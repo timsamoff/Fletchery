@@ -7,22 +7,7 @@
   {
     "rule": "raw-token-value",
     "file": "public/css/base.css",
-    "content": "text-decoration-thickness: 2px;"
-  },
-  {
-    "rule": "raw-token-value",
-    "file": "public/css/base.css",
     "content": "outline-offset: 2px;"
-  },
-  {
-    "rule": "raw-token-value",
-    "file": "public/css/base.css",
-    "content": "width: 48px;"
-  },
-  {
-    "rule": "raw-token-value",
-    "file": "public/css/base.css",
-    "content": "height: 48px;"
   },
   {
     "rule": "raw-token-value",

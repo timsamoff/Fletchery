@@ -42,7 +42,7 @@ images: [file names]  # characters only, optional order
 ...
 ```
 
-Only layers with text are written, in that order. Text before the first layer heading (`preamble`) and unknown `##` sections (`extra`) are kept. A body with no layer headings reads as the Seed. A Sheet with its own `questions` (Premise) is one free-text box; its text is held in `sheetExtra`.
+Only layers with text are written, in that order. Text before the first layer heading (`preamble`) is kept. Only the three layer headings split a body: any other `##` heading stays in the layer it sits in, and a `###` heading that isn't a field label stays in its field (`extra` is always empty now). A layer or field heading that appears twice adds to the first. A body with no layer headings reads as the Seed. A Sheet with its own `questions` (Premise) is one free-text box; its text is held in `sheetExtra`.
 
 ### Sidecar
 
@@ -54,7 +54,7 @@ All page state is the `state` object in `app.js`. Fields set in its literal:
 
 - `settings`, `settingsVersion`: the bible record and its version.
 - `sectionSet`, `section`: the loaded section file and the open section.
-- `page`: `'entry'` or `'list'`. `entry`: `{ path, slug }`.
+- `page`: `'entry'`, `'list'`, `'loading'` (an entry being read; nothing saves), or `'problem'` (an entry that couldn't be read). `entry`: `{ path, slug }`.
 - `characters`: card data for the sidebar and cards. `statusCache`: status per single-entry section.
 - `layers`, `depth`, `mode`, `step`, `contextOpen`, `focusOpen`: the editor.
 - `baseVersion`, `baseContent`, `savedBody`, `frontmatter`: the loaded file, for saving and for dirty checks.

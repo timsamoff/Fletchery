@@ -2,6 +2,10 @@
 
 Newest first. One entry per development session: three to six lines on what changed in the project, why, and which guide files were updated. A session that only edits the guide gets one line.
 
+## 2026-11-15: code review and fixes
+
+A full code review (`Sentinel-Notes/code-review-2026-11-15.md`) found three ways the writer's text could be damaged or hidden, and most findings were fixed the same day. The server now decodes a request as one stream. The layer parser splits a body only at the three layer headings and never replaces a repeated part. Leaving a page waits for the save and stays put if it fails, the last keystrokes are sent on `pagehide`, and a rename can't leave a folder that doesn't match its file. `state.page` gained `'loading'` and `'problem'`. Tests were added in `test/` (`npm test`). Guide files updated: 04, 05, 08, 11.
+
 ## 2026-11-02: guide written
 
 Wrote the first version of this guide from the code at commit `0996626`. All files created. Checked against the code, then reviewed by Tim.

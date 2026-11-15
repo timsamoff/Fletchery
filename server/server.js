@@ -71,7 +71,7 @@ export function createServer(projectDir) {
       await bible.moveFolder(from, to);
       return send(res, 200, {});
     }
-    if (route === 'GET /api/media') return serveMedia(url.searchParams.get('path'), res);
+    if (route === 'GET /api/media') return serveMedia(url.searchParams.get('path'), req, res);
     if (route === 'POST /api/upload') {
       const p = url.searchParams;
       return send(res, 200, await upload(p.get('dir'), p.get('name'), p.get('replace') === '1', req));
@@ -114,17 +114,26 @@ export function createServer(projectDir) {
     return { version: current.version };
   }
 
-  async function serveMedia(rel, res) {
+  async function serveMedia(rel, req, res) {
     const type = IMAGE_TYPES[path.extname(rel ?? '').toLowerCase()];
     if (!type) throw new BibleError(400, 'That isn’t an image Fletchery shows.');
+    const full = bible.resolve(rel);
     let data;
+    let etag;
     try {
-      data = await fs.readFile(bible.resolve(rel));
+      // The tag changes whenever the file does, so the browser keeps its copy of an unchanged image.
+      const stat = await fs.stat(full);
+      etag = `"${stat.size}-${Math.round(stat.mtimeMs)}"`;
+      if (req.headers['if-none-match'] === etag) {
+        res.writeHead(304, { ETag: etag, 'Cache-Control': 'no-cache' });
+        return res.end();
+      }
+      data = await fs.readFile(full);
     } catch (err) {
       if (err.code === 'ENOENT') throw new BibleError(404, 'There is no image there.');
       throw err;
     }
-    res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-cache', 'X-Content-Type-Options': 'nosniff' });
+    res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-cache', ETag: etag, 'X-Content-Type-Options': 'nosniff' });
     res.end(data);
   }
 
@@ -249,6 +258,8 @@ async function readBody(req) {
   if (!String(req.headers['content-type'] ?? '').startsWith('application/json')) {
     throw new BibleError(415, 'Expected JSON.');
   }
+  // Decoded as one stream, so a character split across two chunks stays whole.
+  req.setEncoding('utf8');
   let data = '';
   for await (const chunk of req) {
     data += chunk;
@@ -272,7 +283,7 @@ function listenOnFreePort(server, startPort, tries = 50) {
       });
     };
     const onError = (err) => {
-      if (err.code === 'EADDRINUSE' && candidate < startPort + tries) {
+      if (err.code === 'EADDRINUSE' && candidate < Math.min(startPort + tries, 65535)) {
         candidate++;
         attempt();
       } else reject(err);

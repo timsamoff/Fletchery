@@ -55,6 +55,12 @@ const prefs = new Settings(store, {
   onError: (err) => setStatus(`Settings problem: ${err.message}.`),
 });
 
+// A failure nothing else caught still reaches the writer, in the status line.
+window.addEventListener('unhandledrejection', (event) => {
+  console.error(event.reason);
+  setStatus(`Something went wrong. ${event.reason?.message ?? ''}`.trim());
+});
+
 // ---------- Start ----------
 
 async function start() {
@@ -75,7 +81,7 @@ async function start() {
     setupGridToggle();
     setupSettingsPanel(prefs);
     if (!settings) return showSetup();
-    showEditor(settings, file.version);
+    await showEditor(settings, file.version);
   } catch (err) {
     showProblem('Fletchery couldn’t start', err.message);
   }
@@ -208,7 +214,7 @@ const state = {
   settingsVersion: null,
   sectionSet: null,
   section: null, // the built section being shown
-  page: null, // 'entry' (the editor) or 'list' (a section's cards, such as Characters)
+  page: null, // 'entry' (the editor), 'list' (a section's cards), 'loading' (an entry being read), or 'problem' (unreadable)
   entry: null, // { path, slug } of the entry being edited
   characters: [], // [{ slug, title, status, description, silhouette }] for the sidebar and the cards
   statusCache: {}, // section id -> status word, for single-entry sections shown in the sidebar
@@ -350,15 +356,20 @@ async function showEditor(settings, settingsVersion) {
 // #/premise, #/characters, #/characters/<slug>. An unknown or unbuilt section opens the first built one.
 
 async function route() {
-  const [sectionId, slug] = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  const [sectionId, rawSlug] = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
+  const slug = rawSlug && decodeSlug(rawSlug);
   const first = visibleSections().find((s) => s.built);
   const section = visibleSections().find((s) => s.id === sectionId && s.built);
   if (!section) {
     history.replaceState(null, '', `#/${first.id}`);
     return route();
   }
-  if (state.page === 'entry' && state.conflict) return; // the conflict panel stays until it's resolved
-  if (state.page === 'entry' && isDirty()) await save();
+  if (state.page === 'entry' && state.conflict) return stayOnPage(); // the conflict panel stays until it's resolved
+  if (state.page === 'entry') {
+    await save();
+    // Unsaved text never gets left behind: a failed or conflicting save keeps the writer on this page.
+    if (state.conflict || isDirty()) return stayOnPage();
+  }
   if (state.focusOpen) closeFocus();
 
   state.section = section;
@@ -371,9 +382,26 @@ async function route() {
   await openEntry(section.many ? entryFile(section, slug) : section.file, slug ?? null);
 }
 
+// A folder made by hand can have spaces or accents in its name, which the address carries encoded.
+function decodeSlug(raw) {
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+}
+
+// Puts the address back to the page that's showing, after a move away from it was refused.
+function stayOnPage() {
+  const slug = state.entry?.slug;
+  history.replaceState(null, '', `#/${state.section.id}${slug ? `/${encodeURIComponent(slug)}` : ''}`);
+}
+
 async function openEntry(path, slug) {
   const section = state.section;
-  state.page = 'entry';
+  // Until the file is read, the page holds the last entry's text, so nothing may save. Removing the old text box
+  // fires its blur, which would otherwise write that text into this entry.
+  state.page = 'loading';
   state.entry = { path, slug };
   state.step = 0;
   state.view = 'text';
@@ -433,10 +461,13 @@ async function openEntry(path, slug) {
   setupPortraitMenu();
 
   try {
-    load(toEntry(await store.read(path)), { firstLoad: true });
+    const entry = toEntry(await store.read(path));
+    state.page = 'entry';
+    load(entry, { firstLoad: true });
   } catch (err) {
     if (err.detail) console.error(`${path}: ${err.detail}`);
     setStatus(err.message);
+    state.page = 'problem'; // nothing loaded, so there's nothing here to save or to watch
     page.querySelectorAll('textarea, button, input').forEach((el) => (el.disabled = true));
   }
   main.focus({ preventScroll: true });
@@ -466,7 +497,7 @@ async function loadCharacters() {
         const { frontmatter } = parseEntry(file.content);
         return {
           slug,
-          title: frontmatter.title || slug,
+          title: String(frontmatter.title || slug), // a hand-written title such as 1984 parses as a number
           status: normalizeStatus(frontmatter.status),
           description: frontmatter.description ?? '',
           silhouette: frontmatter.silhouette ?? 'neutral',
@@ -588,7 +619,7 @@ function renderListPage() {
     label: (slug) => state.characters.find((c) => c.slug === slug)?.title ?? '',
   });
   document.getElementById('add-entry').addEventListener('click', () => openNameDialog('add'));
-  document.getElementById('skip').addEventListener('click', skipSection);
+  document.getElementById('skip')?.addEventListener('click', skipSection);
   renderNav();
   main.focus({ preventScroll: true });
 }
@@ -856,13 +887,20 @@ async function addCharacter(name) {
 // Renames the character, its folder, and its file together, so the folder stays readable for writers who
 // work in it directly. Rewriting links in other entries arrives with the media library's link rewriting.
 async function renameCharacter(name) {
-  if (isDirty()) await save();
+  await save();
+  if (state.conflict || isDirty()) throw new Error('Save or resolve your changes first, then rename.');
   const section = state.section;
   const old = state.entry.slug;
   const slug = freeSlug(name, old);
   if (slug !== old) {
     await store.moveFolder(`${section.folder}/${old}`, `${section.folder}/${slug}`);
-    await store.move(`${section.folder}/${slug}/${old}.md`, entryFile(section, slug), state.baseVersion);
+    try {
+      await store.move(`${section.folder}/${slug}/${old}.md`, entryFile(section, slug), state.baseVersion);
+    } catch (err) {
+      // Put the folder back, so the character never ends up in a folder that doesn't match its file.
+      await store.moveFolder(`${section.folder}/${slug}`, `${section.folder}/${old}`).catch(() => {});
+      throw err;
+    }
     state.entry = { path: entryFile(section, slug), slug };
     // Keep the renamed character's place in the card order.
     const order = state.settings.order?.characters ?? [];
@@ -1566,12 +1604,12 @@ function renderDepth() {
   // The forward button goes to the next depth, and from the Sheet to the next section, disabled until it's built.
   const next = DEPTHS[DEPTHS.indexOf(state.depth) + 1];
   const nextButton = document.getElementById('next-depth');
-  const sections = state.sectionSet.sections.filter((s) => !s.onlyFor || s.onlyFor === state.settings.scope);
+  const sections = visibleSections();
   const nextSection = next ? null : sections[sections.findIndex((s) => s.id === state.section.id) + 1];
   nextButton.hidden = !next && !nextSection;
   nextButton.textContent = next ? `Go to ${state.section.depths[next].label}` : `Go to ${nextSection?.title ?? ''}`;
   nextButton.disabled = !next && !nextSection?.built;
-  nextButton.title = nextButton.disabled ? `${nextSection.title} isn’t built yet.` : '';
+  nextButton.title = nextButton.disabled && nextSection ? `${nextSection.title} isn’t built yet.` : '';
   document.getElementById('focus-dialog').setAttribute('aria-label', `Focus: ${state.section.title}, ${state.section.depths[state.depth].label}`);
 }
 
@@ -1913,11 +1951,24 @@ function onInput(textarea) {
   state.timer = setTimeout(save, SAVE_DELAY_MS);
 }
 
+// What the text on the page says the entry should hold: its body, its depth, and its one-line description.
+function textChange() {
+  const from = state.section.descriptionFrom;
+  const description = from ? (state.layers[from] ?? '').split('\n')[0].trim() : undefined;
+  return { body: composedBody(), depth: deepestFilled(state.layers), description };
+}
+
+// Closing the tab or leaving the site within the save delay still sends the last keystrokes.
+window.addEventListener('pagehide', () => {
+  if (state.page !== 'entry' || state.conflict || state.saving || !isDirty()) return;
+  const { content } = updateEntry(state.baseContent, textChange(), template());
+  store.write(entryPath(), content, state.baseVersion, { keepalive: true }).catch(() => {});
+});
+
 // Writes the entry on top of baseVersion. Returns the update result, or null after a conflict or error.
 async function writeEntry(change, baseVersion = state.baseVersion, baseContent = state.baseContent) {
   const body = composedBody();
-  const description = state.section.descriptionFrom ? (state.layers[state.section.descriptionFrom] ?? '').split('\n')[0].trim() : undefined;
-  const result = updateEntry(baseContent, { body, depth: deepestFilled(state.layers), description, ...change }, template());
+  const result = updateEntry(baseContent, { ...textChange(), ...change }, template());
   try {
     const version = await store.write(entryPath(), result.content, baseVersion);
     state.baseVersion = version;
@@ -1943,13 +1994,23 @@ async function writeEntry(change, baseVersion = state.baseVersion, baseContent =
   }
 }
 
-async function save() {
+// A second call while one save is under way waits for that save, so a caller can check the result afterward.
+let savePromise = null;
+function save() {
+  if (savePromise) return savePromise;
+  savePromise = saveNow().finally(() => (savePromise = null));
+  return savePromise;
+}
+
+async function saveNow() {
   clearTimeout(state.timer);
-  if (state.saving || state.conflict || !isDirty()) return;
+  if (state.page !== 'entry' || state.saving || state.conflict || !isDirty()) return;
   state.saving = true;
   setStatus('Saving…');
+  const path = entryPath();
   const result = await writeEntry({});
   state.saving = false;
+  if (state.page !== 'entry' || entryPath() !== path) return; // the writer has moved on to another page
   if (!result) return;
   if (isDirty()) setStatus('Unsaved changes');
   else setStatus(result.reverted ? `Saved at ${timeNow()}. Back to draft because you edited it.` : `Saved at ${timeNow()}`);
@@ -1994,7 +2055,12 @@ async function updateBibleRecord(change) {
         setStatus(`Couldn’t update the settings. ${err.message}`);
         return false;
       }
-      state.settings = JSON.parse(err.current.content);
+      try {
+        state.settings = JSON.parse(err.current.content);
+      } catch {
+        setStatus('Couldn’t update the settings. story-bible/fletchery.json isn’t valid JSON.');
+        return false;
+      }
       state.settingsVersion = err.current.version;
     }
   }

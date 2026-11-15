@@ -17,7 +17,9 @@ Run it from the story project's folder, not from this repo, so app code and stor
 
 ## Test
 
-There is no automated test suite (TODO T1). Verification is by hand in a real browser.
+`npm test` runs the `node:test` tests in `test/`: `core.test.js` for entries, layers, and sidecars, and `server.test.js` for the file store, against a throwaway project in the OS temp folder on port 3400 or the next free one. Add a test with any fix to `server/` or `public/js/core/`.
+
+The page has no automated tests. Verify it by hand in a real browser:
 
 1. Copy a real bible into `scratch/` (gitignored), for example `scratch/<name>/story-bible/`.
 2. From that folder, run `fletchery --port 3100 --no-open`, and open `http://127.0.0.1:3100/`.

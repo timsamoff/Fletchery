@@ -38,7 +38,7 @@ Folded in from `PROJECT_PROFILE.md`'s follow-up list:
 
 ### 2. Persistence and file format (App and Skills)
 
-- [ ] **2.1 Entry file layout.** Use one file per entry, with a `## Seed`, `## Sketch`, and `## Sheet` heading per depth and `###` headings for Sheet fields, read and written by `server/bible.js`. A parser that doesn't recognize a section's headings: **silent**. Text lands in the wrong layer, or round-trips with changes. [plan]
+- [ ] **2.1 Entry file layout.** Use one file per entry, with a `## Seed`, `## Sketch`, and `## Sheet` heading per depth and `###` headings for Sheet fields, read and written by `public/js/core/layers.js` (the server only stores files). A parser that doesn't recognize a section's headings: **silent**. Text lands in the wrong layer, or round-trips with changes. [plan]
 - [ ] **2.2 Frontmatter completeness.** Every entry the server creates gets all seven fields (title, type, depth, status, author, updated, description). Real example: on a recreated file, `putEntry` writes only title, updated, and status (audit Q1). **Silent**. [history]
 - [ ] **2.3 Legacy content.** Files written before a format change must still load. Real example: EOL's premise holds a bare "TBA" with no depth headings, and Phase 2 must read it as the Seed. **Silent** if mishandled. [history]
 - [ ] **2.4 Folder per entry.** Per-item sections (characters, relationships, locations, events, factions, quests) create `<section>/<slug>/` when the entry is created, not when the first image arrives, so relative links stay stable. Single-document sections keep images in `<section>/images/`. Missing: **silent**. Links break later. [plan]
@@ -48,8 +48,8 @@ Folded in from `PROJECT_PROFILE.md`'s follow-up list:
 
 - [ ] **3.1 Section page from data.** The page renders the why-it-matters line, the guiding questions, depth control, status, Skip for now, and the Ask Claude menu from 1.1. A section without its data renders blank or missing controls: **loud** to the eye. [plan]
 - [ ] **3.2 Navigation.** The section appears in the section list, if navigation is built (an open question in the Premise brief). Missing: **silent**. The section exists but can't be reached. [plan]
-- [ ] **3.3 Live updates.** The page's server-sent-events listener accepts changes for the section's files. Today `listen()` in `app.js` drops any change whose path isn't `ENTRY_PATH`, so a new section's outside edits would never appear. **Silent**. [code]
-- [ ] **3.4 Conflict detection.** Every save path sends `baseHash`, and every conflict view keeps "Your version" current. Real example: "Your version" froze when the panel opened and was fixed during the skeleton build. **Silent**. [history]
+- [ ] **3.3 Live updates.** The page's server-sent-events listener accepts changes for the section's files. Today `listen()` in `app.js` handles the open entry and paths under `characters/`, so a new many-entry section's outside edits would not refresh its cards. **Silent**. [code]
+- [ ] **3.4 Conflict detection.** Every save path sends `baseVersion`, and every conflict view keeps "Your version" current. Real example: "Your version" froze when the panel opened and was fixed during the skeleton build. **Silent**. [history]
 - [ ] **3.5 Status shown without color alone.** Empty, draft, and canon each get a text label and a shape. Missing: **silent** for colorblind users. [plan]
 
 ### 4. Generated files (App and Skills)
