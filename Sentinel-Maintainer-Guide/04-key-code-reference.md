@@ -63,7 +63,7 @@ Paths and names only; open the file for the body. Line numbers are left out on p
 | Images | `setView`, `renderImages`, `uploadImages`, `onImagePaste`, `setupImageDialog`, `openImage`, `saveImageDetails`, `duplicateImage`, `saveImageOrder` |
 | Entry rendering | `load`, `renderAll`, `renderHead`, `renderNav`, `renderStatus`, `renderDepth`, `renderWork`, `setDepth`, `setMode` |
 | Focus | `openFocus`, `setupFocus`, `caretSnapshot`, `restoreCaret` |
-| Saving | `onInput`, `textChange`, `writeEntry`, `save` (returns the save under way, if any), `saveNow`, the `pagehide` listener, `toggleCanon`, `updateBibleRecord`, `setSkipped`, `skipSection` |
+| Saving | `onInput`, `fitTextarea` (grows or shrinks a writing box to its text, keeping a dragged height), `textChange`, `writeEntry`, `save` (returns the save under way, if any), `saveNow`, the `pagehide` listener, `toggleCanon`, `updateBibleRecord`, `setSkipped`, `skipSection` |
 | Live updates | `listen`, `checkRemote`, `refreshCharactersSoon` |
 | Conflicts | `showConflict`, `renderConflict`, `resolveConflict`, `closeConflict` |
 | Motion | `animate` (honors reduced motion), `riseIn`, `placeDepthIndicator` |

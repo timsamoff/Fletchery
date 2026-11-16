@@ -31,7 +31,7 @@ One-off scripts go in `scratch/`, not the OS temp folder. Playwright output goes
 ## Debug
 
 - The server logs to the terminal where `fletchery` runs. Unexpected errors print there and return a generic 500 to the page.
-- Notifications appear as a toast (`#toast`). Unsaved, saving, and saved show beside the editor in `#local-status`, and the hidden `#save-status` carries them for screen readers.
+- Notifications appear as a toast (`#toast`, with a close button, `#toast-close`). Unsaved, saving, and saved show beside the editor in `#local-status`, and the hidden `#save-status` carries them for screen readers.
 - Broken frontmatter shows a message in the page and logs the YAML error to the browser console.
 - The grid overlay of the 4px and 28px rhythm lines is turned on with `"grid": true` under `layout` in `story-bible/fletchery-settings.json`.
 

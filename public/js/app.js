@@ -1925,6 +1925,7 @@ function renderWork() {
   });
   work.querySelectorAll('textarea[data-field]').forEach((t) => {
     t.value = fieldValue(t.dataset.field);
+    requestAnimationFrame(() => fitTextarea(t));
     t.addEventListener('input', () => {
       onInput(t);
       fadeChrome(true);
@@ -2146,7 +2147,27 @@ document.addEventListener('pointermove', (e) => {
   }
 });
 
+// Grows a box to fit its text and shrinks it back, but keeps a height the writer dragged.
+// Focus mode scrolls instead.
+function fitTextarea(t) {
+  if (getComputedStyle(t).resize === 'none') {
+    t.style.height = '';
+    return;
+  }
+  const dragged = t._fit != null && Math.abs(t.offsetHeight - t._fit) > 2;
+  const floor = dragged ? t.offsetHeight : 0;
+  const y = window.scrollY;
+  t.style.height = '';
+  const natural = t.offsetHeight;
+  const need = t.scrollHeight + (natural - t.clientHeight);
+  const h = Math.max(need, floor, natural);
+  if (h > natural) t.style.height = `${h}px`;
+  t._fit = h;
+  window.scrollTo(0, y);
+}
+
 function onInput(textarea) {
+  fitTextarea(textarea);
   setFieldValue(textarea.dataset.field, textarea.value);
   if (state.conflict) {
     // Saving waits until the conflict is resolved. Keep "Your version" current.

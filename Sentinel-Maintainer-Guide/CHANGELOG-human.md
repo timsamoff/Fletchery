@@ -6,6 +6,8 @@ Newest first. One entry per development session: three to six lines on what chan
 
 Tim's own palette replaced the cream, charcoal, and orange: a pale gold page, a muted plum-gray sidebar, raspberry for the header, footer, buttons, and spines, a light gray-plum highlight with a raspberry ribbon for the current sidebar item, and gold rules. New flourishes: gilt rules, a ribbon bookmark, card spines, a printer's ornament, and endpaper on the setup screen. Atkinson Hyperlegible Next became the default font (new dependency, old one removed). Notifications became a toast; the Show grid button was removed from the footer. Tokens were renamed (`--color-ink`, `--color-raspberry`, `--color-parchment`, and so on). Later the same day: one scrollbar style everywhere, a grayer sidebar, nothing pure black (`#121212`), and buttons whose label changes now keep one width (`setLabel`, `.label-stack`). Guide files updated: 06, 07, 09, 11, 12.
 
+Later the same day: panels and open tabs took the sidebar's plum, inactive tabs, the toast, and generic profile pictures a darker plum. The toast gained a close button and a wider shadow, and writing boxes now grow with their text (`fitTextarea`). Guide files updated: 04, 11.
+
 ## 2026-11-15: the media library (Characters step 3)
 
 Added the media library: a page at `#/media` showing every image in the bible, a `media/` folder for images that belong to no entry, a picker that puts any image on a character, and moves between the library and entry folders that rewrite every reference and link. Renaming a character now rewrites links into its folder. New modules `core/links.js` and `media-library.js`, a `POST /api/move-media` route, and `test/links.test.js`. Guide files updated: 04, 05, 08.
