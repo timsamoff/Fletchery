@@ -33,6 +33,12 @@ const esc = (s) =>
 
 const timeNow = () => new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
+// A button's label, with every label it can ever have held in the same spot (see .label-stack in base.css), so the
+// button never changes width.
+function setLabel(button, labels, current) {
+  button.innerHTML = `<span class="label-stack">${labels.map((l) => `<span${l === current ? ' data-current' : ''}>${esc(l)}</span>`).join('')}</span>`;
+}
+
 // The footer live region is what screen readers hear; the copy by the editor is for sighted writers on tall pages.
 function setStatus(text) {
   statusEl.textContent = text;
@@ -935,7 +941,7 @@ function openNameDialog(mode) {
   const dialog = document.getElementById('name-dialog');
   dialog.dataset.mode = mode;
   document.getElementById('name-dialog-title').textContent = mode === 'add' ? 'Add a character' : 'Rename this character';
-  document.getElementById('name-submit').textContent = mode === 'add' ? 'Add' : 'Rename';
+  setLabel(document.getElementById('name-submit'), ['Add', 'Rename'], mode === 'add' ? 'Add' : 'Rename');
   document.getElementById('name-input').value = mode === 'add' ? '' : (state.frontmatter.title ?? '');
   document.getElementById('name-error').textContent = '';
   dialog.showModal();
@@ -1757,7 +1763,7 @@ function renderStatus() {
   if (changed) animate(badge, [{ transform: 'rotateX(90deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 260 });
   const button = document.getElementById('canon');
   const isCanon = normalizeStatus(state.frontmatter.status) === 'canon';
-  button.textContent = isCanon ? 'Back to draft' : 'Mark as canon';
+  setLabel(button, ['Mark as canon', 'Back to draft'], isCanon ? 'Back to draft' : 'Mark as canon');
   button.disabled = !isCanon && !composedBody().trim();
   const fm = state.frontmatter;
   const updated = fm.updated ? new Date(fm.updated).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'never';
@@ -1805,7 +1811,10 @@ function renderDepth() {
   const sections = visibleSections();
   const nextSection = next ? null : sections[sections.findIndex((s) => s.id === state.section.id) + 1];
   nextButton.hidden = !next && !nextSection;
-  nextButton.textContent = next ? `Go to ${state.section.depths[next].label}` : `Go to ${nextSection?.title ?? ''}`;
+  // Every label this button can have on this page: each later depth, and the section after the Sheet.
+  const after = sections[sections.findIndex((s) => s.id === state.section.id) + 1];
+  const labels = [...DEPTHS.slice(1).map((d) => `Go to ${state.section.depths[d].label}`), ...(after ? [`Go to ${after.title}`] : [])];
+  setLabel(nextButton, labels, next ? `Go to ${state.section.depths[next].label}` : `Go to ${nextSection?.title ?? ''}`);
   nextButton.disabled = !next && !nextSection?.built;
   nextButton.title = nextButton.disabled && nextSection ? `${nextSection.title} isn’t built yet.` : '';
   document.getElementById('focus-dialog').setAttribute('aria-label', `Focus: ${state.section.title}, ${state.section.depths[state.depth].label}`);

@@ -58,12 +58,12 @@ Fletchery writes no ignore files. Everything in `story-bible/`, including `.flet
 - **Bridge.** The request queue is built first. A "Run now" option using `claude -p` (restricted tools, budget cap, off by default) may come after the bridge phase, but only with approval.
 - **Section lists.** Screenplay and Game narrative use the lists in the approved plan, stored as `sections/<type>.json` and open to later edits.
 - **Colors (changed 2026-11-16).** Tim chose the palette; the old rule of icon colors on cream is gone. Contrast numbers are in `CLAUDE.md`.
-  - Pale gold `#F3ECD8` is the page, gold-white `#FBF8EC` the writing surface and cards, darker gold `#E7DAB6` panels on the page, and muted plum-gray `#DCD1D7` the sidebar.
+  - Pale gold `#F3ECD8` is the page, gold-white `#FBF8EC` the writing surface and cards, darker gold `#E7DAB6` panels on the page, and gray-plum `#DBD5D8` the sidebar, with a lighter `#EFEBED` for its current item.
   - Ink `#29262C` is text and borders; ink-mid `#57505C` is secondary text.
   - Raspberry `#A04459`: header and footer, buttons, link underlines, card spines, focus rings. It passes for small text on the page and the surface, not on the darker panels.
-  - Dusty plum `#79516C` marks the current page in the sidebar. Gold `#C5A13B` is rules, the ribbon bookmark, and ornaments, never text.
+  - Gold `#C5A13B` is rules and ornaments, never text. Dusty plum `#79516C` is a spare second color. Nothing is pure black; the darkest value is `#121212`.
   - Links are ink text with a raspberry underline.
-  - Flourishes (all decorative): a gold double rule under the header, a ribbon bookmark on the current sidebar item, card spines, a printer's ornament closing each page and opening each empty one, and an endpaper lattice on the setup screen. Tim may remove any of them.
+  - Flourishes (all decorative): a gold double rule under the header, a raspberry ribbon bookmark on the current sidebar item, card spines, a printer's ornament closing each page and opening each empty one, and an endpaper lattice on the setup screen. Tim may remove any of them.
 - **Security.** The server binds to `127.0.0.1`, checks the `Host` header, and refuses writes from any other `Origin`.
 - **Rhythm.** Base unit 8px, body 18px on a 28px line height, a 4px baseline grid, and a grid overlay for checking it, turned on with `"grid": true` under `layout` in the settings file (its footer button was removed on 2026-11-16).
 

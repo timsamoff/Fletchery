@@ -79,7 +79,8 @@
   --color-parchment-light: #fbf8ec; /* gold-white: the paper the writer types on, and cards */
   --color-parchment-deep: #e7dab6; /* darker gold: panels, portraits, and drop areas on the page */
   --color-parchment-shade: #dccb9e;
-  --color-mauve: #dcd1d7; /* muted plum-gray: the sidebar */
+  --color-mauve: #dbd5d8; /* gray plum: the sidebar */
+  --color-mauve-light: #efebed; /* the current page in the sidebar */
 
   /* Roles */
   --color-text: var(--color-ink);
@@ -97,8 +98,7 @@
   --color-grid: rgb(160 68 89 / 0.18);
   --color-panel: var(--color-parchment-deep);
   --color-sidebar: var(--color-mauve);
-  --color-sidebar-current: var(--color-plum); /* the current page in the sidebar, with a light label */
-  --color-on-sidebar-current: var(--color-parchment-light);
+  --color-sidebar-current: var(--color-mauve-light);
   --color-tab-back: var(--color-parchment-shade);
   --color-on-dark: var(--color-parchment-light);
   --color-control: var(--color-raspberry); /* filled buttons and pressed chips, with a light label */
@@ -106,7 +106,7 @@
   --color-press: var(--color-ink-deep);
   --color-rule: rgb(41 38 44 / 0.2);
   --shadow-paper: 0 1px 0 rgb(30 27 32 / 0.08), 0 16px 32px -22px rgb(30 27 32 / 0.4);
-  --shadow-sheet: 0 2px 0 rgb(30 27 32 / 0.2), 0 40px 80px -30px rgb(0 0 0 / 0.6);
+  --shadow-sheet: 0 2px 0 rgb(30 27 32 / 0.2), 0 40px 80px -30px rgb(18 18 18 / 0.6);
   --color-backdrop: rgb(30 27 32 / 0.62);
   --color-backdrop-soft: rgb(30 27 32 / 0.25);
   /* Endpaper: a quiet lattice for the setup screen, like the patterned paper inside a book's cover. */

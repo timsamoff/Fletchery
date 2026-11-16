@@ -7,6 +7,12 @@
   box-sizing: border-box;
 }
 
+/* Every scrollbar in the app is the sidebar's: thin, with a quiet thumb on no track. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-rule) transparent;
+}
+
 html {
   background: var(--color-bg);
   color: var(--color-text);
@@ -431,8 +437,6 @@ textarea:focus-visible {
     z-index: 4;
     width: var(--nav-width);
     transition: width var(--duration-base) var(--ease-out);
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-rule) transparent;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto 1fr;
@@ -576,12 +580,7 @@ textarea:focus-visible {
 }
 .nav-list a[aria-current='page'] {
   background: var(--color-sidebar-current);
-  color: var(--color-on-sidebar-current);
-  --focus-ring: 1px solid var(--color-on-sidebar-current);
   font-weight: 700;
-}
-.nav-list a[aria-current='page'] .nav-state {
-  color: inherit;
 }
 /* The current page is marked with a ribbon bookmark with a notched end. */
 .nav-list a {
@@ -594,7 +593,7 @@ textarea:focus-visible {
   top: 0;
   bottom: 0;
   width: calc(var(--space-2) + var(--space-1));
-  background: var(--color-mark); /* gold, to show against the plum row */
+  background: var(--color-accent);
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - var(--space-2)), 0 100%);
   z-index: 1;
 }
@@ -633,9 +632,8 @@ textarea:focus-visible {
   font-size: var(--text-h3);
 }
 .nav-rail a[aria-current='page'] {
-  color: var(--color-on-sidebar-current);
   background: var(--color-sidebar-current);
-  box-shadow: inset 3px 0 0 var(--color-mark);
+  box-shadow: inset 3px 0 0 var(--color-accent);
 }
 
 /* Section page: one layout at every depth. The page fills the window, and a single field grows to fill the page. */
@@ -964,8 +962,6 @@ textarea:focus-visible {
   max-width: none;
 }
 .writing-field textarea {
-  scrollbar-width: thin; /* matches the section list */
-  scrollbar-color: var(--color-rule) transparent;
   border-color: transparent;
   border-radius: 3px;
   padding-block: calc(var(--space-5) + var(--space-2)); /* 40px */
@@ -1295,8 +1291,6 @@ textarea:focus-visible {
   flex: 1;
   overflow: auto;
   padding: var(--space-4) var(--space-5);
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-rule) transparent;
 }
 .settings-body fieldset {
   margin-bottom: var(--space-5);
@@ -1793,12 +1787,6 @@ textarea::placeholder {
 .nav-folder-row:has(> a[aria-current='page']) {
   background: var(--color-sidebar-current);
 }
-.nav-folder-row:has(> a[aria-current='page']) .nav-folder-toggle {
-  color: var(--color-on-sidebar-current);
-}
-.nav-folder-row:has(> a[aria-current='page']) .nav-folder-toggle:hover {
-  background: var(--color-control-hover);
-}
 .nav-folder-toggle:hover {
   background: var(--color-bg);
 }
@@ -2036,6 +2024,18 @@ textarea::placeholder {
     right: var(--space-3);
   }
 }
+/* A button whose label changes holds every label it can have in one spot, so it is always as wide as the longest and
+   never moves its neighbors. Only the current label is visible, and only it is read aloud. */
+.label-stack {
+  display: inline-grid;
+}
+.label-stack > span {
+  grid-area: 1 / 1;
+}
+.label-stack > span:not([data-current]) {
+  visibility: hidden;
+}
+
 /* Both of Remove's labels share one spot, so the button is always as wide as the longer one. */
 .label-swap {
   display: inline-grid;
