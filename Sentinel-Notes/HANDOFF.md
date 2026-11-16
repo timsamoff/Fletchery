@@ -1,10 +1,10 @@
 # Handoff
 
-Updated 2026-11-16. Nothing is in progress. The new look is committed as `3d2ece5`. It is not pushed, and Tim has not approved pushing it.
+Updated 2026-11-16. Nothing is in progress. The new look is committed (`3d2ece5`, then `af882c1` for round 3). Neither is pushed, and Tim has not approved pushing them.
 
 ## 1. Current task and status
 
-None. The look is built, checked in a browser, documented, and committed: pale gold page `#F3ECD8`, gold-white writing surface `#FBF8EC`, darker gold panels `#E7DAB6`, muted plum-gray sidebar `#DCD1D7` with dusty plum `#79516C` for the current item, raspberry `#A04459` for header, footer, buttons, underlines, and card spines, and gold `#C5A13B` for rules, the ribbon, and ornaments. Atkinson Hyperlegible Next is the default font (bold at 500). Notifications are a toast, and the footer's Show grid button is gone. Tim's last requests, darker-gold panels and a plum sidebar highlight, are both done. He has not seen the final version in the app yet.
+None. The look is built, checked in a browser, documented, and committed: pale gold page `#F3ECD8`, gold-white writing surface `#FBF8EC`, darker gold panels `#E7DAB6`, gray-plum sidebar `#DBD5D8` whose current item is a lighter `#EFEBED` with a raspberry ribbon, raspberry `#A04459` for header, footer, buttons, underlines, and card spines, and gold `#C5A13B` for rules and ornaments only. Nothing is pure black (the darkest is `#121212`). Every scrollbar is the sidebar's thin style, set once on `*`. Buttons whose label changes (Mark as canon, the Go to buttons, Add and Rename) keep the width of their longest label through `setLabel` and `.label-stack`. Atkinson Hyperlegible Next is the default font (bold at 500). Notifications are a toast, and the footer's Show grid button is gone. Tim's last round (near-black to `#121212`, a lighter highlight with a raspberry ribbon, one scrollbar style, a grayer sidebar, steady button widths) is done and was checked in a browser: button positions are identical across every label. He has not seen it in the app yet.
 
 ## 2. Files touched
 
@@ -16,7 +16,7 @@ Tim restarts Fletchery (the server changed to serve the new font), reloads, open
 
 ## 4. Open questions for Tim
 
-- OK to push `3d2ece5` and the handoff commit after it?
+- OK to push the look commits and the handoff commits after them?
 - Which flourishes stay (gilt rules, ribbon, card spines, ornament, endpaper)? The ornament glyph looks like a small fruit in the font; an SVG would fix it.
 - Should unsaved, saving, and saved ever become toasts? They stay beside the editor for now.
 - Sentinel 1.8.0: update now, not now, or skip.
