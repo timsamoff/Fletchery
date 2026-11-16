@@ -138,8 +138,14 @@ code {
   position: sticky;
   top: 0;
   z-index: 5;
-  background: var(--color-bg);
-  border-bottom: var(--border) solid var(--color-rule);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  --focus-ring: 1px solid var(--color-on-accent); /* the usual ring is the header's own color */
+  /* Gilt tooling: a gold rule with a finer one under it, like the lines stamped on a spine. */
+  border-bottom: var(--border) solid var(--color-mark);
+  box-shadow:
+    0 3px 0 var(--color-bg),
+    0 var(--space-1) 0 var(--color-mark);
 }
 .site-header .wrap {
   min-height: 82px; /* 84 with the border */
@@ -151,21 +157,21 @@ code {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  color: var(--color-text);
+  color: var(--color-on-accent);
   text-decoration: none;
   font-size: var(--text-h3);
   line-height: var(--leading-h3);
   font-weight: 700;
 }
 .brand img {
-  width: 40px;
-  height: 40px;
+  width: var(--space-7);
+  height: var(--space-7);
   display: block;
 }
 .project-title {
   margin: 0;
   padding-left: var(--space-3);
-  border-left: 1px solid var(--color-rule);
+  border-left: 1px solid var(--color-mark);
   font-family: var(--font-serif);
   font-style: italic;
   font-size: var(--text-h3);
@@ -183,8 +189,10 @@ main:focus {
 
 /* Footer */
 .site-footer {
-  background: var(--color-bg);
-  border-top: var(--border) solid var(--color-rule);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  --focus-ring: 1px solid var(--color-on-accent);
+  border-top: var(--border) solid var(--color-mark);
   font-size: var(--text-small);
 }
 .site-footer .wrap {
@@ -199,7 +207,7 @@ main:focus {
   margin: 0;
 }
 .project-path {
-  color: var(--color-text-quiet);
+  color: var(--color-on-accent);
   overflow-wrap: anywhere;
 }
 .save-status {
@@ -274,7 +282,7 @@ textarea:focus-visible {
   width: 20px;
   height: 20px;
   margin: 4px 0 0;
-  accent-color: var(--color-charcoal);
+  accent-color: var(--color-control);
 }
 .choice label {
   font-weight: 600;
@@ -311,12 +319,12 @@ textarea:focus-visible {
 }
 .button-quiet {
   background: transparent;
-  border-color: var(--color-control);
+  border-color: var(--color-border);
   color: var(--color-text);
 }
 .button-quiet:hover {
   background: var(--color-panel);
-  border-color: var(--color-control);
+  border-color: var(--color-border);
 }
 /* A soft deep-cream fill for a secondary action beside outlined ones; it darkens to charcoal with a light label
    on hover. */
@@ -339,7 +347,7 @@ textarea:focus-visible {
   box-shadow: inset 0 -4px 0 var(--color-accent);
 }
 .button:active:not(:disabled) {
-  box-shadow: inset 0 var(--space-1) 0 var(--color-spine);
+  box-shadow: inset 0 var(--space-1) 0 var(--color-press);
 }
 .button-quiet:active:not(:disabled) {
   box-shadow: inset 0 var(--space-1) 0 var(--color-border-quiet);
@@ -431,7 +439,7 @@ textarea:focus-visible {
     grid-template-areas: 'head' 'list';
     align-content: start;
     overflow: hidden auto;
-    background: var(--color-panel);
+    background: var(--color-sidebar);
     padding-block: var(--space-3);
   }
   .section-nav summary {
@@ -567,10 +575,30 @@ textarea:focus-visible {
   background: var(--color-bg);
 }
 .nav-list a[aria-current='page'] {
-  border-left-color: var(--color-accent);
-  background: var(--color-surface);
+  background: var(--color-sidebar-current);
+  color: var(--color-on-sidebar-current);
+  --focus-ring: 1px solid var(--color-on-sidebar-current);
   font-weight: 700;
 }
+.nav-list a[aria-current='page'] .nav-state {
+  color: inherit;
+}
+/* The current page is marked with a ribbon bookmark with a notched end. */
+.nav-list a {
+  position: relative;
+}
+.nav-list a[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--space-1));
+  top: 0;
+  bottom: 0;
+  width: calc(var(--space-2) + var(--space-1));
+  background: var(--color-mark); /* gold, to show against the plum row */
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - var(--space-2)), 0 100%);
+  z-index: 1;
+}
+
 .nav-item-off {
   color: var(--color-text-quiet);
 }
@@ -605,8 +633,9 @@ textarea:focus-visible {
   font-size: var(--text-h3);
 }
 .nav-rail a[aria-current='page'] {
-  background: var(--color-surface);
-  box-shadow: inset 3px 0 0 var(--color-accent);
+  color: var(--color-on-sidebar-current);
+  background: var(--color-sidebar-current);
+  box-shadow: inset 3px 0 0 var(--color-mark);
 }
 
 /* Section page: one layout at every depth. The page fills the window, and a single field grows to fill the page. */
@@ -630,7 +659,7 @@ textarea:focus-visible {
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 0 var(--space-5);
-  border-bottom: 1px solid var(--color-rule);
+  border-bottom: 1px solid var(--color-mark);
   margin-bottom: var(--space-3);
 }
 .section-head h1 {
@@ -1191,7 +1220,7 @@ textarea:focus-visible {
   align-items: center;
   gap: var(--space-2);
   font: inherit;
-  color: var(--color-text);
+  color: var(--color-on-accent);
   background: none;
   border: var(--border) solid transparent;
   border-radius: var(--radius);
@@ -1202,7 +1231,7 @@ textarea:focus-visible {
     border-color var(--duration-fast) ease;
 }
 .header-button:hover {
-  background: var(--color-panel);
+  background: var(--color-control-hover);
 }
 
 /* Settings: a panel that slides in from the right over a light backdrop, so the writing stays in view. */
@@ -1243,8 +1272,12 @@ textarea:focus-visible {
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-5);
-  border-bottom: 1px solid var(--color-rule);
+  min-height: 84px; /* the header's height, so the two rules meet */
+  padding: 0 var(--space-5);
+  border-bottom: var(--border) solid var(--color-mark);
+  box-shadow:
+    0 3px 0 var(--color-bg),
+    0 var(--space-1) 0 var(--color-mark);
 }
 .settings-bar h2 {
   display: flex;
@@ -1534,6 +1567,42 @@ textarea::placeholder {
   color: var(--color-text-quiet);
   margin: var(--space-5) 0;
 }
+/* A printer's ornament closes each page and opens each empty one. */
+.section-page::after,
+.empty-note::before {
+  content: '❦';
+  display: block;
+  font-family: var(--font-serif);
+  font-size: var(--text-h2);
+  line-height: var(--line);
+  color: var(--color-mark);
+}
+.section-page::after {
+  margin-top: calc(var(--line) * 2);
+  text-align: center;
+}
+.empty-note::before {
+  margin-bottom: var(--space-2);
+}
+/* The setup screen sits on endpaper, with the questions on a sheet of their own. */
+.setup-view main {
+  background-image: var(--endpaper);
+  background-size: var(--line) var(--line);
+}
+.setup-card {
+  max-width: calc(var(--measure) + 2 * var(--space-6));
+  margin: 0 auto var(--line);
+  padding: var(--line) var(--space-6);
+  background: var(--color-surface);
+  border-top: var(--space-2) solid var(--color-accent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-paper);
+}
+@media (max-width: 719px) {
+  .setup-card {
+    padding: var(--line) var(--space-3);
+  }
+}
 .card-grid {
   list-style: none;
   padding: 0;
@@ -1560,6 +1629,15 @@ textarea::placeholder {
 .character-card:hover {
   transform: translateY(calc(-1 * var(--space-1) / 2));
   box-shadow: var(--shadow-sheet);
+}
+/* A character card is a small book: a spine in the accent color with one gilt line, and it tips a little when
+   picked out. */
+.card-grid .character-card {
+  border-left: var(--space-2) solid var(--color-accent);
+  background-image: linear-gradient(to right, var(--color-mark) 0 1px, transparent 1px);
+}
+.card-grid .character-card:hover {
+  transform: translateY(calc(-1 * var(--space-1))) rotate(-1deg);
 }
 /* The photo (a later step) or a silhouette, cropped across the top of the card. */
 .card-portrait {
@@ -1670,8 +1748,7 @@ textarea::placeholder {
   background: none;
 }
 .section-nav .nav-list .nav-sublist a[aria-current='page'] {
-  border-left-color: var(--color-accent);
-  background: var(--color-surface);
+  background: var(--color-sidebar-current); /* the ribbon marks it; a bar behind the ribbon would fill its notch */
   font-weight: 600;
 }
 .section-nav .nav-list .nav-sublist a:hover {
@@ -1714,7 +1791,13 @@ textarea::placeholder {
 }
 /* The current section's highlight runs under its folder arrow too. */
 .nav-folder-row:has(> a[aria-current='page']) {
-  background: var(--color-surface);
+  background: var(--color-sidebar-current);
+}
+.nav-folder-row:has(> a[aria-current='page']) .nav-folder-toggle {
+  color: var(--color-on-sidebar-current);
+}
+.nav-folder-row:has(> a[aria-current='page']) .nav-folder-toggle:hover {
+  background: var(--color-control-hover);
 }
 .nav-folder-toggle:hover {
   background: var(--color-bg);
@@ -2034,4 +2117,29 @@ textarea::placeholder {
   margin: 0;
   font-family: var(--font-serif);
   font-weight: 600;
+}
+
+/* A notification shows as a toast at the bottom of the window. It's a popover, so it sits above any open dialog. */
+.toast {
+  position: fixed;
+  inset: auto auto var(--space-5) 50%;
+  max-width: min(var(--measure), 100vw - 2 * var(--space-3));
+  margin: 0;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  box-shadow: var(--shadow-sheet);
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0;
+  transform: translate(-50%, var(--space-3));
+  transition:
+    opacity var(--duration-base) ease,
+    transform var(--duration-base) var(--ease-out);
+}
+.toast.is-shown {
+  opacity: 1;
+  transform: translate(-50%, 0);
 }

@@ -51,3 +51,7 @@ Mockups: https://claude.ai/artifact/XuVSsW4zdE8JQQvqwQAemM (private).
 - **Writing size by depth.** A Seed is one sentence, so its field shouldn't look like it wants a page. Size follows the depth.
 - **Fade and contrast.** Dimmed chrome fails contrast while it's dimmed. It has to come back at full contrast the moment the writer pauses or reaches for it.
 - **Links that wrap.** The fletching mark keeps a link on one line, so a long link drops whole to the next line.
+
+## 2026-11-16: a new look
+
+Tim wanted to break away from the color schemes of his Sidequest and written projects while keeping a focused, writer-first feel. From a photo of old book spines and his own palette, the page is now pale gold, the sidebar a muted plum-gray, and raspberry carries the header, footer, buttons, underlines, and card spines. Flourishes added: gilt double rules, a ribbon bookmark, card spines, a printer's ornament, and endpaper on the setup screen. Atkinson Hyperlegible Next is the default font. Notifications are a toast, and the footer's Show grid button is gone. The colors and their contrast numbers are in `CLAUDE.md`. Tim makes the new icon himself and wants it bigger (the header mark is 64px now).

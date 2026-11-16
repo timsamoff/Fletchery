@@ -21,7 +21,7 @@
 | Server binds to 127.0.0.1, checks `Host` and `Origin` | Blocks DNS rebinding and other sites writing to the bible | Open binding | `DESIGN.md` "Security" |
 | Launch URL uses 127.0.0.1, not `localhost` | The browser could reach a different server on the IPv6 address | `localhost` | Comment in `bin/fletchery.js` |
 | Premise questions are about change and consequences | Fits stories without a central conflict (Tim's choice) | The Snowflake Method's disasters | `CLAUDE.md` Project |
-| Colors: icon colors only, on cream | Contrast and identity. Numbers are in `CLAUDE.md`. | White text on cream | SPEC "Colors"; `CLAUDE.md` |
+| Colors: Tim's gold, plum, and raspberry palette (2026-11-16) | It set Fletchery apart from his other projects while keeping a calm, writer-first feel. Numbers are in `CLAUDE.md`. | The earlier cream, charcoal, and orange of the icon | SPEC "Colors"; `CLAUDE.md` |
 | Animate state changes, briefly and eased | A fluid feel is a global aesthetic choice. Reduced motion is honored. | Instant changes | `CLAUDE.md` "Design rules" |
 | `CLAUDE.md` and `Sentinel-Notes/` are tracked in the public repo | Remote sessions need the same context | Gitignoring them | `CLAUDE.md` top |
 | The brief `first-prompt/` stays out of git | Kept private by choice. `docs/SPEC.md` carries the decisions. | Committing it | `CLAUDE.md` Project |

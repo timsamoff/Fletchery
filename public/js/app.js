@@ -36,9 +36,34 @@ const timeNow = () => new Date().toLocaleTimeString([], { hour: 'numeric', minut
 // The footer live region is what screen readers hear; the copy by the editor is for sighted writers on tall pages.
 function setStatus(text) {
   statusEl.textContent = text;
+  showToast(text);
+}
+
+// The routine save states (unsaved, saving, saved) stay beside the editor, where they don't interrupt.
+function setSaveState(text) {
+  statusEl.textContent = text;
   const local = document.getElementById('local-status');
   if (local) local.textContent = text;
 }
+
+// Shows a toast for a few seconds, longer for a long message. A click dismisses it.
+const toast = document.getElementById('toast');
+let toastTimer = null;
+function hideToast() {
+  clearTimeout(toastTimer);
+  toast.classList.remove('is-shown');
+  toastTimer = setTimeout(() => toast.matches(':popover-open') && toast.hidePopover(), 300);
+}
+function showToast(text) {
+  if (!text) return;
+  clearTimeout(toastTimer);
+  toast.textContent = text;
+  if (toast.matches(':popover-open')) toast.hidePopover(); // showing it again puts it above a dialog opened since
+  toast.showPopover();
+  requestAnimationFrame(() => toast.classList.add('is-shown'));
+  toastTimer = setTimeout(hideToast, text.length > 80 ? 9000 : 5000);
+}
+toast.addEventListener('click', hideToast);
 
 // A stored file plus its parsed entry. Throws EntryFormatError for broken frontmatter.
 function toEntry(file) {
@@ -92,7 +117,6 @@ async function start() {
     }
     await prefs.load(settings?.font);
     prefs.onChange(applyPrefs);
-    setupGridToggle();
     setupSettingsPanel(prefs);
     if (!settings) return showSetup();
     await showEditor(settings, file.version);
@@ -110,7 +134,6 @@ function applyPrefs(v) {
   else delete root.dataset.fadeScope;
   if (!v.fade.on) fadeChrome(false);
   root.classList.toggle('show-grid', v.layout.grid);
-  document.getElementById('grid-toggle').setAttribute('aria-pressed', String(v.layout.grid));
   if (document.getElementById('entry-meta')) renderStatus(); // the credited name in "Written by"
 }
 
@@ -131,10 +154,6 @@ function applySettings(settings) {
   document.title = `${settings.title} · Fletchery`;
 }
 
-function setupGridToggle() {
-  document.getElementById('grid-toggle').addEventListener('click', () => prefs.update({ layout: { grid: !prefs.values.layout.grid } }));
-}
-
 async function loadSectionSet(storyType) {
   const res = await fetch(`/sections/${encodeURIComponent(storyType)}.json`);
   if (!res.ok) throw new Error(`The section list for “${storyType}” is missing.`);
@@ -144,7 +163,9 @@ async function loadSectionSet(storyType) {
 // ---------- First run ----------
 
 function showSetup() {
+  document.body.classList.add('setup-view');
   view.innerHTML = `
+    <div class="setup-card">
     <h1>Set up this story bible</h1>
     <p>Fletchery keeps the bible in a <code>story-bible</code> folder in this project. These questions are asked once.</p>
     <form id="setup" novalidate>
@@ -169,7 +190,8 @@ function showSetup() {
       <div class="button-row">
         <button type="submit" class="button">Create the bible</button>
       </div>
-    </form>`;
+    </form>
+    </div>`;
 
   const form = document.getElementById('setup');
   const error = document.getElementById('setup-error');
@@ -272,6 +294,7 @@ async function showEditor(settings, settingsVersion) {
   }
 
   // The frame (sidebar and Focus sheet) is built once; each page renders into #page from the address.
+  document.body.classList.remove('setup-view');
   document.body.classList.add('editor-view');
   view.innerHTML = `
     <div class="workspace" id="workspace">
@@ -2121,7 +2144,7 @@ function onInput(textarea) {
     document.getElementById('conflict-mine').value = composedBody();
     return;
   }
-  if (statusEl.textContent !== 'Unsaved changes') setStatus('Unsaved changes');
+  if (statusEl.textContent !== 'Unsaved changes') setSaveState('Unsaved changes');
   clearTimeout(state.timer);
   state.timer = setTimeout(save, SAVE_DELAY_MS);
 }
@@ -2181,14 +2204,14 @@ async function saveNow() {
   clearTimeout(state.timer);
   if (state.page !== 'entry' || state.saving || state.conflict || !isDirty()) return;
   state.saving = true;
-  setStatus('Saving…');
+  setSaveState('Saving…');
   const path = entryPath();
   const result = await writeEntry({});
   state.saving = false;
   if (state.page !== 'entry' || entryPath() !== path) return; // the writer has moved on to another page
   if (!result) return;
-  if (isDirty()) setStatus('Unsaved changes');
-  else setStatus(result.reverted ? `Saved at ${timeNow()}. Back to draft because you edited it.` : `Saved at ${timeNow()}`);
+  if (isDirty()) setSaveState('Unsaved changes');
+  else setSaveState(result.reverted ? `Saved at ${timeNow()}. Back to draft because you edited it.` : `Saved at ${timeNow()}`);
   if (state.remotePending) return checkRemote();
   if (isDirty()) state.timer = setTimeout(save, SAVE_DELAY_MS);
 }

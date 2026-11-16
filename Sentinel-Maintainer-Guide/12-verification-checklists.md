@@ -53,7 +53,7 @@ Manual steps, run against a copy of a bible (see `11-build-run-test.md`). They s
 - [ ] Settings changes apply at once, save, and survive a reload. Editing `fletchery-settings.json` outside updates the page.
 - [ ] With "reduce motion" on in the operating system, no scripted animation runs.
 - [ ] Tab through the page. Every control is reachable and the focus ring shows. Status is never color alone.
-- [ ] Show grid: new blocks sit on the 4px lines, and body blocks on whole 28px lines.
+- [ ] Grid overlay (turn it on in the settings file): new blocks sit on the 4px lines, and body blocks on whole 28px lines.
 
 ## Server
 

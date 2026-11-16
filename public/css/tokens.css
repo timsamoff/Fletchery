@@ -29,18 +29,19 @@
   src: url('/fonts/source-sans-3-latin-700-normal.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'Atkinson Hyperlegible';
+  font-family: 'Atkinson Hyperlegible Next';
   font-weight: 400;
   font-style: normal;
   font-display: swap;
-  src: url('/fonts/atkinson-hyperlegible-latin-400-normal.woff2') format('woff2');
+  src: url('/fonts/atkinson-hyperlegible-next-latin-400-normal.woff2') format('woff2');
 }
+/* Every bold weight asked for (600, 700) is drawn with the 500, which is as heavy as this face needs to get. */
 @font-face {
-  font-family: 'Atkinson Hyperlegible';
-  font-weight: 700;
+  font-family: 'Atkinson Hyperlegible Next';
+  font-weight: 500 900;
   font-style: normal;
   font-display: swap;
-  src: url('/fonts/atkinson-hyperlegible-latin-700-normal.woff2') format('woff2');
+  src: url('/fonts/atkinson-hyperlegible-next-latin-500-normal.woff2') format('woff2');
 }
 
 @font-face {
@@ -67,41 +68,57 @@
 
 :root {
   /* Palette */
-  --color-charcoal: #2a2d32;
-  --color-spine: #1d1f23;
-  --color-charcoal-mid: #3b3f46;
-  --color-orange: #e0601e;
-  --color-cream: #f1ece2;
-  --color-cream-light: #f8f5ef;
-  --color-cream-deep: #eae3d5;
-  --color-cream-shade: #dfd6c4;
+  --color-ink: #29262c; /* deep neutral charcoal */
+  --color-ink-deep: #1e1b20;
+  --color-ink-mid: #57505c; /* cool gray-plum */
+  --color-raspberry: #a04459; /* muted raspberry red */
+  --color-raspberry-deep: #873449;
+  --color-plum: #79516c; /* dusty plum */
+  --color-gilt: #c5a13b; /* soft golden yellow: lines and marks only, never text */
+  --color-parchment: #f3ecd8; /* pale gold: the page */
+  --color-parchment-light: #fbf8ec; /* gold-white: the paper the writer types on, and cards */
+  --color-parchment-deep: #e7dab6; /* darker gold: panels, portraits, and drop areas on the page */
+  --color-parchment-shade: #dccb9e;
+  --color-mauve: #dcd1d7; /* muted plum-gray: the sidebar */
 
   /* Roles */
-  --color-text: var(--color-charcoal);
-  --color-text-quiet: var(--color-charcoal-mid);
-  --color-text-hint: rgb(59 63 70 / 0.75); /* placeholder text: dimmer than real text, still about 4.8:1 on the paper */
-  --color-bg: var(--color-cream);
-  --color-surface: var(--color-cream-light);
-  --color-border: var(--color-charcoal);
-  --color-border-quiet: var(--color-charcoal-mid);
-  --color-accent: var(--color-orange);
-  --color-on-accent: var(--color-spine);
-  --color-focus: var(--color-orange);
-  --color-grid: rgb(224 96 30 / 0.18);
-  --color-panel: var(--color-cream-deep);
-  --color-tab-back: var(--color-cream-shade);
-  --color-on-dark: var(--color-cream-light);
-  --color-control: var(--color-charcoal);
-  --color-control-hover: var(--color-spine);
-  --color-rule: rgb(42 45 50 / 0.2);
-  --shadow-paper: 0 1px 0 rgb(29 31 35 / 0.08), 0 16px 32px -22px rgb(29 31 35 / 0.4);
-  --shadow-sheet: 0 2px 0 rgb(29 31 35 / 0.2), 0 40px 80px -30px rgb(0 0 0 / 0.6);
-  --color-backdrop: rgb(29 31 35 / 0.62);
-  --color-backdrop-soft: rgb(29 31 35 / 0.25);
+  --color-text: var(--color-ink);
+  --color-text-quiet: var(--color-ink-mid);
+  --color-text-hint: rgb(87 80 92 / 0.85); /* placeholder text: dimmer than real text, still about 4.6:1 on the paper */
+  --color-bg: var(--color-parchment);
+  --color-surface: var(--color-parchment-light);
+  --color-border: var(--color-ink);
+  --color-border-quiet: var(--color-ink-mid);
+  --color-accent: var(--color-raspberry);
+  --color-accent-2: var(--color-plum);
+  --color-mark: var(--color-gilt);
+  --color-on-accent: var(--color-parchment-light);
+  --color-focus: var(--color-raspberry);
+  --color-grid: rgb(160 68 89 / 0.18);
+  --color-panel: var(--color-parchment-deep);
+  --color-sidebar: var(--color-mauve);
+  --color-sidebar-current: var(--color-plum); /* the current page in the sidebar, with a light label */
+  --color-on-sidebar-current: var(--color-parchment-light);
+  --color-tab-back: var(--color-parchment-shade);
+  --color-on-dark: var(--color-parchment-light);
+  --color-control: var(--color-raspberry); /* filled buttons and pressed chips, with a light label */
+  --color-control-hover: var(--color-raspberry-deep);
+  --color-press: var(--color-ink-deep);
+  --color-rule: rgb(41 38 44 / 0.2);
+  --shadow-paper: 0 1px 0 rgb(30 27 32 / 0.08), 0 16px 32px -22px rgb(30 27 32 / 0.4);
+  --shadow-sheet: 0 2px 0 rgb(30 27 32 / 0.2), 0 40px 80px -30px rgb(0 0 0 / 0.6);
+  --color-backdrop: rgb(30 27 32 / 0.62);
+  --color-backdrop-soft: rgb(30 27 32 / 0.25);
+  /* Endpaper: a quiet lattice for the setup screen, like the patterned paper inside a book's cover. */
+  --endpaper:
+    radial-gradient(circle at 50% 50%, rgb(197 161 59 / 0.5) 0 1px, transparent 2px),
+    linear-gradient(45deg, transparent 48%, rgb(121 81 108 / 0.1) 48% 52%, transparent 52%),
+    linear-gradient(-45deg, transparent 48%, rgb(160 68 89 / 0.1) 48% 52%, transparent 52%);
 
   /* Type. The writer's own text is set in the serif; the interface stays in the sans. */
-  --font-body: 'Source Sans 3', system-ui, sans-serif;
-  --font-hyperlegible: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-source: 'Source Sans 3', system-ui, sans-serif;
+  --font-hyperlegible: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --font-body: var(--font-hyperlegible);
   --font-serif: 'Literata', Georgia, serif;
   --font-writing: var(--font-serif);
   --text-writing: 20px;
@@ -140,8 +157,8 @@
   --duration-base: 300ms;
 }
 
-:root[data-font='atkinson-hyperlegible'] {
-  --font-body: var(--font-hyperlegible);
+:root[data-font='source-sans-3'] {
+  --font-body: var(--font-source);
 }
 :root[data-writing-font='interface'] {
   --font-writing: var(--font-body);

@@ -21,7 +21,7 @@ As of Characters step 2:
 | `server/server.js` | HTTP server: static files, section definitions, fonts from `node_modules/@fontsource`, the browser build of `yaml` at `/vendor/yaml/`, the file API (including moving a whole folder, for renames), image upload and serving, and server-sent events. |
 | `server/bible.js` | File storage inside `story-bible/`: the path guard, atomic writes, list, delete, move, and content hashing. It knows nothing about entries. |
 | `server/watch.js` | Recursive `fs.watch` on the bible. It reports a change only when a file's content hash differs from the last one seen or written. |
-| `public/index.html` | Page shell: skip link, header, `main`, and footer with the save-status live region. |
+| `public/index.html` | Page shell: skip link, header, `main`, and footer. The save-status live region is hidden text in the page shell, and a toast shows notifications. |
 | `public/js/app.js` | First-run setup, page addresses (`#/premise`, `#/characters`, `#/characters/<slug>`), the sidebar, the Characters cards, adding and renaming characters, the portrait menu and crop view, the Images tab, and the entry editor: depth control, the "One at a time" and "All questions" layouts, status and marking canon, Skip for now, autosave, live updates, and the conflict panel. |
 | `public/js/settings.js` | The writer's settings in `story-bible/fletchery-settings.json` (load, merge, save with a version check, reload on outside edits) and the Settings panel. |
 | `public/js/core/layers.js` | The Seed, Sketch, and Sheet layers inside an entry body. Only those three headings split a body; any other text, headings included, stays where it is. |

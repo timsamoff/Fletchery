@@ -15,7 +15,7 @@ The app is Fletchery, renamed from Fletcherling on 2026-10-30. Bibles made befor
 
 ### Stack
 
-Node, with a plain HTML, CSS, and JavaScript front end and no build step. The reasons: the `@fontsource` packages for Source Sans 3, Atkinson Hyperlegible, and Literata (the serif for the writer's own text, added 2026-10-30) are npm packages, `npm link` gives a global command on Windows with no extra setup, and Node's built-in recursive `fs.watch` works on Windows. Dependencies stay few, and each one needs a reason. No database.
+Node, with a plain HTML, CSS, and JavaScript front end and no build step. The reasons: the `@fontsource` packages for Atkinson Hyperlegible Next, Source Sans 3, and Literata (the serif for the writer's own text, added 2026-10-30) are npm packages, `npm link` gives a global command on Windows with no extra setup, and Node's built-in recursive `fs.watch` works on Windows. Dependencies stay few, and each one needs a reason. No database.
 
 A build step is allowed (decided 2026-10-30), for example for a formatting editor. Tim runs it for the web edition. A local writer gets instructions plain enough to follow themselves or hand to their AI.
 
@@ -57,14 +57,15 @@ Fletchery writes no ignore files. Everything in `story-bible/`, including `.flet
 - **Series scope.** One bible for the whole series. The top-level layout matches a standalone. A series adds `books/<slug>/` (that book's `premise.md` and `plot/`) and `series/` (continuity). Characters, relationships, world, timeline, themes, and voice are shared. Top-level `premise/` holds the series premise. A standalone has no `books/` or `series/`, and `plot/` sits at the top level.
 - **Bridge.** The request queue is built first. A "Run now" option using `claude -p` (restricted tools, budget cap, off by default) may come after the bridge phase, but only with approval.
 - **Section lists.** Screenplay and Game narrative use the lists in the approved plan, stored as `sections/<type>.json` and open to later edits.
-- **Colors.** The UI uses only the icon's colors on cream. No white text anywhere.
-  - Charcoal `#2A2D32`: body text, headings, borders, rules, icons (11.74:1 on cream `#F1ECE2`, 12.70:1 on card cream `#F8F5EF`).
-  - Spine charcoal `#1D1F23`: labels on orange buttons (4.61:1 on `#E0601E`).
-  - Mid charcoal `#3B3F46`: secondary text and quiet borders (8.98:1 on cream).
-  - Rust orange `#E0601E`: button fills, focus rings, status marks, link underlines, and large text only. It's 3.04:1 on cream, so it never carries small text.
-  - Links are charcoal text with an orange underline.
+- **Colors (changed 2026-11-16).** Tim chose the palette; the old rule of icon colors on cream is gone. Contrast numbers are in `CLAUDE.md`.
+  - Pale gold `#F3ECD8` is the page, gold-white `#FBF8EC` the writing surface and cards, darker gold `#E7DAB6` panels on the page, and muted plum-gray `#DCD1D7` the sidebar.
+  - Ink `#29262C` is text and borders; ink-mid `#57505C` is secondary text.
+  - Raspberry `#A04459`: header and footer, buttons, link underlines, card spines, focus rings. It passes for small text on the page and the surface, not on the darker panels.
+  - Dusty plum `#79516C` marks the current page in the sidebar. Gold `#C5A13B` is rules, the ribbon bookmark, and ornaments, never text.
+  - Links are ink text with a raspberry underline.
+  - Flourishes (all decorative): a gold double rule under the header, a ribbon bookmark on the current sidebar item, card spines, a printer's ornament closing each page and opening each empty one, and an endpaper lattice on the setup screen. Tim may remove any of them.
 - **Security.** The server binds to `127.0.0.1`, checks the `Host` header, and refuses writes from any other `Origin`.
-- **Rhythm.** Base unit 8px, body 18px on a 28px line height, a 4px baseline grid, and a "Show grid" overlay for checking it.
+- **Rhythm.** Base unit 8px, body 18px on a 28px line height, a 4px baseline grid, and a grid overlay for checking it, turned on with `"grid": true` under `layout` in the settings file (its footer button was removed on 2026-11-16).
 
 ## Section lists
 
@@ -130,5 +131,5 @@ Each of these is a default. Any of them can be changed during plan review.
 8. **Generated indexes when the app isn't running.** Claude Code may edit the bible while Fletchery is closed. Default: index generation is also available as a command (`fletchery index`), and the skills run it after they change files. `BIBLE.md` tells the AI not to edit `index.md` files by hand.
 9. **Saving.** The browser saves about 500 ms after typing stops, and on blur. Each save carries the version the browser last loaded. If the file changed on disk since then, the server refuses the write and the page shows both versions and asks which to keep.
 10. **Story type.** It's asked once, but it can be changed later in settings, with a warning. Changing it never deletes files.
-11. **Writer's settings** (changed 2026-10-30). The writer's settings live in `story-bible/fletchery-settings.json`, never in browser storage, and are edited in a Settings panel opened from the header. That file holds the author and co-authors (as credited, so a pen name works), the interface font (Source Sans 3 or Atkinson Hyperlegible), the writing font, how pastes are handled, the fade options, and layout choices such as the last question layout and the folded section list. `fletchery.json` keeps the bible's own record (story type, title, skips). A `font` left in an older `fletchery.json` is read once as the starting interface font. Each story keeps its own settings. API keys never go in a story folder, because story folders get synced, shared, uploaded, or committed (some are git repos, many aren't): they live in `fletchery-api.json` in the per-user config folder (`%APPDATA%\Fletchery\` on Windows, `~/Library/Application Support/Fletchery/` on macOS, `$XDG_CONFIG_HOME/fletchery/` or `~/.config/fletchery/` on Linux), readable only by the user, and only the local server touches them.
+11. **Writer's settings** (changed 2026-10-30). The writer's settings live in `story-bible/fletchery-settings.json`, never in browser storage, and are edited in a Settings panel opened from the header. That file holds the author and co-authors (as credited, so a pen name works), the interface font (Atkinson Hyperlegible Next, the default, or Source Sans 3), the writing font, how pastes are handled, the fade options, and layout choices such as the last question layout and the folded section list. `fletchery.json` keeps the bible's own record (story type, title, skips). A `font` left in an older `fletchery.json` is read once as the starting interface font. Each story keeps its own settings. API keys never go in a story folder, because story folders get synced, shared, uploaded, or committed (some are git repos, many aren't): they live in `fletchery-api.json` in the per-user config folder (`%APPDATA%\Fletchery\` on Windows, `~/Library/Application Support/Fletchery/` on macOS, `$XDG_CONFIG_HOME/fletchery/` or `~/.config/fletchery/` on Linux), readable only by the user, and only the local server touches them.
 12. **Fonts and the network.** Fonts come from `@fontsource` at `npm install` time and are served locally. The local edition makes no external requests. The web edition's exceptions are listed above.

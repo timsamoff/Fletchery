@@ -34,9 +34,9 @@ Rules the code relies on. Each is marked **enforced** (code or the gate checks i
 - **One save at a time, one conflict at a time.** `state.saving` and `state.conflict` guard `save`. `route` does not navigate away from an entry while a conflict is open.
 - **The page never keeps preferences in browser storage.** Unenforced. A project convention in `CLAUDE.md`.
 - **Scripted animation goes through `animate`.** Unenforced. Direct `el.animate` calls skip the reduced-motion check.
-- **Every vertical size is a multiple of 4px; blocks take whole 28px lines.** Partly enforced: the gate's `raw-token-value` rule flags values that equal a token. Rhythm as a whole is checked by eye with "Show grid".
+- **Every vertical size is a multiple of 4px; blocks take whole 28px lines.** Partly enforced: the gate's `raw-token-value` rule flags values that equal a token. Rhythm as a whole is checked by eye with the grid overlay (`"grid": true` under `layout` in the settings file).
 - **Colors come from `tokens.css` only.** Enforced by the gate's `color-literal` rule, with one baselined exception.
-- **Text on cream uses charcoal tones; orange never carries small text.** Unenforced. See `CLAUDE.md`.
+- **Ink tones carry text; gold never does, and raspberry only on the page and the surface.** Unenforced. See `CLAUDE.md` for the contrast numbers.
 
 ## Restart rule
 

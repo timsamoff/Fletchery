@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Fletchery</title>
     <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-    <link rel="preload" href="/fonts/source-sans-3-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/atkinson-hyperlegible-next-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/css/tokens.css" />
     <link rel="stylesheet" href="/css/base.css" />
     <script type="importmap">
@@ -19,7 +19,7 @@
     <header class="site-header">
       <div class="wrap">
         <a class="brand" href="/">
-          <img src="/icon.svg" alt="" width="48" height="48" />
+          <img src="/icon.svg" alt="" width="64" height="64" />
           <span>Fletchery</span>
         </a>
         <p class="project-title" id="project-title"></p>
@@ -52,9 +52,10 @@
     <footer class="site-footer">
       <div class="wrap">
         <p class="project-path" id="project-path"></p>
-        <p class="save-status" id="save-status" role="status" aria-live="polite"></p>
-        <button type="button" class="button button-quiet" id="grid-toggle" aria-pressed="false">Show grid</button>
+        <p class="visually-hidden" id="save-status" role="status" aria-live="polite"></p>
       </div>
     </footer>
+
+    <p class="toast" id="toast" popover="manual" aria-hidden="true"></p>
   </body>
 </html>

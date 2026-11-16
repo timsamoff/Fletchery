@@ -10,7 +10,7 @@ Node 20 or later (`engines` in `package.json`); developed on Node 25.2 on Window
 |---|---|---|
 | `yaml` | Frontmatter parsing and serialization in `entry.js`. Node loads it from `node_modules`; the browser loads its prebuilt browser build, served from `node_modules/yaml/browser/dist` at `/vendor/yaml/`. | A new major version may move the browser build path, which `YAML_DIR` in `server.js` and the import map in `index.html` assume. Its output formatting affects how frontmatter is written. |
 | `@fontsource/source-sans-3` | Interface font | Font file names are matched by name in `serveStatic` |
-| `@fontsource/atkinson-hyperlegible` | The accessible interface font option | Same |
+| `@fontsource/atkinson-hyperlegible-next` | The default interface font (replaced `@fontsource/atkinson-hyperlegible` on 2026-11-16) | Same |
 | `@fontsource/literata` | The serif for the writer's own text | Same |
 
 Fonts are served from `node_modules/@fontsource/<name>/files` at `/fonts/<file>`. The `@font-face` rules are in `public/css/tokens.css`. The local edition makes no external requests.

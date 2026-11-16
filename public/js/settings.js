@@ -8,7 +8,7 @@ const SAVE_DELAY_MS = 300;
 const DEFAULTS = {
   version: 1,
   author: { name: '', coAuthors: '' }, // as credited, so a pen name works
-  interfaceFont: 'source-sans-3', // or 'atkinson-hyperlegible'
+  interfaceFont: 'atkinson-hyperlegible', // Atkinson Hyperlegible Next, or 'source-sans-3'
   writingFont: 'literata', // or 'interface'
   paste: 'paragraphs', // or 'lines'
   fade: { on: true, scope: 'sidebar', pauseSeconds: 2 }, // scope 'sidebar' or 'full'
@@ -164,8 +164,8 @@ function formHtml(v) {
     <fieldset>
       <legend>Interface</legend>
       <p class="settings-question">Interface font</p>
+      ${radio('interfaceFont', 'atkinson-hyperlegible', 'Atkinson Hyperlegible Next', v.interfaceFont, 'Designed for readers with low vision.')}
       ${radio('interfaceFont', 'source-sans-3', 'Source Sans 3', v.interfaceFont)}
-      ${radio('interfaceFont', 'atkinson-hyperlegible', 'Atkinson Hyperlegible', v.interfaceFont, 'Designed for readers with low vision.')}
     </fieldset>
     <fieldset>
       <legend>Fade while typing</legend>
