@@ -1,10 +1,10 @@
 # Handoff
 
-Updated 2026-11-16. Nothing is in progress. The new look is committed (`3d2ece5`, then `af882c1` for round 3). Neither is pushed, and Tim has not approved pushing them.
+Updated 2026-11-16. Nothing is in progress. Everything is committed and pushed.
 
 ## 1. Current task and status
 
-None. The look is built, checked in a browser, documented, and committed: pale gold page `#F3ECD8`, gold-white writing surface `#FBF8EC`, darker gold panels `#E7DAB6`, gray-plum sidebar `#DBD5D8` whose current item is a lighter `#EFEBED` with a raspberry ribbon, raspberry `#A04459` for header, footer, buttons, underlines, and card spines, and gold `#C5A13B` for rules and ornaments only. Nothing is pure black (the darkest is `#121212`). Every scrollbar is the sidebar's thin style, set once on `*`. Buttons whose label changes (Mark as canon, the Go to buttons, Add and Rename) keep the width of their longest label through `setLabel` and `.label-stack`. Atkinson Hyperlegible Next is the default font (bold at 500). Notifications are a toast, and the footer's Show grid button is gone. Tim's last round (near-black to `#121212`, a lighter highlight with a raspberry ribbon, one scrollbar style, a grayer sidebar, steady button widths) is done and was checked in a browser: button positions are identical across every label. He has not seen it in the app yet.
+None. Today's work, all pushed: panels and open tabs use the sidebar's plum `#DBD5D8`; inactive tabs, generic profile pictures, and the toast use a darker plum `#CDC1C8`; the toast has a close button and a wide soft shadow (`--shadow-toast`); writing boxes grow and shrink with their text and keep a dragged height (`fitTextarea` in `app.js`). Tim has not yet tried the auto-grow in his own bible.
 
 ## 2. Files touched
 
@@ -12,25 +12,20 @@ None uncommitted.
 
 ## 3. Next step
 
-Tim restarts Fletchery (the server changed to serve the new font), reloads, opens Settings and picks Atkinson Hyperlegible Next (a saved setting overrides the new default), and says what to adjust. Then he makes the new icon (`assets/fletchery-icon.svg` is still the dark one; the header mark is 64px). Then the overall app design discussion he asked for: the look is done, so ask about layout and interaction, or the code's structure, before proposing anything. Characters step 4 (relationships) is the next build step.
+Tim restarts nothing (no server changes), reloads, and tries the auto-grow boxes and the toast. Then the new icon (`assets/fletchery-icon.svg` is still the dark one), the overall design discussion he asked for, and Characters step 4 (relationships).
 
 ## 4. Open questions for Tim
 
-- OK to push the look commits and the handoff commits after them?
 - Which flourishes stay (gilt rules, ribbon, card spines, ornament, endpaper)? The ornament glyph looks like a small fruit in the font; an SVG would fix it.
 - Should unsaved, saving, and saved ever become toasts? They stay beside the editor for now.
-- Sentinel 1.8.0: update now, not now, or skip.
+- Sentinel update: the repo is on 1.8.0 now; confirm nothing else is pending.
 - Delete a character: a real delete or a trash folder?
 
 ## 5. Tried and failed
 
 - Backslashes and quotes in a Bash heredoc get mangled. Write patch scripts with the Write tool into `scratch/`, then run them.
-- Several source files have CRLF line endings. Use the Edit tool, or normalize line endings in the script (see `scratch/look-patch*.cjs`).
-- The gate's raw-token rule flags `4px`, `8px`, `28px`, `64px` and other token values in `base.css`. Use the token.
-- The wide-screen sidebar padding rule is `.section-nav .nav-list a`, so sidebar overrides need that much specificity.
-- An accent bar behind the ribbon bookmark fills its notch; the ribbon alone marks the current item.
-- Playwright can't open `file:` pages. Serve the folder with `python -m http.server` and wait a moment before loading.
-- After any server change, tell Tim to restart Fletchery first. A status-line message is invisible behind a modal dialog; use the toast.
-- A saved Settings value wins over a new default, so a changed default needs Tim to re-pick it.
-- The handoff-only push exception covers the handoff file alone. Pushing it carries every unpushed commit under it, so push only when no other commit is waiting on Tim's approval.
-- Tim tests on his real EOL bible on port 3000. Never send it a request that changes anything.
+- Several source files have CRLF line endings. Use the Edit tool.
+- The gate's raw-token rule flags values like `4px` and `28px` in `base.css`. Use the token.
+- The sheet shadow (`--shadow-sheet`) vanishes on a small card because of its negative spread; the toast has its own token.
+- Tim tests on his real EOL bible on port 3000. Never send it a request that changes anything. Test typing on a throwaway story folder on another port (`scratch/`).
+- `scratch/autogrow-story` was busy when deleted; remove it later (gitignored).
