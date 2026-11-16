@@ -1,6 +1,6 @@
 # Handoff
 
-Updated 2026-11-16. Nothing is in progress. The media library (Characters step 3) is tested by Tim and committed as `c0d3e12`. It is not pushed yet.
+Updated 2026-11-16. Nothing is in progress. The media library (Characters step 3) is tested by Tim and committed as `c0d3e12`. It is pushed.
 
 ## 1. Current task and status
 
@@ -12,11 +12,10 @@ None uncommitted.
 
 ## 3. Next step
 
-Ask Tim whether to push. Then the overall app design discussion he asked for: ask what he has in mind (the look and interaction, the code's structure, or both) before proposing anything. After that, Characters step 4 (relationships) is the next build step in `characters-design-brief.md`.
+The overall app design discussion he asked for: ask what he has in mind (the look and interaction, the code's structure, or both) before proposing anything. After that, Characters step 4 (relationships) is the next build step in `characters-design-brief.md`.
 
 ## 4. Open questions for Tim
 
-- OK to push `c0d3e12` and the commits after it?
 - Sentinel 1.8.0: update now, not now, or skip.
 - Delete a character: a real delete or a trash folder?
 - Whether any research idea moves from "discuss later" to planned.
