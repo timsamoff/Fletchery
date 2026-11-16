@@ -33,7 +33,7 @@ This file and `Sentinel-Notes/` are committed to the public repo by deliberate c
 
 ## Working conventions
 
-- **Comments:** one or two sentences at most, saying what the code is for or why. Longer background, history, or reasoning goes here, or into `docs/SPEC.md` if it's an architectural decision.
+- **Comments:** one or two sentences at most, and no more than two lines of about 100 characters each, saying what the code is for or why. Longer background, history, or reasoning goes here, or into `docs/SPEC.md` if it's an architectural decision.
 - **Documentation routing:** a tracked, unresolved inconsistency goes to `Sentinel-Notes/TODO.md` (plus a one-line pointer here if it could be mistaken for convention). A settled operational convention goes here. A settled architectural decision goes in `docs/SPEC.md`, and `DESIGN.md` changes whenever the decision changes how the parts fit together. Anything an external user needs goes in the README. A declined suggestion is either "not now" (TODO) or a settled rejection (here or SPEC.md, with the reason).
 - **TODO items:** one line each, and anything longer gets `Sentinel-Notes/<issue>-design-brief.md`. Move a finished item's line to the Done section at the bottom. Move a finished item's brief to `Sentinel-Notes/archive/`. Updating `TODO.md` is part of finishing the work, not a follow-up.
 - **After finishing a TODO item:** name the item most worth doing next with a reason, then start on it unless Tim redirects. TODO items carry no priority, effort, or dependency data, so the pick is judgment from the item text, and should be stated that way. If two are close, name both with a one-line reason each, then proceed on the stronger.
