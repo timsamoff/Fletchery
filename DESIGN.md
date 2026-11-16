@@ -29,6 +29,8 @@ As of Characters step 2:
 | `public/js/core/entry.js` | Entry files: frontmatter parsing and serialization, new-entry frontmatter, and the body update rules. It imports the bare name `yaml`, which the page's import map points at `/vendor/yaml/` and Node resolves from `node_modules`, so the same module runs in both. |
 | `public/js/core/store.js` | The storage interface and `LocalServerStore`, its backend for the local edition. |
 | `public/js/core/media.js` | Image names and sidecars: reading and writing `<image>.meta.md` (caption, alt text, and what to notice), keeping any other text. |
+| `public/js/core/links.js` | Links between files: image references in frontmatter, Markdown links in entry text, and the rewriting that keeps both working when a file or folder moves. Also walks the whole bible and moves an image with its sidecar. |
+| `public/js/media-library.js` | The media library page (`#/media`) and the picker that puts an image from anywhere in the bible on an entry. `app.js` owns the frame and the image dialog. |
 | `public/css/tokens.css` | Every color, type size, rhythm, and spacing value, plus the `@font-face` rules. |
 | `public/css/base.css` | Layout and components, built only from tokens. |
 | `test/` | `node:test` tests for the core and the server, run with `npm test`. |
@@ -47,6 +49,7 @@ The server is a file store. Paths are relative to `story-bible/`, and a version 
 | `DELETE /api/file` | Deletes a file, with the same version check. |
 | `POST /api/move` | Moves a file, with the same version check. Refuses if the destination exists. |
 | `POST /api/move-folder` | Moves a whole folder, such as a renamed character's. Refuses if anything has the new name. |
+| `POST /api/move-media` | Moves an image, to the library or into an entry's folder. Images have no version to check, so it refuses only if the destination exists. |
 | `POST /api/upload?dir=&name=` | Saves the request body as an image (JPEG, PNG, WebP, or GIF, up to 25 MB) in `dir`, under a safe version of `name`. A clash gets `-2`, `-3`, and so on, unless `replace=1` (used for the portrait copy). Returns the path. |
 | `GET /api/media?path=` | An image from the bible, with its own content type and an `ETag`, so an unchanged image answers 304. SVG isn't served, because it can carry scripts. |
 | `DELETE /api/media` | Deletes an image. |

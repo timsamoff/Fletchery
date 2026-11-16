@@ -112,3 +112,13 @@ test('images: only known types, no overwrite, and unchanged ones are not sent tw
   assert.equal(again.status, 304);
   assert.equal((await fetch(`${origin}/api/media?path=a.md`)).status, 400);
 });
+
+test('an image moves to a free name only, and only images move this way', async () => {
+  const move = (from, to) => api('POST', '/api/move-media', { from, to });
+  assert.equal((await move('pics/my-photo.png', 'media/my-photo.png')).status, 200);
+  assert.deepEqual([...(await fs.readFile(path.join(project, 'story-bible', 'media', 'my-photo.png')))], [1, 2, 3]);
+  assert.equal((await move('pics/my-photo-2.png', 'media/my-photo.png')).status, 409);
+  assert.equal((await move('pics/gone.png', 'media/gone.png')).status, 404);
+  assert.equal((await move('a.md', 'media/a.png')).status, 400);
+  assert.equal((await move('pics/my-photo-2.png', '../out.png')).status, 400);
+});

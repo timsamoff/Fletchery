@@ -71,6 +71,7 @@ export function createServer(projectDir) {
       await bible.moveFolder(from, to);
       return send(res, 200, {});
     }
+    if (route === 'POST /api/move-media') return send(res, 200, await moveMedia(await readBody(req)));
     if (route === 'GET /api/media') return serveMedia(url.searchParams.get('path'), req, res);
     if (route === 'POST /api/upload') {
       const p = url.searchParams;
@@ -158,6 +159,20 @@ export function createServer(projectDir) {
     await bible.writeAtomic(rel, data);
     watcher.start();
     return { path: rel };
+  }
+
+  // Moves an image, to the library or into an entry's folder. Refused if anything already has the new name.
+  async function moveMedia({ from, to }) {
+    const isImage = (rel) => Boolean(IMAGE_TYPES[path.extname(rel ?? '').toLowerCase()]);
+    if (!isImage(from) || !isImage(to)) throw new BibleError(400, 'That isn’t an image.');
+    try {
+      await fs.access(bible.resolve(from));
+    } catch {
+      throw new BibleError(404, 'There is no image to move.');
+    }
+    watcher.expect(from, null);
+    await bible.move(from, to);
+    return {};
   }
 
   async function removeMedia(rel) {

@@ -7,7 +7,9 @@ Conventions: when an item is finished, move its line to the Done section at the 
 - [ ] Visual redesign before more feature work: steps 1-3 built, motion added, Focus sheet reworked, links updated; see [visual-redesign-design-brief.md](visual-redesign-design-brief.md).
 - [ ] Settings page: credit (shown as Written by), fonts, paste, fade built; AI preview with Gemini; key location set; see [settings-page-design-brief.md](settings-page-design-brief.md).
 - [ ] Fletchery web edition beside the local one (optional AI via Anthropic or OpenRouter; local or Drive storage): shared core first; see [web-edition-design-brief.md](web-edition-design-brief.md).
-- [ ] Characters with images, the media library, relationships, and indexes: steps 1 and 2 built and confirmed; see [characters-design-brief.md](characters-design-brief.md).
+- [ ] Characters with images, the media library, relationships, and indexes: steps 1-3 built, step 3 awaiting Tim's check; see [characters-design-brief.md](characters-design-brief.md).
+- [ ] Media library follow-ups: PDFs, and notes and quick capture for the rest of Notes and media.
+- [ ] Discuss with Tim: the overall app design (ask what he has in mind first).
 - [ ] Remember the open tab (Seed, Sketch, Sheet, or Images) for each entry across reloads; a reload now always opens the deepest filled depth.
 - [ ] World and settings need images too: reuse the Characters image zone and sidecars once step 2 is built.
 - [ ] Onboarding screen (no story added yet) needs work: it's barebones and not elegant. Maybe a splash screen that can be turned on or off.

@@ -69,3 +69,13 @@ Paths and names only; open the file for the body. Line numbers are left out on p
 | Motion | `animate` (honors reduced motion), `riseIn`, `placeDepthIndicator` |
 
 The `state` object near the top of the "Section editor" group is the page's single store; see `05-state-and-data.md`.
+
+## Links and the media library (added 2026-11-15)
+
+| Where | What |
+|---|---|
+| `public/js/core/links.js` | `refToPath` and `pathToRef` (a bare name is in the entry's folder, a path is anywhere else), `linkedPaths` (what an entry points to), `rewriteEntry` (one file's content after a move, or null), `moveMap`, `listAll`, `rewriteAll`, `moveImage`, `freeName`, `LIBRARY_DIR` |
+| `public/js/media-library.js` | `createMediaLibrary(store, ui)` returns `load`, `renderPage`, `openPicker`, and `upload`. It draws the page at `#/media` and fills the picker dialog. |
+| `public/js/app.js` | `route` sends `#/media` to the library; `openImage(image)` shows the actions that fit (an entry's own image, one shown from elsewhere, or any image seen from the library); `moveOpenImage`, `pickImage`, `existingPaths`, `folderName`; `renameCharacter` calls `rewriteAll`. |
+| `server/server.js` | `POST /api/move-media` (`moveMedia`). |
+| `test/links.test.js` | Tests for all of `links.js`, with an in-memory store. |

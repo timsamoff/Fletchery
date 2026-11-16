@@ -1968,3 +1968,70 @@ textarea::placeholder {
 [data-armed] .label-swap > span:last-child {
   opacity: 1;
 }
+
+/* The media library: every image in the bible on one page, grouped by where it's kept. */
+.media-intro {
+  max-width: var(--measure);
+  margin: 0 0 var(--line);
+}
+.image-drop.is-dropping {
+  border-color: var(--color-accent);
+  background: var(--color-surface);
+}
+.media-filter {
+  max-width: calc(var(--space-7) * 6);
+  margin-top: var(--line);
+}
+.media-group h2 {
+  margin: var(--line) 0 0;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: var(--text-h3);
+  line-height: var(--leading-h3);
+}
+.image-pick-row {
+  margin: var(--space-2) 0 0;
+}
+/* In the image dialog: where the image is kept, and the ways to move it. */
+.image-used {
+  margin: 0 0 var(--space-3);
+}
+.image-move {
+  margin: 0;
+}
+.image-move select,
+.image-move .button {
+  width: 100%;
+}
+.image-move .button {
+  margin-top: var(--space-2);
+}
+.image-actions [hidden],
+.image-used[hidden] {
+  display: none;
+}
+/* The picker shows the same cards over the page, to put one of them on an entry. */
+.picker-dialog {
+  width: min(1280px, 100vw - 2 * var(--space-5));
+  max-height: calc(100vh - 2 * var(--space-5));
+  padding: var(--space-5);
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--color-bg);
+  color: var(--color-text);
+  box-shadow: var(--shadow-sheet);
+}
+.picker-dialog::backdrop {
+  background: var(--color-backdrop-soft);
+}
+.picker-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.picker-bar h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 600;
+}

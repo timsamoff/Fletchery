@@ -72,3 +72,7 @@ The writer's preferences live in `prefs` (a `Settings`), not in `state`. Nothing
 The disk file is the source of truth. A version is `hash(text)`, the SHA-256 of the file's UTF-8 text. The server computes it on read and write. The page never computes one; it passes back the version it last received as `baseVersion`. `null` means the file must not exist yet.
 
 Images are hashed as `buffer.toString('utf8')`, which is lossy for binary data. Both the server's `expect` call and the watcher's later read use the same conversion, so they agree. The value is not meaningful as a content fingerprint of an image.
+
+## Image references (added 2026-11-15)
+
+An entry's `images` list orders its images. Each item is a bare file name (an image in the entry's folder) or a path from the bible root (an image in `media/` or in another entry's folder). `portrait.image` follows the same rule. In `state.images` each item has `key` (how the list names it), `path`, `name`, and `linked` (true when it's kept somewhere else). `state.address` is the address of the page that's showing, and `state.page` can also be `'media'`.

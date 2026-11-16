@@ -1,7 +1,9 @@
 // First-run setup, section navigation, and the section editor, with live sync and conflict handling.
 import { normalizeStatus, parseEntry, updateEntry } from './core/entry.js';
 import { DEPTHS, deepestFilled, parseLayers, serializeLayers } from './core/layers.js';
+import { baseOf, dirOf, LIBRARY_DIR, moveImage, moveMap, pathToRef, refToPath, rewriteAll } from './core/links.js';
 import { isImage, parseSidecar, PORTRAIT_FILE, PORTRAIT_SIZE, sidecarPath, updateSidecar } from './core/media.js';
+import { createMediaLibrary } from './media-library.js';
 import { LocalServerStore, StoreConflict } from './core/store.js';
 import { Settings, SETTINGS_FILE, setupSettingsPanel } from './settings.js';
 
@@ -53,6 +55,18 @@ function showProblem(heading, message) {
 const prefs = new Settings(store, {
   onSaved: () => setStatus('Settings saved.'),
   onError: (err) => setStatus(`Settings problem: ${err.message}.`),
+});
+
+// The media library page (#/media) and its picker. "Notes and media" in the sidebar opens it.
+const MEDIA_PAGE = 'media';
+const MEDIA_AREA = 'notes';
+const library = createMediaLibrary(store, {
+  esc,
+  setStatus,
+  riseIn: (el, options) => riseIn(el, options),
+  openImage: (image) => openImage(image),
+  page: () => document.getElementById('page'),
+  isOpen: () => state.page === 'media',
 });
 
 // A failure nothing else caught still reaches the writer, in the status line.
@@ -214,7 +228,8 @@ const state = {
   settingsVersion: null,
   sectionSet: null,
   section: null, // the built section being shown
-  page: null, // 'entry' (the editor), 'list' (a section's cards), 'loading' (an entry being read), or 'problem' (unreadable)
+  page: null, // 'entry' (the editor), 'list' (a section's cards), 'media' (the library), 'loading' (an entry being read), or 'problem' (unreadable)
+  address: '', // the address of the page that's showing, to go back to when a move away is refused
   entry: null, // { path, slug } of the entry being edited
   characters: [], // [{ slug, title, status, description, silhouette }] for the sidebar and the cards
   statusCache: {}, // section id -> status word, for single-entry sections shown in the sidebar
@@ -308,15 +323,32 @@ async function showEditor(settings, settingsVersion) {
           <label for="image-notice">What to notice</label>
           <textarea id="image-notice" rows="3"></textarea>
         </div>
+        <p class="hint image-used" id="image-used" hidden></p>
+        <p class="form-error" id="image-error" role="alert"></p>
         <div class="image-actions">
           <button type="button" class="button button-quiet" id="image-duplicate">Duplicate</button>
           <button type="button" class="button button-quiet" id="image-use-portrait">Use as portrait</button>
+          <button type="button" class="button button-quiet" id="image-to-library">Move to the library</button>
+          <button type="button" class="button button-quiet" id="image-to-entry">Move to this entry’s folder</button>
+          <button type="button" class="button button-quiet" id="image-unlink">Take off this entry</button>
+          <div class="field settings-select image-move" id="image-move">
+            <label for="image-move-target">Move to a character’s folder</label>
+            <select id="image-move-target"></select>
+            <button type="button" class="button button-quiet" id="image-move-go">Move</button>
+          </div>
           <button type="button" class="button button-quiet" id="image-remove" aria-label="Remove">
             <span class="label-swap"><span>Remove</span><span>Remove it from the folder?</span></span>
           </button>
         </div>
       </div>
       <button type="button" class="button image-done" id="image-done">Done</button>
+    </dialog>
+    <dialog class="picker-dialog" id="picker-dialog" aria-labelledby="picker-title">
+      <div class="picker-bar">
+        <h2 id="picker-title">Choose an image</h2>
+        <button type="button" class="button button-quiet" id="picker-cancel">Cancel</button>
+      </div>
+      <div class="picker-body" id="picker-body"></div>
     </dialog>
     <dialog class="crop-dialog" id="crop-dialog" aria-labelledby="crop-title">
       <h2 id="crop-title">Choose the part to use</h2>
@@ -344,6 +376,7 @@ async function showEditor(settings, settingsVersion) {
   setupNameDialog();
   setupImageDialog();
   setupCropDialog();
+  document.getElementById('picker-cancel').addEventListener('click', () => document.getElementById('picker-dialog').close());
   document.addEventListener('paste', onImagePaste);
 
   await Promise.all([loadCharacters(), loadSingleStatuses()]);
@@ -360,7 +393,8 @@ async function route() {
   const slug = rawSlug && decodeSlug(rawSlug);
   const first = visibleSections().find((s) => s.built);
   const section = visibleSections().find((s) => s.id === sectionId && s.built);
-  if (!section) {
+  const toMedia = sectionId === MEDIA_PAGE;
+  if (!section && !toMedia) {
     history.replaceState(null, '', `#/${first.id}`);
     return route();
   }
@@ -372,13 +406,24 @@ async function route() {
   }
   if (state.focusOpen) closeFocus();
 
+  if (toMedia) {
+    state.address = `#/${MEDIA_PAGE}`;
+    state.page = 'media';
+    state.section = null;
+    state.entry = null;
+    renderNav();
+    main.focus({ preventScroll: true });
+    window.scrollTo(0, 0);
+    return library.renderPage();
+  }
   state.section = section;
-  if (section.many && !slug) return renderListPage();
-  const known = !section.many || state.characters.some((c) => c.slug === slug);
-  if (!known) {
-    history.replaceState(null, '', `#/${section.id}`);
+  const known = section.many && slug && state.characters.some((c) => c.slug === slug);
+  if (section.many && !known) {
+    if (slug) history.replaceState(null, '', `#/${section.id}`);
+    state.address = `#/${section.id}`;
     return renderListPage();
   }
+  state.address = location.hash;
   await openEntry(section.many ? entryFile(section, slug) : section.file, slug ?? null);
 }
 
@@ -393,8 +438,7 @@ function decodeSlug(raw) {
 
 // Puts the address back to the page that's showing, after a move away from it was refused.
 function stayOnPage() {
-  const slug = state.entry?.slug;
-  history.replaceState(null, '', `#/${state.section.id}${slug ? `/${encodeURIComponent(slug)}` : ''}`);
+  history.replaceState(null, '', state.address);
 }
 
 async function openEntry(path, slug) {
@@ -886,7 +930,7 @@ async function addCharacter(name) {
 }
 
 // Renames the character, its folder, and its file together, so the folder stays readable for writers who
-// work in it directly. Rewriting links in other entries arrives with the media library's link rewriting.
+// work in it directly. Links and image references in other files that pointed into the old folder are rewritten.
 async function renameCharacter(name) {
   await save();
   if (state.conflict || isDirty()) throw new Error('Save or resolve your changes first, then rename.');
@@ -910,10 +954,22 @@ async function renameCharacter(name) {
     }
   }
   await writeEntry({ set: { title: name } });
+  let report = '';
+  if (slug !== old) {
+    // The entry's own links don't change (it moved with its folder), so it's left out and can't conflict.
+    const map = moveMap([
+      { from: `${section.folder}/${old}/${old}.md`, to: entryFile(section, slug) },
+      { from: `${section.folder}/${old}`, to: `${section.folder}/${slug}` },
+    ]);
+    const { changed, failed } = await rewriteAll(store, map, { skip: [state.entry.path] });
+    if (changed.length) report += ` Updated ${changed.length} ${changed.length === 1 ? 'file' : 'files'} that pointed to it.`;
+    if (failed.length) report += ` Couldn’t update ${failed.join(', ')}.`;
+  }
   await loadCharacters();
-  setStatus(`Renamed to ${name}.`);
   history.replaceState(null, '', `#/${section.id}/${encodeURIComponent(slug)}`);
+  state.address = location.hash;
   await openEntry(state.entry.path, slug);
+  setStatus(`Renamed to ${name}.${report}`);
 }
 
 // The portrait's menu: the photo if there is one, every placeholder silhouette, and the photo options.
@@ -939,7 +995,7 @@ function setupPortraitMenu() {
     if (e.target.closest('#portrait-upload')) return document.getElementById('portrait-input').click();
     if (e.target.closest('#portrait-crop')) {
       menu.hidePopover();
-      return openCrop(`${entryFolder()}/${state.frontmatter.portrait.image}`);
+      return openCrop(refToPath(state.frontmatter.portrait.image, entryFolder()));
     }
     const choice = e.target.closest('[data-kind]');
     if (!choice) return;
@@ -1033,21 +1089,24 @@ async function renderImages() {
   if (!home || state.view !== 'images') return;
   const dir = entryFolder();
   // The writer's order, kept as `images` in the frontmatter, comes first; anything not in it follows by name.
-  const order = state.frontmatter.images ?? [];
-  const rank = (name) => (order.includes(name) ? order.indexOf(name) : order.length);
-  const files = (await store.list(dir))
+  // An item in that list is a file name for an image in this folder, or a path for one kept somewhere else
+  // (the library, or another entry's folder). key is how the list names it.
+  const order = Array.isArray(state.frontmatter.images) ? state.frontmatter.images.filter((r) => typeof r === 'string') : [];
+  const rank = (key) => (order.includes(key) ? order.indexOf(key) : order.length);
+  const own = (await store.list(dir))
     .filter((e) => e.type === 'file' && isImage(e.name) && e.name !== PORTRAIT_FILE)
-    .sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name));
+    .map((e) => ({ key: e.name, path: `${dir}/${e.name}`, linked: false }));
+  const elsewhere = (await existingPaths(order.filter((r) => r.includes('/') && isImage(r)))).map((path) => ({ key: path, path, linked: true }));
+  const items = [...own, ...elsewhere].sort((a, b) => rank(a.key) - rank(b.key) || a.key.localeCompare(b.key));
   state.images = await Promise.all(
-    files.map(async ({ name }) => {
-      const path = `${dir}/${name}`;
+    items.map(async (item) => {
       let meta;
       try {
-        meta = parseSidecar((await store.read(sidecarPath(path))).content);
+        meta = parseSidecar((await store.read(sidecarPath(item.path))).content);
       } catch {
         meta = parseSidecar(null);
       }
-      return { path, name, ...meta };
+      return { ...item, name: baseOf(item.path), ...meta };
     }),
   );
   // Cards like the character cards, each image at its own proportions.
@@ -1055,11 +1114,12 @@ async function renderImages() {
     ? `<ul class="image-grid">${state.images
         .map(
           (img) => `
-        <li data-name="${esc(img.name)}"><button type="button" class="character-card image-card" data-path="${esc(img.path)}" aria-label="${esc(img.caption || img.name)}. Open it larger." aria-describedby="image-reorder-help">
+        <li data-name="${esc(img.key)}"><button type="button" class="character-card image-card" data-path="${esc(img.path)}" aria-label="${esc(img.caption || img.name)}. Open it larger." aria-describedby="image-reorder-help">
           <img src="${store.mediaUrl(img.path)}" alt="${esc(img.alt)}" loading="lazy" />
           <span class="card-body">
             <span class="card-name">${esc(img.caption || img.name)}</span>
             ${img.notice ? `<span class="card-seed">${esc(img.notice)}</span>` : ''}
+            ${img.linked ? `<span class="card-status">From ${esc(folderName(dirOf(img.path)))}</span>` : ''}
           </span>
         </button></li>`,
         )
@@ -1071,17 +1131,45 @@ async function renderImages() {
       <span class="hint">JPEG, PNG, WebP, or GIF, up to 25 MB each.</span>
     </button>
     <input type="file" id="image-input" accept="${IMAGE_ACCEPT}" multiple hidden />
+    <p class="image-pick-row"><button type="button" class="link-button" id="image-pick">Choose from the media library</button></p>
     <p class="form-error" id="images-error" role="alert"></p>
     ${grid}
     <p class="visually-hidden" id="image-reorder-help">Drag to reorder, or press Alt with an arrow key.</p>`;
   home.querySelectorAll('.image-grid li').forEach((li, i) => riseIn(li, { delay: i * 30, fill: 'backwards' }));
   setupCardReorder(home.querySelector('.image-grid'), {
     attr: 'name',
-    current: () => state.images.map((i) => i.name),
+    current: () => state.images.map((i) => i.key),
     save: saveImageOrder,
-    label: (name) => state.images.find((i) => i.name === name)?.caption || name,
+    label: (key) => state.images.find((i) => i.key === key)?.caption || baseOf(key),
   });
   if (!home.dataset.ready) setupImagesHome(home);
+}
+
+// A folder as the writer knows it: the library, a character's folder, or its path.
+function folderName(dir) {
+  if (dir === LIBRARY_DIR) return 'the library';
+  const section = state.sectionSet.sections.find((s) => s.many && s.folder && dirOf(dir) === s.folder);
+  const owner = section && state.characters.find((c) => c.slug === baseOf(dir));
+  return owner ? `${owner.title}’s folder` : `story-bible/${dir}`;
+}
+
+// The paths that still have a file behind them. A reference to an image that's gone is kept in the entry but not shown.
+async function existingPaths(paths) {
+  const dirs = [...new Set(paths.map(dirOf))];
+  const names = new Map(await Promise.all(dirs.map(async (d) => [d, (await store.list(d)).map((e) => e.name)])));
+  return paths.filter((p) => names.get(dirOf(p)).includes(baseOf(p)));
+}
+
+// Puts an image kept somewhere else on this entry, by adding its path to the entry's list.
+async function pickImage() {
+  await library.openPicker({
+    exclude: state.images.map((i) => i.path),
+    onPick: async (path) => {
+      if (await writeEntry({ set: { images: [...state.images.map((i) => i.key), path] } })) setStatus('Added the image to this entry.');
+      await renderImages();
+      document.querySelector(`.image-card[data-path="${CSS.escape(path)}"]`)?.focus();
+    },
+  });
 }
 
 // Listeners on the images area itself, which stays put while its contents are redrawn.
@@ -1089,8 +1177,9 @@ function setupImagesHome(home) {
   home.dataset.ready = '1';
   home.addEventListener('click', (e) => {
     if (e.target.closest('#image-drop')) return document.getElementById('image-input').click();
+    if (e.target.closest('#image-pick')) return pickImage();
     const thumb = e.target.closest('.image-card');
-    if (thumb) openImage(thumb.dataset.path);
+    if (thumb) openImage(state.images.find((i) => i.path === thumb.dataset.path));
   });
   home.addEventListener('change', (e) => {
     if (e.target.id !== 'image-input') return;
@@ -1113,14 +1202,14 @@ function setupImagesHome(home) {
 }
 
 async function saveImageOrder(order, message = 'Saved the new order.') {
-  state.images.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
+  state.images.sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key));
   if (await writeEntry({ set: { images: order } })) setStatus(message);
 }
 
 let imagesTimer = null;
 function refreshImagesSoon() {
   clearTimeout(imagesTimer);
-  imagesTimer = setTimeout(() => !state.imageOpen && renderImages(), 300);
+  imagesTimer = setTimeout(() => !state.imageOpen && (state.page === 'media' ? library.renderPage() : renderImages()), 300);
 }
 
 // Problems show in the tab itself, since the status line under the writing is hidden here.
@@ -1174,10 +1263,20 @@ function setupImageDialog() {
     const path = state.imageOpen?.path;
     await saveImageDetails();
     state.imageOpen = null;
-    await renderImages();
+    await (state.page === 'media' ? library.renderPage() : renderImages());
     document.querySelector(`.image-card[data-path="${CSS.escape(path ?? '')}"]`)?.focus();
   });
   document.getElementById('image-duplicate').addEventListener('click', duplicateImage);
+  document.getElementById('image-to-library').addEventListener('click', () => moveOpenImage(LIBRARY_DIR));
+  document.getElementById('image-to-entry').addEventListener('click', () => moveOpenImage(entryFolder()));
+  document.getElementById('image-move-go').addEventListener('click', () => moveOpenImage(document.getElementById('image-move-target').value));
+  document.getElementById('image-unlink').addEventListener('click', async () => {
+    const { path } = state.imageOpen;
+    if (await writeEntry({ set: { images: state.images.filter((i) => i.path !== path).map((i) => i.key) } })) {
+      setStatus('Taken off this entry. The image is still where it was.');
+    }
+    dialog.close();
+  });
   document.getElementById('image-use-portrait').addEventListener('click', async () => {
     const { path } = state.imageOpen;
     dialog.close();
@@ -1215,22 +1314,75 @@ async function duplicateImage() {
     const copy = await store.upload(entryFolder(), path.split('/').pop(), blob);
     const side = await store.read(sidecarPath(path));
     if (side.exists) await store.write(sidecarPath(copy), side.content, null);
-    const names = state.images.map((i) => i.name);
-    const name = path.split('/').pop();
-    names.splice(names.indexOf(name) + 1, 0, copy.split('/').pop());
-    await writeEntry({ set: { images: names } });
+    const keys = state.images.map((i) => i.key);
+    keys.splice(keys.indexOf(baseOf(path)) + 1, 0, baseOf(copy));
+    await writeEntry({ set: { images: keys } });
     setStatus('Duplicated the image.');
   } catch (err) {
-    return setStatus(`Couldn’t duplicate the image. ${err.message}`);
+    return imageProblem(`Couldn’t duplicate the image. ${err.message}`);
   }
   dialog.close();
 }
 
-async function openImage(path) {
-  const img = state.images.find((i) => i.path === path);
+// Moves the open image and its sidecar into a folder (the library, or an entry's), and repairs every reference to
+// it. On an entry's Images tab the entry keeps showing the image, from its new place.
+async function moveOpenImage(toDir) {
+  const { path } = state.imageOpen;
+  const onEntry = state.page === 'entry';
+  await saveImageDetails();
+  if (onEntry) {
+    await save();
+    if (state.conflict || isDirty()) return imageProblem('Save or resolve your changes first, then move the image.');
+    // Listing every image first means this entry's reference is rewritten along with the others.
+    if (!(await writeEntry({ set: { images: state.images.map((i) => i.key) } }))) return imageProblem('This entry couldn’t be saved, so the image wasn’t moved.');
+  }
+  let result;
+  try {
+    result = await moveImage(store, path, toDir);
+  } catch (err) {
+    return imageProblem(`Couldn’t move the image. ${err.message}`);
+  }
+  if (onEntry) await checkRemote(); // this entry's file was rewritten too
+  const fixed = result.changed.length;
+  setStatus(
+    `Moved to ${folderName(toDir)}.` +
+      (fixed ? ` Updated ${fixed} ${fixed === 1 ? 'file' : 'files'} that pointed to it.` : '') +
+      (result.failed.length ? ` Couldn’t update ${result.failed.join(', ')}.` : ''),
+  );
+  state.imageOpen = { ...state.imageOpen, path: result.to }; // so focus returns to the card in its new place
+  state.imageOpen.saved = imageValues();
+  document.getElementById('image-dialog').close();
+}
+
+// A problem while the image dialog is open shows inside it, since the dialog covers the status line.
+function imageProblem(text) {
+  setStatus(text);
+  document.getElementById('image-error').textContent = text;
+}
+
+// image: { path, caption, alt, notice }, plus linked on an entry's tab, or note and targets from the media library.
+async function openImage(image) {
+  const img = image;
+  const { path } = img;
+  const onEntry = state.page === 'entry';
   const side = await store.read(sidecarPath(path));
   state.imageOpen = { path, raw: side.content, version: side.version, saved: { caption: img.caption, alt: img.alt, notice: img.notice } };
   for (const [key, id] of Object.entries(IMAGE_FIELDS)) document.getElementById(id).value = img[key];
+  // Which actions fit: an entry's own image, one it shows from elsewhere, or any image seen from the library page.
+  const own = onEntry && !img.linked;
+  const show = (id, on) => (document.getElementById(id).hidden = !on);
+  show('image-duplicate', own);
+  show('image-use-portrait', onEntry);
+  show('image-to-library', onEntry ? own : dirOf(path) !== LIBRARY_DIR);
+  show('image-to-entry', onEntry && img.linked);
+  show('image-unlink', onEntry && img.linked);
+  show('image-move', !onEntry && img.targets?.length);
+  show('image-remove', own || !onEntry);
+  document.getElementById('image-move-target').innerHTML = (img.targets ?? []).map((t) => `<option value="${esc(t.dir)}">${esc(t.title)}</option>`).join('');
+  const note = onEntry ? (img.linked ? `This image is in ${folderName(dirOf(path))}. This entry shows it from there.` : '') : img.note;
+  document.getElementById('image-used').textContent = note ?? '';
+  show('image-used', Boolean(note));
+  document.getElementById('image-error').textContent = '';
   const preview = document.getElementById('image-preview');
   preview.src = store.mediaUrl(path);
   preview.alt = img.alt;
@@ -1324,7 +1476,7 @@ async function openCrop(path) {
   crop.min = S / Math.min(img.naturalWidth, img.naturalHeight);
   // Reopening the same image starts from the saved crop.
   const saved = state.frontmatter.portrait;
-  if (saved?.image === path.split('/').pop() && saved.size) {
+  if (saved?.image && refToPath(saved.image, entryFolder()) === path && saved.size) {
     crop.k = S / saved.size;
     crop.x = -saved.x * crop.k;
     crop.y = -saved.y * crop.k;
@@ -1372,7 +1524,7 @@ async function saveCrop() {
   const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.9));
   try {
     await store.upload(entryFolder(), PORTRAIT_FILE, blob, { replace: true });
-    await writeEntry({ set: { portrait: { image: crop.path.split('/').pop(), ...area } } });
+    await writeEntry({ set: { portrait: { image: pathToRef(crop.path, entryFolder()), ...area } } });
   } catch (err) {
     return setStatus(`Couldn’t save the portrait. ${err.message}`);
   }
@@ -1478,10 +1630,16 @@ function renderNav() {
         <div class="nav-folder-body" id="nav-folder-${s.id}"${open ? '' : ' inert'}><ul class="nav-sublist">${names}</ul></div>
       </li>`;
   };
+  // Notes and media opens the media library, the part of that area built so far.
+  const areaItem = (a) =>
+    a.id === MEDIA_AREA
+      ? `<li><a href="#/${MEDIA_PAGE}"${state.page === 'media' ? ' aria-current="page"' : ''}><span class="nav-title">${esc(a.title)}</span>
+        <span class="nav-state">Media library</span></a></li>`
+      : item(a);
   const sections = visibleSections();
   document.getElementById('nav-lists').innerHTML = `
     <ol class="nav-list">${sections.map(item).join('')}</ol>
-    <ul class="nav-list nav-areas">${(state.sectionSet.areas ?? []).map(item).join('')}</ul>`;
+    <ul class="nav-list nav-areas">${(state.sectionSet.areas ?? []).map(areaItem).join('')}</ul>`;
   // The folder opens and closes in place, so its height can animate; redrawing the sidebar would make it snap.
   document.querySelectorAll('[data-folder]').forEach((b) =>
     b.addEventListener('click', () => {
@@ -2107,6 +2265,7 @@ function listen() {
     if (change.path === SETTINGS_FILE) return prefs.reload(change.version);
     if (change.path.startsWith('characters/')) refreshCharactersSoon();
     if (state.page === 'entry' && state.view === 'images' && change.path.startsWith(`${entryFolder()}/`)) refreshImagesSoon();
+    if (state.page === 'media' && (isImage(change.path) || change.path.endsWith('.meta.md'))) refreshImagesSoon();
     if (state.page !== 'entry' || change.path !== entryPath() || change.version === state.baseVersion) return;
     if (state.saving) state.remotePending = true;
     else checkRemote();

@@ -10,7 +10,7 @@ export class EntryFormatError extends Error {
   }
 }
 
-const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;
+export const FRONTMATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;
 
 // Splits a file into frontmatter and body. Throws EntryFormatError if the YAML is broken.
 export function parseEntry(raw) {

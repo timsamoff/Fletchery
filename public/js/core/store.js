@@ -45,6 +45,11 @@ export class LocalServerStore {
     await this.#call('POST', '/api/move-folder', { from, to });
   }
 
+  // Moves an image, which has no version to check. Refused if anything already has the new name.
+  async moveMedia(from, to) {
+    await this.#call('POST', '/api/move-media', { from, to });
+  }
+
   // Saves an image (a Blob) into a folder and returns its path. A clash gets a number unless replace is set.
   async upload(dir, name, blob, { replace = false } = {}) {
     const query = new URLSearchParams({ dir, name, ...(replace ? { replace: '1' } : {}) });

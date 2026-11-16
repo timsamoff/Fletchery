@@ -17,7 +17,7 @@
     "yaml": "^2.9.1"
   },
   "scripts": {
-    "test": "node --test test/core.test.js test/server.test.js",
+    "test": "node --test test/core.test.js test/links.test.js test/server.test.js",
     "prepare": "node sentinel-gate/check.js --install",
     "sentinel:install": "node sentinel-gate/check.js --install",
     "sentinel:full": "node sentinel-gate/check.js --full",

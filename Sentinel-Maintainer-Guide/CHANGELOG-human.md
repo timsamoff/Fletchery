@@ -2,6 +2,10 @@
 
 Newest first. One entry per development session: three to six lines on what changed in the project, why, and which guide files were updated. A session that only edits the guide gets one line.
 
+## 2026-11-15: the media library (Characters step 3)
+
+Added the media library: a page at `#/media` showing every image in the bible, a `media/` folder for images that belong to no entry, a picker that puts any image on a character, and moves between the library and entry folders that rewrite every reference and link. Renaming a character now rewrites links into its folder. New modules `core/links.js` and `media-library.js`, a `POST /api/move-media` route, and `test/links.test.js`. Guide files updated: 04, 05, 08.
+
 ## 2026-11-15: code review and fixes
 
 A full code review (`Sentinel-Notes/code-review-2026-11-15.md`) found three ways the writer's text could be damaged or hidden, and most findings were fixed the same day. The server now decodes a request as one stream. The layer parser splits a body only at the three layer headings and never replaces a repeated part. Leaving a page waits for the save and stays put if it fails, the last keystrokes are sent on `pagehide`, and a rename can't leave a folder that doesn't match its file. `state.page` gained `'loading'` and `'problem'`. Tests were added in `test/` (`npm test`). Guide files updated: 04, 05, 08, 11.

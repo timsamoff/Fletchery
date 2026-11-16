@@ -15,7 +15,8 @@ Severity: High (likely to cause a bug or block planned work), Medium (a trap for
 | Watcher reads every changed file as UTF-8 text | Low | Image uploads up to 25 MB are read and hashed in full on each event. Fine for the local edition. |
 | Upload buffers the whole body in memory | Low | Capped at `MAX_IMAGE_BYTES` (25,000,000). |
 | `moveFolder` does not call `watcher.expect` | Low | A folder rename produces change events for moved files. The page tolerates them, but the cards refresh. [UNVERIFIED: the visible effect was not tested.] |
-| Renaming a character does not rewrite links in other entries | Medium | No entry links yet, so nothing breaks today. The media library step is planned to add link rewriting (comment above `renameCharacter`). |
+| A move rewrites other files one at a time | Low | `rewriteAll` reads and writes each `.md` file in turn, with no rollback. A file it can't update is named in the status line and left as it was. |
+| The media library reads the whole bible each time it opens | Low | `createMediaLibrary().load` lists every folder and reads every entry and sidecar. Fine for hundreds of files; a larger bible would want an index. |
 | Windows file locks | Low | `retryOnWindowsLock` retries 5 times. A lock held longer fails the operation. |
 
 ## Debt and open items
