@@ -1,32 +1,35 @@
 # Handoff
 
-Updated 2026-11-16. Nothing is in progress. The media library (Characters step 3) is tested by Tim and committed as `c0d3e12`. It is pushed.
+Updated 2026-11-16. A new look is applied in the working tree for Tim to see. It is not committed, and the docs don't describe it yet.
 
 ## 1. Current task and status
 
-None. Tim confirmed the media library works after restarting Fletchery. His first try failed only because the running server predated the new route, and the message was hidden behind the image dialog; problems now show inside the dialog.
+Tim chose a rose-gray palette of his own (paper `#F0EAED`, surface `#FAF7F9`, panel `#E5D9DF`, ink `#29262C`, ink-mid `#57505C`, accent raspberry `#A04459`, accent-2 plum `#79516C`, mark gold `#C5A13B`) and asked for all six flourishes, to subtract from later. He declined a per-story binding color and will make a new icon himself, which he wants bigger. All of that is built and checked with Playwright. Tim hasn't seen it in the app yet.
 
-## 2. Files touched
+## 2. Files touched (uncommitted)
 
-None uncommitted.
+- `public/css/tokens.css`: the palette tokens renamed and recolored, new roles `--color-accent-2`, `--color-mark`, `--color-press`, and `--endpaper`.
+- `public/css/base.css`: filled buttons use the accent with a light label and quiet buttons an ink border; gilt double rules under the header and section heads; a ribbon bookmark on the current sidebar item; numeral column in the sidebar; character cards with a spine and a hover tilt; an ornament after each page and before each empty note; endpaper and a card for the setup screen; the header icon at 64px.
+- `public/js/app.js`: `setup-view` on the body and a `.setup-card` wrapper in `showSetup`; `roman` and the numerals in `renderNav`.
+- `public/index.html`: icon width and height 64.
+- `scratch/palette-preview.html`, `scratch/look-patch.cjs` (gitignored).
 
 ## 3. Next step
 
-The overall app design discussion he asked for: ask what he has in mind (the look and interaction, the code's structure, or both) before proposing anything. After that, Characters step 4 (relationships) is the next build step in `characters-design-brief.md`.
+Tim looks at it on his story (a page reload is enough; no server change) and says what to subtract. Then, in the same commit as the look: rewrite the color rules in `CLAUDE.md` ("Design rules": no longer icon colors on cream, and the accent can now carry small text) and in `docs/SPEC.md` ("Colors"), update the maintainer guide where it names tokens or colors, and add the changelog entry. Contrast on paper: ink 12.57, ink-mid 6.54, raspberry 5.11 (4.42 on panel, so no small raspberry text on the panel), plum 5.52, gold 2.07 (lines and marks only). Light label on raspberry 5.69.
 
 ## 4. Open questions for Tim
 
+- Which flourishes stay.
 - Sentinel 1.8.0: update now, not now, or skip.
 - Delete a character: a real delete or a trash folder?
-- Whether any research idea moves from "discuss later" to planned.
 
 ## 5. Tried and failed
 
 - Backslashes and quotes in a Bash heredoc get mangled. Write patch scripts with the Write tool into `scratch/`, then run them.
-- Several source files have CRLF line endings, so multi-line string matches from a script fail. Use the Edit tool, or normalize line endings in the script (see `scratch/docs-patch2.cjs`).
-- Changing `bin/fletchery.js` or `sections/*.json` trips the README gate.
-- A Playwright `goto` to a new hash on a loaded page is only a hash change. Reload after it, and check which entry is open before typing.
-- An `<input type="search">` gets no field styling; use `type="text"`.
-- After any server change, tell Tim to restart Fletchery as the first test step, and check the running server has the new route before debugging anything else (`POST` an empty body to the route: 404 "Not found." means an old server).
-- A status-line message is invisible while a modal dialog is open. Show problems inside the dialog.
+- Several source files have CRLF line endings. Use the Edit tool, or normalize line endings in the script (see `scratch/look-patch.cjs`).
+- The gate's raw-token rule flags `4px`, `8px`, `28px`, `64px` and other token values in `base.css`. Use the token.
+- The wide-screen sidebar padding rule is `.section-nav .nav-list a`, so sidebar overrides need that much specificity.
+- Playwright can't open `file:` pages. Serve the folder with `python -m http.server` and wait a moment before loading.
+- After any server change, tell Tim to restart Fletchery first. A status-line message is invisible behind a modal dialog.
 - Tim tests on his real EOL bible on port 3000. Never send it a request that changes anything.
