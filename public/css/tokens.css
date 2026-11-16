@@ -107,7 +107,7 @@
   --color-rule: rgb(41 38 44 / 0.2);
   --shadow-paper: 0 1px 0 rgb(30 27 32 / 0.08), 0 16px 32px -22px rgb(30 27 32 / 0.4);
   --shadow-sheet: 0 2px 0 rgb(30 27 32 / 0.2), 0 40px 80px -30px rgb(18 18 18 / 0.6);
-  --shadow-toast: 0 2px 0 rgb(30 27 32 / 0.2), 0 12px 24px -6px rgb(18 18 18 / 0.5); /* the sheet's shadow, tightened for a small card */
+  --shadow-toast: 0 2px 0 rgb(30 27 32 / 0.2), 0 8px 48px 0 rgb(18 18 18 / 0.6); /* a wide soft halo; the sheet's offset shadow vanishes on a small card */
   --color-backdrop: rgb(30 27 32 / 0.62);
   --color-backdrop-soft: rgb(30 27 32 / 0.25);
   /* Endpaper: a quiet lattice for the setup screen, like the patterned paper inside a book's cover. */
