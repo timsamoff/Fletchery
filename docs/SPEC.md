@@ -58,7 +58,7 @@ Fletchery writes no ignore files. Everything in `story-bible/`, including `.flet
 - **Bridge.** The request queue is built first. A "Run now" option using `claude -p` (restricted tools, budget cap, off by default) may come after the bridge phase, but only with approval.
 - **Section lists.** Screenplay and Game narrative use the lists in the approved plan, stored as `sections/<type>.json` and open to later edits.
 - **Colors (changed 2026-11-16).** Tim chose the palette; the old rule of icon colors on cream is gone. Contrast numbers are in `CLAUDE.md`.
-  - Pale gold `#F3ECD8` is the page, gold-white `#FBF8EC` the writing surface and cards, darker gold `#E7DAB6` panels on the page, and gray-plum `#DBD5D8` the sidebar, with a lighter `#EFEBED` for its current item.
+  - Pale gold `#F3ECD8` is the page, gold-white `#FBF8EC` the writing surface and cards, gray-plum `#DBD5D8` the sidebar and the panels on the page (open tabs included), a darker plum `#CDC1C8` inactive tabs and generic profile pictures, with a lighter `#EFEBED` for its current item.
   - Ink `#29262C` is text and borders; ink-mid `#57505C` is secondary text.
   - Raspberry `#A04459`: header and footer, buttons, link underlines, card spines, focus rings. It passes for small text on the page and the surface, not on the darker panels.
   - Gold `#C5A13B` is rules and ornaments, never text. Dusty plum `#79516C` is a spare second color. Nothing is pure black; the darkest value is `#121212`.

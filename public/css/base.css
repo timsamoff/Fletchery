@@ -2125,12 +2125,15 @@ textarea::placeholder {
   inset: auto auto var(--space-5) 50%;
   max-width: min(var(--measure), 100vw - 2 * var(--space-3));
   margin: 0;
-  padding: var(--space-2) var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-4);
   border: 0;
   border-radius: var(--radius);
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  box-shadow: var(--shadow-sheet);
+  background: var(--color-tab-back);
+  color: var(--color-text);
+  box-shadow: var(--shadow-toast);
   font-weight: 600;
   cursor: pointer;
   opacity: 0;
@@ -2142,4 +2145,27 @@ textarea::placeholder {
 .toast.is-shown {
   opacity: 1;
   transform: translate(-50%, 0);
+}
+.toast-text {
+  flex: 1;
+}
+.toast-close {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--line);
+  height: var(--line);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text-quiet);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) ease,
+    color var(--duration-fast) ease;
+}
+.toast-close:hover {
+  background: var(--color-sidebar);
+  color: var(--color-text);
 }

@@ -63,7 +63,7 @@ function hideToast() {
 function showToast(text) {
   if (!text) return;
   clearTimeout(toastTimer);
-  toast.textContent = text;
+  document.getElementById('toast-text').textContent = text;
   if (toast.matches(':popover-open')) toast.hidePopover(); // showing it again puts it above a dialog opened since
   toast.showPopover();
   requestAnimationFrame(() => toast.classList.add('is-shown'));
